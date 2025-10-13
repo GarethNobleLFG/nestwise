@@ -13,3 +13,15 @@ services:
       - ./frontend:/app
       - /app/node_modules
     env_file: ./.env
+  
+  nestwise-backend:
+    build: ./backend
+    container_name: nestwise-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    volumes:
+      - ./backend:/app
+    command: uvicorn app:app --host 0.0.0.0 --port 8000 --reload

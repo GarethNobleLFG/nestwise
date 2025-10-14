@@ -219,15 +219,15 @@ export default function PlannerBot() {
                 flexGrow: 1,
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: messages.length === 0 ? 'center' : 'flex-start',
-                alignItems: 'center',
+                alignItems: 'stretch',
                 position: 'relative',
                 p: 2,
-                overflowY: 'auto',
                 width: '75%',
+                overflow: 'hidden',
               }}
             >
-              <Box sx={{ width: '100%', mb: 8, px: 2 }}>
+              {/* Messages container - scrollable */}
+              <Box sx={{ flex: 1, overflowY: 'auto', px: 2 }}>
                 {/* Initial bot message or typing */}
                 {(messages.length === 0 || messages.some(msg => msg.initial)) && (
                   <Box
@@ -242,6 +242,7 @@ export default function PlannerBot() {
                       boxShadow: '0px 4px 16px rgba(0,0,0,0.1)',
                       fontWeight: 'bold',
                       mx: 'auto',
+                      mt: 1,
                     }}
                   >
                     <Typography variant="body1">{typingText || messages[0]?.content}</Typography>
@@ -292,53 +293,56 @@ export default function PlannerBot() {
                     )}
                   </Box>
                 ))}
+                {/* Add some bottom padding so last message isn't hidden behind the input */}
+                <Box sx={{ height: '86px' }} />
               </Box>
 
-              {/* Input bubble */}
+              {/* Input bubble - sits below the scrollable messages */}
               <Box
                 sx={{
-                  position: 'absolute',
-                  bottom: 16,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
+                  position: 'sticky',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
                   display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  width: '90%',
-                  maxWidth: 800,
+                  justifyContent: 'center',
+                  py: 1.5,
+                  background: 'transparent',
                 }}
               >
-                <Button
-                  variant="outlined"
-                  component="label"
-                  sx={{ minWidth: '80px', height: '50px', borderRadius: 3, fontWeight: 'bold' }}
-                >
-                  Upload
-                  <input type="file" hidden multiple onChange={handleFileUpload} />
-                </Button>
+                <Box sx={{ width: '90%', maxWidth: 800, display: 'flex', gap: 1 }}>
+                  <Button
+                    variant="outlined"
+                    component="label"
+                    sx={{ minWidth: '80px', height: '50px', borderRadius: 3, fontWeight: 'bold' }}
+                  >
+                    Upload
+                    <input type="file" hidden multiple onChange={handleFileUpload} />
+                  </Button>
 
-                <Box
-                  sx={{
-                    bgcolor: 'white',
-                    borderRadius: 3,
-                    boxShadow: '0px 4px 16px rgba(0,0,0,0.15)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    px: 2,
-                    py: 1,
-                    flexGrow: 1,
-                  }}
-                >
-                  <TextField
-                    fullWidth
-                    placeholder="Type a message..."
-                    variant="standard"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyPress={(e) => { if (e.key === 'Enter') handleSend(); }}
-                    InputProps={{ disableUnderline: true }}
-                  />
-                  <IconButton color="primary" onClick={handleSend}><SendIcon /></IconButton>
+                  <Box
+                    sx={{
+                      bgcolor: 'white',
+                      borderRadius: 3,
+                      boxShadow: '0px 4px 16px rgba(0,0,0,0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      px: 2,
+                      py: 1,
+                      flexGrow: 1,
+                    }}
+                  >
+                    <TextField
+                      fullWidth
+                      placeholder="Type a message..."
+                      variant="standard"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyPress={(e) => { if (e.key === 'Enter') handleSend(); }}
+                      InputProps={{ disableUnderline: true }}
+                    />
+                    <IconButton color="primary" onClick={handleSend}><SendIcon /></IconButton>
+                  </Box>
                 </Box>
               </Box>
             </Box>

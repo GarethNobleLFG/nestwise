@@ -49,7 +49,7 @@ if use_langgraph:
         vector_store = InMemoryVectorStore(embeddings)
 
         # ---- Load PDFs from Google Drive folder ----
-        pdf_folder = "/retirement_pdfs"
+        pdf_folder = "./retirement_pdfs"
         pdf_files = glob.glob(f"{pdf_folder}/*.pdf")
 
         loaded_docs = []
@@ -57,6 +57,7 @@ if use_langgraph:
             try:
                 loader = PyPDFLoader(file_path)
                 pages = loader.load()   # returns one Document per page
+                print(f"Loaded {file_path} -> {len(pages)} pages")
                 loaded_docs.extend(pages)
                 print(f"Loaded {file_path} -> {len(pages)} pages")
             except Exception as e:

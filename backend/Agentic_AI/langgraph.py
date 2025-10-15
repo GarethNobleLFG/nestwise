@@ -1,15 +1,19 @@
 # ---- Imports ----
 import os, getpass, time, traceback, glob
 from typing import Dict
-import gradio as gr
+
+
 import openai
-from IPython.display import Image,display
 
-# Prompt for API key
-if not os.environ.get("OPENAI_API_KEY"):
-    os.environ["OPENAI_API_KEY"] = getpass.getpass("Enter your OpenAI API key: ").strip()
 
-openai.api_key = os.environ["OPENAI_API_KEY"]
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+if not OPENAI_API_KEY:
+    raise RuntimeError(
+        "OPENAI_API_KEY not found in environment. Set it in Docker (env_file / env) "
+        "or pass as a secret. Example: `OPENAI_API_KEY=sk-... docker compose up`"
+    )
+
+openai.api_key = OPENAI_API_KEY
 
 # ---- LangChain / LangGraph setup ----
 use_langgraph = True
@@ -141,7 +145,7 @@ if use_langgraph:
         graph = graph_builder.compile(checkpointer=memory)
 
         agent_executor = create_react_agent(llm, [retrieve], checkpointer=memory)
-        display(Image(graph.get_graph().draw_mermaid_png()))
+       
         print("LangGraph + RAG pipeline built successfully.")
     except Exception as e:
         print("Error building LangGraph RAG pipeline:", e)

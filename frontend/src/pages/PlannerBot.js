@@ -22,11 +22,17 @@ import AppBar from '../app-bar/AppBar';
 export default function PlannerBot() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [sending, setSending] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [chatToDelete, setChatToDelete] = useState(null);
   const [typingText, setTypingText] = useState(''); // for animated typing
 
   const initialMessage = 'Hello! I am your Planner Bot. How can I help you today?';
+
+
+
+
+
 
   // Animate the initial bot message
   useEffect(() => {
@@ -43,39 +49,174 @@ export default function PlannerBot() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+
+
+
+
+
+
+  const simulateTypingEffect = async (text, placeholderIndex, setMessages) => {
+    let i = 0;
+
+    return new Promise((resolve) => {
+      const interval = setInterval(() => {
+        i++;
+
+        const partialText = text.slice(0, i);
+
+        // Update the placeholder message with the current typing progress
+        setMessages((prev) => {
+          const updated = [...prev];
+
+          updated[placeholderIndex] = {
+            ...updated[placeholderIndex],
+            content: partialText,
+            isTyping: true,
+          };
+
+          return updated;
+        });
+
+        if (i >= text.length) {
+          clearInterval(interval);
+          resolve(); // Resolve the promise when typing is complete
+        }
+      }, 50);
+    });
+  };
+
+
+  const handleSend = async () => {
+    if (!input.trim() || sending) return;
+
+    console.log("HELLO ARE YOU THERE?")
+
+    const userInput = input.trim();
+
+    setInput('');
+    setSending(true);
 
     // Add user message
     setMessages((prev) =>
-      prev.map((msg) => ({ ...msg, initial: false })).concat({ role: 'user', content: input })
+      prev
+        .map((msg) => ({ ...msg, initial: false }))
+        .concat({ role: 'user', content: userInput })
     );
 
-    const userInput = input;
-    setInput('');
+    // Add bot placeholder (will be replaced when response arrives)
+    const botPlaceholder = { role: 'bot', content: '...', isTyping: true };
+    setMessages((prev) => [...prev, botPlaceholder]);
 
-    // Add bot placeholder
-    const botMessage = { role: 'bot', content: '', isTyping: true };
-    setMessages((prev) => [...prev, botMessage]);
+    // Send GET request to backend root '/' and use its 'message' field as the reply
+    try {
+      const res = await fetch(`http://localhost:8000/`, { method: 'GET' });
 
-    // Animate bot response
-    let i = 0;
-    const fullText = `You said: "${userInput}"`;
-    const interval = setInterval(() => {
-      i++;
-      setMessages((prev) => {
+      if (!res.ok) {
+        throw new Error(`Server returned ${res.status}`);
+      }
+
+      const data = await res.json();
+
+      console.log(data.message);
+
+      const botText = data?.message ?? data?.response ?? 'No response from server.';
+
+      console.log('PlannerBot: backend response', data);
+
+      // Simulate typing effect before displaying the response
+      const placeholderIndex = messages.length; // Index of the placeholder message
+
+      await simulateTypingEffect(botText, placeholderIndex, setMessages);
+
+      // Replace last message (the placeholder) with the actual response
+      setMessages(async (prev) => {
         const updated = [...prev];
-        updated[updated.length - 1] = { ...updated[updated.length - 1], content: fullText.slice(0, i) };
+
+        // Call simulateTypingEffect to progressively update the content
+        await simulateTypingEffect(botText, placeholderIndex, setMessages);
+
+        // Once typing is complete, finalize the message
+        updated[placeholderIndex] = {
+          ...updated[placeholderIndex],
+          content: botText,
+          isTyping: false,
+        };
+
         return updated;
       });
-      if (i >= fullText.length) clearInterval(interval);
-    }, 50);
+
+    } catch (err) {
+      const errMsg = `Error: ${err.message}`;
+
+      const placeholderIndex = messages.length; // Index of the placeholder message
+
+      await simulateTypingEffect(errMsg, placeholderIndex, setMessages);
+
+      setMessages((prev) => {
+        const updated = [...prev];
+
+        updated[placeholderIndex] = {
+          ...updated[placeholderIndex],
+          content: errMsg,
+          isTyping: false,
+        };
+
+        return updated;
+      });
+
+    } finally {
+      setSending(false);
+    }
   };
+
+
+
+
+
 
   const handleFileUpload = (event) => {
     const files = event.target.files;
     if (files.length > 0) console.log('Uploaded files:', files);
   };
+
+
+
+
+
+
+  const handleDeleteClick = (idx) => {
+    setChatToDelete(idx);
+    setOpenDeleteDialog(true);
+  };
+
+
+
+
+
+
+
+  const handleConfirmDelete = () => {
+    if (chatToDelete !== null) {
+      setMessages((prev) => prev.filter((_, i) => i !== chatToDelete));
+      setChatToDelete(null);
+      setOpenDeleteDialog(false);
+    }
+  };
+
+
+
+
+
+
+
+
+  const handleCancelDelete = () => {
+    setChatToDelete(null);
+    setOpenDeleteDialog(false);
+  };
+
+
+
 
   const handleNewChat = () => {
     setMessages([]);
@@ -93,23 +234,12 @@ export default function PlannerBot() {
     }, 50);
   };
 
-  const handleDeleteClick = (idx) => {
-    setChatToDelete(idx);
-    setOpenDeleteDialog(true);
-  };
 
-  const handleConfirmDelete = () => {
-    if (chatToDelete !== null) {
-      setMessages((prev) => prev.filter((_, i) => i !== chatToDelete));
-      setChatToDelete(null);
-      setOpenDeleteDialog(false);
-    }
-  };
 
-  const handleCancelDelete = () => {
-    setChatToDelete(null);
-    setOpenDeleteDialog(false);
-  };
+
+
+
+
 
   return (
     <AppTheme>
@@ -338,10 +468,12 @@ export default function PlannerBot() {
                       variant="standard"
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
-                      onKeyPress={(e) => { if (e.key === 'Enter') handleSend(); }}
+                      onKeyClick={(e) => { if (e.key === 'Enter') { handleSend(); } }}
                       InputProps={{ disableUnderline: true }}
                     />
-                    <IconButton color="primary" onClick={handleSend}><SendIcon /></IconButton>
+                    <IconButton color="primary" onClick={handleSend()} disabled={sending || !input.trim()}>
+                      <SendIcon />
+                    </IconButton>
                   </Box>
                 </Box>
               </Box>

@@ -21,7 +21,7 @@ function AppTheme(props) {
             colorSchemeSelector: 'data-mui-color-scheme',
             cssVarPrefix: 'template',
           },
-          colorSchemes, // v6 feature for light & dark modes
+          ...colorSchemes.light, // Force light mode by using only the light color scheme
           typography,
           shadows,
           shape,

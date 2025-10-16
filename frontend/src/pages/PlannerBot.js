@@ -115,6 +115,7 @@ export default function PlannerBot() {
         throw new Error(`Server returned ${res.status}`);
       }
 
+
       const data = await res.json();
 
       console.log(data.message);
@@ -145,26 +146,12 @@ export default function PlannerBot() {
         return updated;
       });
 
-    } catch (err) {
+    }
+    catch (err) {
       const errMsg = `Error: ${err.message}`;
-
-      const placeholderIndex = messages.length; // Index of the placeholder message
-
-      await simulateTypingEffect(errMsg, placeholderIndex, setMessages);
-
-      setMessages((prev) => {
-        const updated = [...prev];
-
-        updated[placeholderIndex] = {
-          ...updated[placeholderIndex],
-          content: errMsg,
-          isTyping: false,
-        };
-
-        return updated;
-      });
-
-    } finally {
+      alert(errMsg); // Display the error message in an alert box
+    }
+    finally {
       setSending(false);
     }
   };
@@ -468,10 +455,18 @@ export default function PlannerBot() {
                       variant="standard"
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
-                      onKeyClick={(e) => { if (e.key === 'Enter') { handleSend(); } }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleSend();
+                        }
+                      }}
                       InputProps={{ disableUnderline: true }}
                     />
-                    <IconButton color="primary" onClick={handleSend()} disabled={sending || !input.trim()}>
+                    <IconButton
+                      color="primary"
+                      onClick={handleSend}
+                      disabled={sending || !input.trim()}
+                    >
                       <SendIcon />
                     </IconButton>
                   </Box>

@@ -63,33 +63,90 @@ export default function PlannerBot() {
 
 
 
-  const simulateTypingEffect = async (text, placeholderIndex, setMessages) => {
-    let i = 0;
 
-    return new Promise((resolve) => {
-      const interval = setInterval(() => {
-        i++;
-        const partialText = text.slice(0, i);
 
-        setMessages((prev) => {
-          const safePrev = Array.isArray(prev) ? prev : [];
-          const updated = [...safePrev];
-          updated[placeholderIndex] = {
-            ...updated[placeholderIndex],
-            content: partialText,
-            isTyping: true,
-          };
-          return updated;
-        });
 
-        if (i >= text.length) {
-          clearInterval(interval);
-          resolve();
-        }
-      }, 50);
+
+  const addUserMessage = async (content) => {
+    setMessages((prev) => {
+      const safePrev = Array.isArray(prev) ? prev : [];
+      return [...safePrev, { role: 'user', content: content }];
     });
   };
 
+
+
+
+
+
+
+
+
+
+
+  const addBotMessage = async (content) => {
+    const simulateTypingEffect = (text) => {
+      let i = 0;
+
+      return new Promise((resolve) => {
+        const interval = setInterval(() => {
+          i++;
+          const partialText = text.slice(0, i);
+
+          setMessages((prev) => {
+            const safePrev = Array.isArray(prev) ? prev : [];
+            const updated = [...safePrev];
+            const lastIndex = updated.length - 1;
+
+            // Update the last bot message with the partial text
+            if (lastIndex >= 0 && updated[lastIndex].role === 'bot' && updated[lastIndex].isTyping) {
+              updated[lastIndex] = {
+                ...updated[lastIndex],
+                content: partialText,
+              };
+            } else {
+              // Add a new bot message if none exists
+              updated.push({ role: 'bot', content: partialText, isTyping: true });
+            }
+
+            return updated;
+          });
+
+          if (i >= text.length) {
+            clearInterval(interval);
+            resolve(text); // Resolve when typing is complete
+          }
+        }, 50);
+      });
+    };
+
+
+    // Simulate typing effect and finalize the bot message
+    await simulateTypingEffect(content);
+
+    // Finalize the bot message
+    setMessages((prev) => {
+      const safePrev = Array.isArray(prev) ? prev : [];
+      const updated = [...safePrev];
+      const lastIndex = updated.length - 1;
+
+      if (lastIndex >= 0 && updated[lastIndex].role === 'bot') {
+        updated[lastIndex] = {
+          ...updated[lastIndex],
+          content,
+          isTyping: false,
+        };
+      }
+
+      return updated;
+    });
+  };
+
+
+
+
+
+  
 
 
 
@@ -102,28 +159,10 @@ export default function PlannerBot() {
     setSending(true);
 
 
-
-    // Add user message
-    setMessages((prev) => {
-      const safePrev = Array.isArray(prev) ? prev : [];
-      return safePrev
-        .map((msg) => ({ ...msg, initial: false }))
-        .concat({ role: 'user', content: userInput });
-    });
+    addUserMessage(userInput);
 
 
 
-
-    // Add bot placeholder
-    const botPlaceholder = { role: 'bot', content: '...', isTyping: true };
-    setMessages((prev) => {
-      const safePrev = Array.isArray(prev) ? prev : [];
-      return [...safePrev, botPlaceholder];
-    });
-
-
-
-    
     try {
       const res = await fetch(`http://localhost:8000/`, { method: 'GET' });
       if (!res.ok) throw new Error(`Server returned ${res.status}`);
@@ -131,21 +170,8 @@ export default function PlannerBot() {
       const data = await res.json();
       const botText = data?.message ?? 'No response from server.';
 
-      // Simulate typing effect
-      const placeholderIndex = messages.length;
-      await simulateTypingEffect(botText, placeholderIndex, setMessages);
+      await addBotMessage(botText, true);
 
-      // Replace placeholder with actual response
-      setMessages((prev) => {
-        const safePrev = Array.isArray(prev) ? prev : [];
-        const updated = [...safePrev];
-        updated[placeholderIndex] = {
-          ...updated[placeholderIndex],
-          content: botText,
-          isTyping: false,
-        };
-        return updated;
-      });
     } catch (err) {
       alert(`Error: ${err.message}`);
     } finally {
@@ -156,6 +182,9 @@ export default function PlannerBot() {
 
 
 
+
+
+  
 
 
   const handleFileUpload = (event) => {

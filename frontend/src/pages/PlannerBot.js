@@ -33,6 +33,14 @@ export default function PlannerBot() {
 
 
 
+  // Ensure messages is always an array
+  const safeMessages = Array.isArray(messages) ? messages : []; // If coming from props
+  // OR
+  // const [messages, setMessages] = useState([]); // If using state
+
+
+
+
 
   // Animate the initial bot message
   useEffect(() => {
@@ -61,97 +69,86 @@ export default function PlannerBot() {
     return new Promise((resolve) => {
       const interval = setInterval(() => {
         i++;
-
         const partialText = text.slice(0, i);
 
-        // Update the placeholder message with the current typing progress
         setMessages((prev) => {
-          const updated = [...prev];
-
+          const safePrev = Array.isArray(prev) ? prev : [];
+          const updated = [...safePrev];
           updated[placeholderIndex] = {
             ...updated[placeholderIndex],
             content: partialText,
             isTyping: true,
           };
-
           return updated;
         });
 
         if (i >= text.length) {
           clearInterval(interval);
-          resolve(); // Resolve the promise when typing is complete
+          resolve();
         }
       }, 50);
     });
   };
 
 
+
+
+
   const handleSend = async () => {
     if (!input.trim() || sending) return;
 
-    console.log("HELLO ARE YOU THERE?")
-
     const userInput = input.trim();
-
     setInput('');
     setSending(true);
 
+
+
     // Add user message
-    setMessages((prev) =>
-      prev
+    setMessages((prev) => {
+      const safePrev = Array.isArray(prev) ? prev : [];
+      return safePrev
         .map((msg) => ({ ...msg, initial: false }))
-        .concat({ role: 'user', content: userInput })
-    );
+        .concat({ role: 'user', content: userInput });
+    });
 
-    // Add bot placeholder (will be replaced when response arrives)
+
+
+
+    // Add bot placeholder
     const botPlaceholder = { role: 'bot', content: '...', isTyping: true };
-    setMessages((prev) => [...prev, botPlaceholder]);
+    setMessages((prev) => {
+      const safePrev = Array.isArray(prev) ? prev : [];
+      return [...safePrev, botPlaceholder];
+    });
 
-    // Send GET request to backend root '/' and use its 'message' field as the reply
+
+
+    
     try {
       const res = await fetch(`http://localhost:8000/`, { method: 'GET' });
-
-      if (!res.ok) {
-        throw new Error(`Server returned ${res.status}`);
-      }
-
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
 
       const data = await res.json();
+      const botText = data?.message ?? 'No response from server.';
 
-      console.log(data.message);
-
-      const botText = data?.message ?? data?.response ?? 'No response from server.';
-
-      console.log('PlannerBot: backend response', data);
-
-      // Simulate typing effect before displaying the response
-      const placeholderIndex = messages.length; // Index of the placeholder message
-
+      // Simulate typing effect
+      const placeholderIndex = messages.length;
       await simulateTypingEffect(botText, placeholderIndex, setMessages);
 
-      // Replace last message (the placeholder) with the actual response
-      setMessages(async (prev) => {
-        const updated = [...prev];
-
-        // Call simulateTypingEffect to progressively update the content
-        await simulateTypingEffect(botText, placeholderIndex, setMessages);
-
-        // Once typing is complete, finalize the message
+      // Replace placeholder with actual response
+      setMessages((prev) => {
+        const safePrev = Array.isArray(prev) ? prev : [];
+        const updated = [...safePrev];
         updated[placeholderIndex] = {
           ...updated[placeholderIndex],
           content: botText,
           isTyping: false,
         };
-
         return updated;
       });
-
-    }
-    catch (err) {
-      const errMsg = `Error: ${err.message}`;
-      alert(errMsg); // Display the error message in an alert box
-    }
-    finally {
+    } catch (err) {
+      alert(`Error: ${err.message}`);
+    } finally {
       setSending(false);
     }
   };
@@ -220,10 +217,6 @@ export default function PlannerBot() {
       }
     }, 50);
   };
-
-
-
-
 
 
 
@@ -302,7 +295,7 @@ export default function PlannerBot() {
               <Divider sx={{ borderBottomWidth: 2, mb: 1 }} />
 
               <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
-                {messages.map((msg, idx) => (
+                {safeMessages.map((msg, idx) => (
                   <Box
                     key={idx}
                     sx={{
@@ -346,7 +339,7 @@ export default function PlannerBot() {
               {/* Messages container - scrollable */}
               <Box sx={{ flex: 1, overflowY: 'auto', px: 2 }}>
                 {/* Initial bot message or typing */}
-                {(messages.length === 0 || messages.some(msg => msg.initial)) && (
+                {(safeMessages.length === 0 || safeMessages.some(msg => msg.initial)) && (
                   <Box
                     sx={{
                       bgcolor: 'white',
@@ -362,11 +355,11 @@ export default function PlannerBot() {
                       mt: 1,
                     }}
                   >
-                    <Typography variant="body1">{typingText || messages[0]?.content}</Typography>
+                    <Typography variant="body1">{typingText || safeMessages[0]?.content}</Typography>
                   </Box>
                 )}
 
-                {messages.map((msg, idx) => (
+                {safeMessages.map((msg, idx) => (
                   <Box
                     key={idx}
                     sx={{

@@ -22,11 +22,25 @@ import AppBar from '../app-bar/AppBar';
 export default function PlannerBot() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [sending, setSending] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [chatToDelete, setChatToDelete] = useState(null);
   const [typingText, setTypingText] = useState(''); // for animated typing
 
   const initialMessage = 'Hello! I am your Planner Bot. How can I help you today?';
+
+
+
+
+
+  // Ensure messages is always an array
+  const safeMessages = Array.isArray(messages) ? messages : []; // If coming from props
+  // OR
+  // const [messages, setMessages] = useState([]); // If using state
+
+
+
+
 
   // Animate the initial bot message
   useEffect(() => {
@@ -43,39 +57,179 @@ export default function PlannerBot() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
 
-    // Add user message
-    setMessages((prev) =>
-      prev.map((msg) => ({ ...msg, initial: false })).concat({ role: 'user', content: input })
-    );
 
-    const userInput = input;
-    setInput('');
 
-    // Add bot placeholder
-    const botMessage = { role: 'bot', content: '', isTyping: true };
-    setMessages((prev) => [...prev, botMessage]);
 
-    // Animate bot response
-    let i = 0;
-    const fullText = `You said: "${userInput}"`;
-    const interval = setInterval(() => {
-      i++;
-      setMessages((prev) => {
-        const updated = [...prev];
-        updated[updated.length - 1] = { ...updated[updated.length - 1], content: fullText.slice(0, i) };
-        return updated;
-      });
-      if (i >= fullText.length) clearInterval(interval);
-    }, 50);
+
+
+
+
+
+
+  const addUserMessage = async (content) => {
+    setMessages((prev) => {
+      const safePrev = Array.isArray(prev) ? prev : [];
+      return [...safePrev, { role: 'user', content: content }];
+    });
   };
+
+
+
+
+
+
+
+
+
+
+
+  const addBotMessage = async (content) => {
+    const simulateTypingEffect = (text) => {
+      let i = 0;
+
+      return new Promise((resolve) => {
+        const interval = setInterval(() => {
+          i++;
+          const partialText = text.slice(0, i);
+
+          setMessages((prev) => {
+            const safePrev = Array.isArray(prev) ? prev : [];
+            const updated = [...safePrev];
+            const lastIndex = updated.length - 1;
+
+            // Update the last bot message with the partial text
+            if (lastIndex >= 0 && updated[lastIndex].role === 'bot' && updated[lastIndex].isTyping) {
+              updated[lastIndex] = {
+                ...updated[lastIndex],
+                content: partialText,
+              };
+            } else {
+              // Add a new bot message if none exists
+              updated.push({ role: 'bot', content: partialText, isTyping: true });
+            }
+
+            return updated;
+          });
+
+          if (i >= text.length) {
+            clearInterval(interval);
+            resolve(text); // Resolve when typing is complete
+          }
+        }, 50);
+      });
+    };
+
+
+    // Simulate typing effect and finalize the bot message
+    await simulateTypingEffect(content);
+
+    // Finalize the bot message
+    setMessages((prev) => {
+      const safePrev = Array.isArray(prev) ? prev : [];
+      const updated = [...safePrev];
+      const lastIndex = updated.length - 1;
+
+      if (lastIndex >= 0 && updated[lastIndex].role === 'bot') {
+        updated[lastIndex] = {
+          ...updated[lastIndex],
+          content,
+          isTyping: false,
+        };
+      }
+
+      return updated;
+    });
+  };
+
+
+
+
+
+  
+
+
+
+
+  const handleSend = async () => {
+    if (!input.trim() || sending) return;
+
+    const userInput = input.trim();
+    setInput('');
+    setSending(true);
+
+
+    addUserMessage(userInput);
+
+
+
+    try {
+      const res = await fetch(`http://localhost:8000/`, { method: 'GET' });
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+
+      const data = await res.json();
+      const botText = data?.message ?? 'No response from server.';
+
+      await addBotMessage(botText, true);
+
+    } catch (err) {
+      alert(`Error: ${err.message}`);
+    } finally {
+      setSending(false);
+    }
+  };
+
+
+
+
+
+
+  
+
 
   const handleFileUpload = (event) => {
     const files = event.target.files;
     if (files.length > 0) console.log('Uploaded files:', files);
   };
+
+
+
+
+
+
+  const handleDeleteClick = (idx) => {
+    setChatToDelete(idx);
+    setOpenDeleteDialog(true);
+  };
+
+
+
+
+
+
+
+  const handleConfirmDelete = () => {
+    if (chatToDelete !== null) {
+      setMessages((prev) => prev.filter((_, i) => i !== chatToDelete));
+      setChatToDelete(null);
+      setOpenDeleteDialog(false);
+    }
+  };
+
+
+
+
+
+
+
+
+  const handleCancelDelete = () => {
+    setChatToDelete(null);
+    setOpenDeleteDialog(false);
+  };
+
+
+
 
   const handleNewChat = () => {
     setMessages([]);
@@ -93,23 +247,8 @@ export default function PlannerBot() {
     }, 50);
   };
 
-  const handleDeleteClick = (idx) => {
-    setChatToDelete(idx);
-    setOpenDeleteDialog(true);
-  };
 
-  const handleConfirmDelete = () => {
-    if (chatToDelete !== null) {
-      setMessages((prev) => prev.filter((_, i) => i !== chatToDelete));
-      setChatToDelete(null);
-      setOpenDeleteDialog(false);
-    }
-  };
 
-  const handleCancelDelete = () => {
-    setChatToDelete(null);
-    setOpenDeleteDialog(false);
-  };
 
   return (
     <AppTheme>
@@ -185,7 +324,7 @@ export default function PlannerBot() {
               <Divider sx={{ borderBottomWidth: 2, mb: 1 }} />
 
               <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
-                {messages.map((msg, idx) => (
+                {safeMessages.map((msg, idx) => (
                   <Box
                     key={idx}
                     sx={{
@@ -229,7 +368,7 @@ export default function PlannerBot() {
               {/* Messages container - scrollable */}
               <Box sx={{ flex: 1, overflowY: 'auto', px: 2 }}>
                 {/* Initial bot message or typing */}
-                {(messages.length === 0 || messages.some(msg => msg.initial)) && (
+                {(safeMessages.length === 0 || safeMessages.some(msg => msg.initial)) && (
                   <Box
                     sx={{
                       bgcolor: 'white',
@@ -245,11 +384,11 @@ export default function PlannerBot() {
                       mt: 1,
                     }}
                   >
-                    <Typography variant="body1">{typingText || messages[0]?.content}</Typography>
+                    <Typography variant="body1">{typingText || safeMessages[0]?.content}</Typography>
                   </Box>
                 )}
 
-                {messages.map((msg, idx) => (
+                {safeMessages.map((msg, idx) => (
                   <Box
                     key={idx}
                     sx={{
@@ -338,10 +477,20 @@ export default function PlannerBot() {
                       variant="standard"
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
-                      onKeyPress={(e) => { if (e.key === 'Enter') handleSend(); }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleSend();
+                        }
+                      }}
                       InputProps={{ disableUnderline: true }}
                     />
-                    <IconButton color="primary" onClick={handleSend}><SendIcon /></IconButton>
+                    <IconButton
+                      color="primary"
+                      onClick={handleSend}
+                      disabled={sending || !input.trim()}
+                    >
+                      <SendIcon />
+                    </IconButton>
                   </Box>
                 </Box>
               </Box>

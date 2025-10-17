@@ -25,12 +25,11 @@ export default function PlannerBot() {
   const [sending, setSending] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [chatToDelete, setChatToDelete] = useState(null);
-  const [typingText, setTypingText] = useState(''); // for animated typing
+  const [typingText, setTypingText] = useState('');
+  const [sessionId, setSessionId] = useState(null);
+  const [history, setHistory] = useState([]);
 
   const initialMessage = 'Hello! I am your Planner Bot. How can I help you today?';
-
-
-
 
 
   // Ensure messages is always an array
@@ -38,11 +37,25 @@ export default function PlannerBot() {
   // OR
   // const [messages, setMessages] = useState([]); // If using state
 
+  // --- Start backend chat session ---
+  const startChatSession = React.useCallback(async () => {
+    try {
+      const res = await fetch('http://localhost:8000/chatbot/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!res.ok) throw new Error('Failed to start session');
+      const data = await res.json();
+      setSessionId(data.session_id);
+      setHistory(data.history);
+      await addBotMessage(data.question);
+    } catch (err) {
+      console.error(err);
+      await addBotMessage('Error starting session.');
+    }
+  }, []);
 
-
-
-
-  // Animate the initial bot message
+  // Animate initial bot message
   useEffect(() => {
     let i = 0;
     const interval = setInterval(() => {
@@ -50,19 +63,13 @@ export default function PlannerBot() {
       setTypingText(initialMessage.slice(0, i));
       if (i >= initialMessage.length) {
         clearInterval(interval);
-        setMessages([{ role: 'bot', content: initialMessage, initial: true }]);
+        setMessages((prev) => [...prev, { role: 'bot', content: initialMessage, initial: true }]);
         setTypingText('');
+        startChatSession(); // starting the chat session after initial message
       }
     }, 50);
     return () => clearInterval(interval);
   }, []);
-
-
-
-
-
-
-
 
 
 
@@ -73,13 +80,6 @@ export default function PlannerBot() {
       return [...safePrev, { role: 'user', content: content }];
     });
   };
-
-
-
-
-
-
-
 
 
 
@@ -146,34 +146,74 @@ export default function PlannerBot() {
 
 
 
-  
 
 
 
 
+
+  // const handleSend = async () => {
+  //   if (!input.trim() || sending) return;
+
+  //   const userInput = input.trim();
+  //   setInput('');
+  //   setSending(true);
+
+
+  //   addUserMessage(userInput);
+
+
+
+  //   try {
+  //     const res = await fetch(`http://localhost:8000/`, { method: 'GET' });
+  //     if (!res.ok) throw new Error(`Server returned ${res.status}`);
+
+  //     const data = await res.json();
+  //     const botText = data?.message ?? 'No response from server.';
+
+  //     await addBotMessage(botText, true);
+
+  //   } catch (err) {
+  //     alert(`Error: ${err.message}`);
+  //   } finally {
+  //     setSending(false);
+  //   }
+  // };
+
+  // --- Handle Send button ---
   const handleSend = async () => {
     if (!input.trim() || sending) return;
 
     const userInput = input.trim();
     setInput('');
     setSending(true);
-
-
     addUserMessage(userInput);
 
-
-
     try {
-      const res = await fetch(`http://localhost:8000/`, { method: 'GET' });
-      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      if (!sessionId) throw new Error('Session not started');
+
+      // Send user input to backend
+      const res = await fetch('http://localhost:8000/chatbot/answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          message: userInput,
+          history: history,
+        }),
+      });
+
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
       const data = await res.json();
-      const botText = data?.message ?? 'No response from server.';
 
-      await addBotMessage(botText, true);
+      // Update history for next request
+      setHistory(data.history);
 
+      // Show backend’s response
+      await addBotMessage(data.response);
     } catch (err) {
-      alert(`Error: ${err.message}`);
+      console.error(err);
+      await addBotMessage(`Error: ${err.message}`);
     } finally {
       setSending(false);
     }
@@ -183,8 +223,6 @@ export default function PlannerBot() {
 
 
 
-
-  
 
 
   const handleFileUpload = (event) => {

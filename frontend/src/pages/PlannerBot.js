@@ -30,7 +30,7 @@ export default function PlannerBot() {
   const [sessionId, setSessionId] = useState(null);
   const [history, setHistory] = useState([]);
 
-  const initialMessage = 'Hello! I am your Planner Bot. How can I help you today?';
+  const initialMessage = 'Hello! I am NestWiseAI. How can I help you today?';
 
 
   const safeMessages = Array.isArray(messages) ? messages : []; // If coming from props
@@ -54,8 +54,6 @@ export default function PlannerBot() {
       if (!res.ok) throw new Error('Failed to start session');
       const data = await res.json();
       setSessionId(data.session_id);
-      setHistory(data.history);
-      await addBotMessage(data.question);
     } catch (err) {
       console.error(err);
       await addBotMessage('Error starting session.');
@@ -181,7 +179,6 @@ export default function PlannerBot() {
         body: JSON.stringify({
           session_id: sessionId,
           message: userInput,
-          history: history,
         }),
       });
 

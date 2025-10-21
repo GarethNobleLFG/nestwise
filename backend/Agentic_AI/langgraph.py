@@ -1,112 +1,189 @@
-# ---- Imports ----
-import os, getpass, time, traceback, glob
-from typing import Dict
 
 
-import openai
 
+import os
+from getpass import getpass
+from langchain_community.chat_models import ChatOpenAI
+from langchain_openai import OpenAIEmbeddings
+prev_assistant_message = None
+initial_state = None
+from langchain_core.prompts import PromptTemplate # Corrected import
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-if not OPENAI_API_KEY:
-    raise RuntimeError(
-        "OPENAI_API_KEY not found in environment. Set it in Docker (env_file / env) "
-        "or pass as a secret. Example: `OPENAI_API_KEY=sk-... docker compose up`"
-    )
+import json
+from langchain_openai import ChatOpenAI
+import glob
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_core.vectorstores import InMemoryVectorStore
+from langchain_core.tools import tool
+from langgraph.prebuilt import ToolNode, tools_condition, create_react_agent
 
-openai.api_key = OPENAI_API_KEY
+# Retrieve the API key from Colab's user data
+openai_api_key = os.getenv('OPENAI_API_KEY')
 
-# ---- LangChain / LangGraph setup ----
-use_langgraph = True
-try:
-    from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-    #from langchain_unstructured import UnstructuredLoader
-    from langchain_community.document_loaders import PyPDFLoader
-    from langchain_text_splitters import RecursiveCharacterTextSplitter
-    from langchain_core.vectorstores import InMemoryVectorStore
-    from langchain_core.documents import Document
-    from langchain_core.messages import SystemMessage
-    from langchain_core.tools import tool
-    from langgraph.graph import MessagesState, StateGraph, END
-    from langgraph.prebuilt import ToolNode, tools_condition, create_react_agent
-    from langgraph.checkpoint.memory import MemorySaver
-except Exception as e:
-    print("Could not import LangGraph/LangChain components")
-    print("Import error:", e)
-    use_langgraph = False
+# Set the API key as an environment variable
+os.environ['OPENAI_API_KEY'] = openai_api_key
 
-# ---- If LangGraph available: build vector store from PDFs ----
-vector_store = None
-llm = None
-agent_executor = None
-graph = None
-memory = None
+model_chatbot = ChatOpenAI(model="gpt-4o", temperature=0)
+model_scrute = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+model_extractor = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+model_planner= ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
-if use_langgraph:
-    try:
-        # Initialize LLM + embeddings
-        llm = ChatOpenAI(model="gpt-4o-mini")
-        embeddings = OpenAIEmbeddings()
-        vector_store = InMemoryVectorStore(embeddings)
+embeddings = OpenAIEmbeddings()
+vector_store = InMemoryVectorStore(embeddings)
 
-        # ---- Load PDFs from Google Drive folder ----
-        pdf_folder = "./retirement_pdfs"
-        pdf_files = glob.glob(f"{pdf_folder}/*.pdf")
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+## System Propmt chatbot
+system_prompt_chatbot = SystemMessage(content='''
+You are NestWise, a financial planning assistant.
+You must ONLY talk about retirement and personal finance.
+If the user asks about unrelated topics (e.g., cooking, movies), politely redirect back:
+"I can’t provide recipes, but I can help you estimate your retirement savings instead."
+''')
 
-        loaded_docs = []
-        for file_path in pdf_files:
-            try:
-                loader = PyPDFLoader(file_path)
-                pages = loader.load()   # returns one Document per page
-                print(f"Loaded {file_path} -> {len(pages)} pages")
-                loaded_docs.extend(pages)
-                print(f"Loaded {file_path} -> {len(pages)} pages")
-            except Exception as e:
-                print(f"Failed to load {file_path}: {e}")
+## extractor
+system_prompt_extract = SystemMessage(content='''
+You will be analyzing the conversation history between a user and a chatbot about retirement planning.
+''')
 
-        #THIS IS USED IF PDF FILES ARE IMAGE BASED AND NOT TEXTBASED
-        # loaded_docs = []
-        # for file_path in pdf_files:
-        #     try:
-        #         loader = UnstructuredLoader(
-        #             file_path=file_path,
-        #             strategy="hi_res"   # enables OCR + layout parsing
-        #         )
-        #         docs = list(loader.lazy_load())  # returns Document objects
-        #         loaded_docs.extend(docs)
-        #         print(f"Loaded {file_path} -> {len(docs)} structures")
-        #     except Exception as e:
-        #         print(f"Failed to load {file_path}: {e}")
+## Summarizer
+system_prompt_summarize = SystemMessage(content='''
+You are a helpful assistant that summarizes conversations about retirement planning.
+Summarize the following conversation and the extracted user profile information.
+Focus on the user's retirement goal, the financial information collected (age, savings, salary, location), and any potential next steps discussed.
+Present the summary clearly and concisely.
+''')
 
-        # Split docs into chunks
-        splitter = RecursiveCharacterTextSplitter(chunk_size=900, chunk_overlap=150)
-        splits = splitter.split_documents(loaded_docs)
+real_profile = {}
+shadow_profile = {
+    "goal" : False,
+    "age" : False,
+    "savings" : False,
+    "salary" : False,
+    "location" : False
+}
 
-        # Add to vector store
-        _ = vector_store.add_documents(documents=splits)
-        print("Added PDF documents to InMemoryVectorStore. Total chunks:", len(splits))
+from typing import Literal
+from langgraph.graph import MessagesState
+from langgraph.graph import StateGraph, START, END
+from langgraph.checkpoint.memory import MemorySaver
 
-        # Define retriever tool
-        @tool(response_format="content_and_artifact")
-        def retrieve(query: str):
-            """Retrieve information related to a query from the vector store."""
-            retrieved_docs = vector_store.similarity_search(query, k=3)
-            serialized = "\n\n".join(
-                (f"Source: {getattr(doc, 'metadata', {})}\nContent: {doc.page_content}")
-                for doc in retrieved_docs
-            )
-            return serialized, retrieved_docs
+# State class to store messages
+class ChatbotState(MessagesState):
+  pass
 
-        # Build LangGraph flow
-        graph_builder = StateGraph(MessagesState)
+## extractor state
+class ExtractorState(MessagesState):
+  all_fields_filled: bool
 
-        def query_or_respond(state: MessagesState):
-            llm_with_tools = llm.bind_tools([retrieve])
-            response = llm_with_tools.invoke(state["messages"])
-            return {"messages": [response]}
+#summarizer state
+class SummarizerState(MessagesState):
+  summary: str
 
-        tools_node = ToolNode([retrieve])
+# planner state
+class PlannerState(MessagesState):
+  pass
 
-        def generate(state: MessagesState):
+# Master state for final graph
+class MasterState(MessagesState):
+  chatbot: dict
+  extractor: dict
+  summarizer: dict
+  profile: dict
+  planner: dict
+
+from typing import Literal
+from langgraph.graph import MessagesState
+from langgraph.graph import StateGraph, START, END
+from langgraph.checkpoint.memory import MemorySaver
+
+## To call agent chatbot
+
+def call_chatbot(state: ChatbotState):
+  shadow_system_prompt = f"""
+  Below is a dictionary representing the user's information.
+  Each key corresponds to a data field, and each value indicates whether the information has already been collected:{shadow_profile}
+
+  Your task is to decide what the chatbot should ask the user next.
+   - If the "goal" field is false, the chatbot should prompt the user to share their retirement goal (e.g., early retirement, financial security, travel, etc.).
+   - If the "goal" field is true, the chatbot should ask about exactly one other field from the dictionary that is still false.
+
+  Return only the next message the chatbot should send to the user — no explanations, no JSON, and no extra text.
+  """
+
+  state["messages"] = [system_prompt_chatbot] + [SystemMessage(content=shadow_system_prompt)] + state["messages"]
+  response = model_chatbot.invoke(state["messages"])
+  state['messages'] = state['messages'] + [response]
+  return state
+
+# To call extractor
+def call_extractor(state: ExtractorState):
+  shadow_system_prompt = f"""
+  Below is a dictionary representing the user's information.
+  Each key corresponds to a data field, and each value indicates whether the information has already been collected:{shadow_profile}
+
+  Your task is to:
+  1. Examine the conversation history that follows.
+
+  2. For every field currently marked as false, check if the user has provided information that can fill that field.
+
+  3. If the user has supplied the missing information, extract it accurately.
+
+  Respond only with a JSON object containing ONLY the previously false fields that you can now populate, using this exact structure:
+  {{
+    "fieldName1" : fieldValue1,
+    "fieldName2" : fieldValue2,
+    ...
+  }}
+
+  If no new information is found, return an empty JSON object: {{}}.
+  Do not include explanations, reasoning, or extra text outside the JSON.
+  """
+  state["messages"] = [system_prompt_extract] + [SystemMessage(content=shadow_system_prompt)] + state["messages"]
+  response = model_extractor.invoke(state["messages"])
+  print(f"Extractor response: {response.content}")
+  response_dict = json.loads(response.content)
+
+  if not response_dict:
+    return
+
+  common_keys = response_dict.keys() & shadow_profile.keys()
+
+  for key in common_keys:
+    shadow_profile[key] = True
+
+  real_profile.update(response_dict)
+  boolValue = all(value is True for value in shadow_profile.values())
+  state["all_fields_filled"] = boolValue
+  print(f"New shadow profile {shadow_profile}")
+  return state
+
+## To call RAG Agent
+def query_or_respond(state: PlannerState):
+    rag_query = (
+      "Based on the user's retirement profile, provide a comprehensive retirement plan using the loaded PDF knowledge.\n\n"
+      f"User Profile:\n{real_profile}\n\n"
+      "Your plan should include:\n"
+      "1) A detailed personalized summary of their 401(k) outlook, considering their age, savings, salary, and location (where applicable).\n"
+      "2) At least five specific and actionable next steps tailored to their profile.\n"
+      "3) A comprehensive list of potential risks and important notes relevant to their situation.\n\n"
+      "Ensure the plan is well-structured and easy to understand.\n\n"
+      "Include a line: 'This is educational and not financial advice.'\n"
+  )
+    state["messages"] =  [SystemMessage(rag_query)] + state["messages"]
+    model_planner_with_tools = model_planner.bind_tools([retrieve])
+    response = model_planner_with_tools.invoke(state["messages"])
+    return {"messages": [response]}
+
+## to Call Summarizer
+def call_summarizer(state: SummarizerState):
+  state["messages"] = [system_prompt_summarize] + state["messages"]
+  response = model_extractor.invoke(state["messages"])
+  return {"summary": response.content}
+
+# To Call Planner to give final resposnse
+def call_planner(state: PlannerState):
+  
             recent_tool_messages = []
             for message in reversed(state["messages"]):
                 if message.type == "tool":
@@ -114,112 +191,265 @@ if use_langgraph:
                 else:
                     break
             tool_messages = recent_tool_messages[::-1]
+  
             docs_content = "\n\n".join(doc.content for doc in tool_messages)
             system_message_content = (
                 "You are an assistant for question-answering tasks. "
                 "Use the following pieces of retrieved context to answer the question. "
+                "Always cite the sources (filename and page) at the end of each fact you use. "
                 "If you don't know the answer, say that you don't. Keep it concise."
                 f"\n\n{docs_content}"
             )
-            conversation_messages = [
-                message
-                for message in state["messages"]
-                if message.type in ("human", "system")
-                or (message.type == "ai" and not message.tool_calls)
-            ]
-            prompt = [SystemMessage(system_message_content)] + conversation_messages
-            response = llm.invoke(prompt)
+            
+            state["messages"] =  [SystemMessage(system_message_content)] + state["messages"]
+            response = model_planner.invoke(state["messages"])
             return {"messages": [response]}
 
-        # Assemble graph
-        graph_builder.add_node(query_or_respond)
-        graph_builder.add_node(tools_node)
-        graph_builder.add_node(generate)
-        graph_builder.set_entry_point("query_or_respond")
-        graph_builder.add_conditional_edges(
-            "query_or_respond", tools_condition, {END: END, "tools": "tools"}
-        )
-        graph_builder.add_edge("tools", "generate")
-        graph_builder.add_edge("generate", END)
+## to decide to call the planner agent.
+def route_decision_extractor(state: MasterState) -> str:
+  profile_filled = state.get("extractor").get("all_fields_filled")
+  if profile_filled:
+    return "planner"
+  else:
+    return "chatbot"
 
-        memory = MemorySaver()
-        graph = graph_builder.compile(checkpointer=memory)
+def route_decision_summarize(state: MasterState) -> str:
+  messages_count = len(state.get("chatbot").get("messages"))
+  if messages_count >= 10:
+    return "summarizer"
+  else:
+    return "__end__"
 
-        agent_executor = create_react_agent(llm, [retrieve], checkpointer=memory)
-       
-        print("LangGraph + RAG pipeline built successfully.")
+## RAG Implementation
+
+# ---- Load PDFs from Google Drive folder ----
+pdf_folder = "./retirement_pdfs"  # Update with your folder path
+pdf_files = glob.glob(f"{pdf_folder}/*.pdf")
+
+loaded_docs = []
+for file_path in pdf_files:
+    try:
+        loader = PyPDFLoader(file_path)
+        pages = loader.load()   # returns one Document per page
+        print(f"Loaded {file_path} -> {len(pages)} pages")
+        loaded_docs.extend(pages)
+        print(f"Loaded {file_path} -> {len(pages)} pages")
     except Exception as e:
-        print("Error building LangGraph RAG pipeline:", e)
-        traceback.print_exc()
-        use_langgraph = False
+        print(f"Failed to load {file_path}: {e}")
 
-# ---- Guided Questionnaire ----
-questions = [
-    "What is your age?",
-    "What is your current annual income (USD)?",
-    "How much have you already saved for retirement (USD)?",
-    "What percentage of your income do you currently contribute to your 401(k)? (e.g., 5)",
-    "Does your employer match contributions? If yes, what is the match (e.g., 50% up to 6%)? If no, say 'no'.",
-    "How would you describe your risk tolerance? (Low, Medium, High)",
-    "What is your planned retirement age?"
-]
+# Split docs into chunks
+splitter = RecursiveCharacterTextSplitter(chunk_size=900, chunk_overlap=150)
+splits = splitter.split_documents(loaded_docs)
 
-SESSION_STATE: Dict[str, dict] = {}
+# Add to vector store
+_ = vector_store.add_documents(documents=splits)
+print("Added PDF documents to InMemoryVectorStore. Total chunks:", len(splits))
 
+# Define retriever tool
+@tool(response_format="content_and_artifact")
+def retrieve(query: str):
+    """Retrieve information related to a query from the vector store."""
+    retrieved_docs = vector_store.similarity_search(query, k=3)
+    formatted_snippets = []
+    for doc in retrieved_docs:
+        meta = getattr(doc, "metadata", {})
+        source = meta.get("source", "Unknown source")
+        print("Doc source:", source)
+        page = meta.get("page", "N/A")
+        formatted_snippets.append(
+            f"Source: {os.path.basename(source)}, Page: {page}\n"
+            f"Content:\n{doc.page_content.strip()}"
+        )
+    
+
+    serialized = "\n\n---\n\n".join(formatted_snippets)
+    return serialized, retrieved_docs
+
+
+
+
+## Graph for RAG 
+
+memory = MemorySaver()
+tools_node = ToolNode([retrieve])
+# Chatbot (persistent)
+chatbot_graph = StateGraph(ChatbotState)
+chatbot_graph.add_node("chatbot", call_chatbot)
+chatbot_graph.add_edge(START, "chatbot")
+chatbot_subgraph = chatbot_graph.compile(checkpointer=memory)
+
+# Summarizer
+summarizer_graph = StateGraph(SummarizerState)
+summarizer_graph.add_node("summarizer", call_summarizer)
+summarizer_graph.add_edge(START, "summarizer")
+summarizer_subgraph = summarizer_graph.compile()
+
+# Extractor (stateless)
+extractor_graph = StateGraph(ExtractorState)
+extractor_graph.add_node("extractor", call_extractor)
+extractor_graph.add_edge(START, "extractor")
+extractor_subgraph = extractor_graph.compile()
+
+## Planner
+planner_graph = StateGraph(PlannerState)
+planner_graph.add_node(query_or_respond)
+planner_graph.add_node(tools_node)
+planner_graph.add_node(call_planner)
+planner_graph.set_entry_point("query_or_respond")
+planner_graph.add_conditional_edges(
+    "query_or_respond", tools_condition, {END: END, "tools": "tools"}
+)
+planner_graph.add_edge("tools", "call_planner")
+planner_graph.add_edge("call_planner", END)
+planner_subgraph = planner_graph.compile(checkpointer=memory)
+
+### Functions to run individual graphs
+
+def run_chatbot(master_state: MasterState):
+  chatbot_data = master_state.get("chatbot", {})
+  chatbot_state = ChatbotState(**chatbot_data)
+
+  all_messages = master_state.get("messages", [])
+  human_messages = [m for m in all_messages if m.type == "human"][-1:]  # last human message
+  last_human = human_messages[-1:] if human_messages else []
+
+  if chatbot_state:
+    chatbot_state["messages"] = chatbot_state["messages"] + last_human
+  else:
+    chatbot_state["messages"] = last_human
+
+  chatbot_state = chatbot_subgraph.invoke(chatbot_state)
+
+  master_state["chatbot"] = dict(chatbot_state)
+  return master_state
+
+def run_extractor(master_state: MasterState):
+
+  extractor_data = master_state.get("extractor", {})
+  chatbot_data = master_state.get("chatbot", {})
+  extractor_state = ExtractorState(**extractor_data)
+  chatbot_state = ChatbotState(**chatbot_data)
+
+  # Get the last human message from the master conversation
+  all_messages = master_state.get("messages", [])
+  human_messages = [m for m in all_messages if m.type == "human"][-1:]  # last human message
+  last_human = human_messages[-1:] if human_messages else []
+
+  # Get the last message that the chatbot sent to the user
+  chatbot_messages = [
+        m for m in chatbot_state.get("messages", []) if m.type in ("ai", "system")
+  ]
+  last_chatbot = chatbot_messages[-1] if chatbot_messages else AIMessage(content="NO CHATBOT MESSAGES FOUND")
+  
+  # Combine for the extractor's current processing
+  extractor_state["messages"] = [HumanMessage(content=last_chatbot.content)] + last_human
+
+  extractor_state = extractor_subgraph.invoke(extractor_state)
+
+  master_state["extractor"] = dict(extractor_state)
+  return master_state
+
+### to run summarizer
+def run_summarizer(master_state: MasterState):
+  summarizer_data = master_state.get("summarizer", {})
+  chatbot_data = master_state.get("chatbot", {})
+  summarizer_state = SummarizerState(**summarizer_data)
+  chatbot_state = ChatbotState(**chatbot_data)
+
+  chatbot_messages = [
+      m for m in chatbot_state.get("messages", [])
+  ]
+
+  summarizer_state["messages"] = [HumanMessage("Last Summary:" + summarizer_state.get("summary", "None"))] + chatbot_messages
+
+  # Run the summarizer subgraph
+  summarizer_state["summary"] = summarizer_subgraph.invoke(summarizer_state)["summary"]
+  chatbot_state["messages"] = [system_prompt_chatbot] + [HumanMessage("Summary:" + summarizer_state["summary"])] + chatbot_messages[-1:]
+  master_state["summarizer"] = dict(summarizer_state)
+  master_state["chatbot"] = dict(chatbot_state)
+  return master_state
+
+def run_planner(master_state: MasterState):
+    planner_data = master_state.get("planner", {})
+    planner_state = PlannerState(**planner_data)
+    planner_state=planner_subgraph.invoke(planner_state)
+    master_state["planner"] = dict(planner_state)
+    return master_state
+
+# Final Master Graph
+workflow = StateGraph(MasterState)
+
+workflow.add_node("chatbot", run_chatbot)
+workflow.add_node("extractor", run_extractor)
+workflow.add_node("planner", run_planner)
+workflow.add_node("summarizer", run_summarizer)
+
+workflow.add_edge(START, "extractor")
+
+workflow.add_conditional_edges(
+    "extractor",
+    route_decision_extractor,
+    {
+        "planner": "planner",
+        "chatbot": "chatbot",
+    },
+)
+
+workflow.add_conditional_edges(
+    "chatbot",
+    route_decision_summarize,
+    {
+        "summarizer": "summarizer",
+        "__end__": "__end__",
+    },
+)
+
+workflow.add_edge("planner", END)
+
+graph = workflow.compile()
+
+initialMessage = 'Hello! I am NestWiseAI. How can I help you today?'
+initial_state = MasterState(
+    messages=[],
+    chatbot={"messages": [AIMessage(content=initialMessage)]},
+    planner={"messages":[]},
+    extractor={"all_fields_filled": False},
+    profile=shadow_profile
+)
+print(initial_state)
 def start_session(session_id: str):
-    SESSION_STATE[session_id] = {"current_q": 0, "responses": {}}
-
-def run_rag(query: str, thread_id: str = None) -> str:
-    if use_langgraph and graph is not None:
-        try:
-            config = {"configurable": {"thread_id": thread_id or f"thread-{int(time.time()*1000)}"}}
-            last_content = None
-            for step in graph.stream({"messages": [{"role": "user", "content": query}]}, stream_mode="values", config=config):
-                msg = step["messages"][-1]
-                try:
-                    last_content = getattr(msg, "content", None) or getattr(msg, "text", None) or str(msg)
-                except Exception:
-                    last_content = str(msg)
-            if last_content:
-                return last_content
-        except Exception as e:
-            print("Graph run failed. Error:", e)
-            traceback.print_exc()
-
-# ---- Chat handler ----
-def chat_step(user_message: str, history, session_id=None):
-    if session_id is None:
-        session_id = str(time.time())
-
-    if session_id not in SESSION_STATE:
-        start_session(session_id)
-
-    state = SESSION_STATE[session_id]
-    q_index = state["current_q"]
-
-    if user_message is not None and user_message.strip() != "":
-        state["responses"][questions[q_index]] = user_message.strip()
-        q_index += 1
-        state["current_q"] = q_index
-
-    if q_index < len(questions):
-        next_q = questions[q_index]
-        return next_q, history + [[user_message, next_q]]
-
-    profile_lines = [f"{k}: {v}" for k, v in state["responses"].items()]
-    profile_text = "\n".join(profile_lines)
-    rag_query = (
-        "User retirement profile:\n\n"
-        f"{profile_text}\n\n"
-        "Using the loaded PDF knowledge, provide:\n"
-        "1) A concise personalized summary of their 401(k) outlook (3-6 sentences).\n"
-        "2) Three clear next steps (actionable).\n"
-        "3) Short risks/notes.\n\n"
-        "Include a line: 'This is educational and not financial advice.'\n"
+    global initial_state 
+    initial_state= MasterState(
+        messages=[],
+        chatbot={"messages": []},
+        planner={"messages":[]},
+        extractor={"all_fields_filled": False},
+        profile=shadow_profile
     )
+    return session_id
 
-    summary = run_rag(rag_query, thread_id=f"session-{session_id}")
-    SESSION_STATE.pop(session_id, None)
 
-    final_output = f"Here’s your personalized 401(k) summary:\n\n{summary}"
-    return final_output, history + [[user_message, final_output]]
+def chat_step(user_message: str, session_id: str):
+    if user_message:
+        human_message = HumanMessage(content=user_message)
+    else:
+        human_message = None
+    
+    global initial_state
+    global prev_assistant_message
+    
+    # Run the graph
+    initial_state["messages"].append(human_message)
+    initial_state = graph.invoke(initial_state)
+
+    # Print the assistant's reply
+    assistant_message = initial_state['chatbot']['messages'][-1]
+    
+    if assistant_message == prev_assistant_message:
+        planner_message = initial_state['planner']['messages'][-1]
+        return planner_message.content
+    prev_assistant_message = assistant_message
+    return assistant_message.content 
+  
+
+ 

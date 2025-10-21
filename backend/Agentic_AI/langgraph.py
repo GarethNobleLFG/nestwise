@@ -54,15 +54,6 @@ Focus on the user's retirement goal, the financial information collected (age, s
 Present the summary clearly and concisely.
 ''')
 
-real_profile = {}
-shadow_profile = {
-    "goal" : False,
-    "age" : False,
-    "savings" : False,
-    "salary" : False,
-    "location" : False
-}
-
 from typing import Literal
 from langgraph.graph import MessagesState
 from langgraph.graph import StateGraph, START, END
@@ -70,26 +61,25 @@ from langgraph.checkpoint.memory import MemorySaver
 
 # State class to store messages
 class ChatbotState(MessagesState):
-  pass
+  shadow_profile: dict
 
-## extractor state
 class ExtractorState(MessagesState):
+  real_profile: dict
+  shadow_profile: dict
   all_fields_filled: bool
 
-#summarizer state
 class SummarizerState(MessagesState):
   summary: str
 
-# planner state
 class PlannerState(MessagesState):
-  pass
+    real_profile: dict
 
-# Master state for final graph
 class MasterState(MessagesState):
   chatbot: dict
   extractor: dict
   summarizer: dict
-  profile: dict
+  real_profile: dict
+  shadow_profile: dict
   planner: dict
 
 from typing import Literal
@@ -102,7 +92,7 @@ from langgraph.checkpoint.memory import MemorySaver
 def call_chatbot(state: ChatbotState):
   shadow_system_prompt = f"""
   Below is a dictionary representing the user's information.
-  Each key corresponds to a data field, and each value indicates whether the information has already been collected:{shadow_profile}
+  Each key corresponds to a data field, and each value indicates whether the information has already been collected:{state.get("shadow_profile", {})}
 
   Your task is to decide what the chatbot should ask the user next.
    - If the "goal" field is false, the chatbot should prompt the user to share their retirement goal (e.g., early retirement, financial security, travel, etc.).
@@ -120,7 +110,7 @@ def call_chatbot(state: ChatbotState):
 def call_extractor(state: ExtractorState):
   shadow_system_prompt = f"""
   Below is a dictionary representing the user's information.
-  Each key corresponds to a data field, and each value indicates whether the information has already been collected:{shadow_profile}
+  Each key corresponds to a data field, and each value indicates whether the information has already been collected:{state.get("shadow_profile", {})}
 
   Your task is to:
   1. Examine the conversation history that follows.
@@ -141,8 +131,11 @@ def call_extractor(state: ExtractorState):
   """
   state["messages"] = [system_prompt_extract] + [SystemMessage(content=shadow_system_prompt)] + state["messages"]
   response = model_extractor.invoke(state["messages"])
+  
   print(f"Extractor response: {response.content}")
   response_dict = json.loads(response.content)
+  shadow_profile = state.get("shadow_profile", {})
+  real_profile = state.get("real_profile", {})
 
   if not response_dict:
     return
@@ -155,6 +148,8 @@ def call_extractor(state: ExtractorState):
   real_profile.update(response_dict)
   boolValue = all(value is True for value in shadow_profile.values())
   state["all_fields_filled"] = boolValue
+  state["real_profile"] = real_profile
+  state["shadow_profile"] = shadow_profile
   print(f"New shadow profile {shadow_profile}")
   return state
 
@@ -162,9 +157,9 @@ def call_extractor(state: ExtractorState):
 def query_or_respond(state: PlannerState):
     rag_query = (
       "Based on the user's retirement profile, provide a comprehensive retirement plan using the loaded PDF knowledge.\n\n"
-      f"User Profile:\n{real_profile}\n\n"
+      f"User Profile:\n{state.get('real_profile')}\n\n"
       "Your plan should include:\n"
-      "1) A detailed personalized summary of their 401(k) outlook, considering their age, savings, salary, and location (where applicable).\n"
+      "1) A detailed personalized summary of their retirement outlook, considering their age, savings, salary, and location (where applicable).\n"
       "2) At least five specific and actionable next steps tailored to their profile.\n"
       "3) A comprehensive list of potential risks and important notes relevant to their situation.\n\n"
       "Ensure the plan is well-structured and easy to understand.\n\n"
@@ -304,6 +299,8 @@ planner_subgraph = planner_graph.compile(checkpointer=memory)
 
 def run_chatbot(master_state: MasterState):
   chatbot_data = master_state.get("chatbot", {})
+  shadow_profile = master_state.get("shadow_profile", {})
+  chatbot_data["shadow_profile"] = shadow_profile
   chatbot_state = ChatbotState(**chatbot_data)
 
   all_messages = master_state.get("messages", [])
@@ -318,12 +315,15 @@ def run_chatbot(master_state: MasterState):
   chatbot_state = chatbot_subgraph.invoke(chatbot_state)
 
   master_state["chatbot"] = dict(chatbot_state)
+  master_state["shadow_profile"] = chatbot_state.get("shadow_profile", {})
   return master_state
 
 def run_extractor(master_state: MasterState):
-
   extractor_data = master_state.get("extractor", {})
   chatbot_data = master_state.get("chatbot", {})
+  shadow_profile = master_state.get("shadow_profile", {})
+  real_profile = master_state.get("real_profile", {})
+  extractor_data["shadow_profile"] = shadow_profile
   extractor_state = ExtractorState(**extractor_data)
   chatbot_state = ChatbotState(**chatbot_data)
 
@@ -344,6 +344,8 @@ def run_extractor(master_state: MasterState):
   extractor_state = extractor_subgraph.invoke(extractor_state)
 
   master_state["extractor"] = dict(extractor_state)
+  master_state["real_profile"] = extractor_state.get("real_profile", {})
+  master_state["shadow_profile"] = extractor_state.get("shadow_profile", {})
   return master_state
 
 ### to run summarizer
@@ -368,6 +370,8 @@ def run_summarizer(master_state: MasterState):
 
 def run_planner(master_state: MasterState):
     planner_data = master_state.get("planner", {})
+    real_profile = master_state.get("real_profile", {})
+    planner_data["real_profile"] = real_profile
     planner_state = PlannerState(**planner_data)
     planner_state=planner_subgraph.invoke(planner_state)
     master_state["planner"] = dict(planner_state)
@@ -413,7 +417,14 @@ def start_session(session_id: str):
         chatbot={"messages": [AIMessage(content=initialMessage)]},
         planner={"messages":[]},
         extractor={"all_fields_filled": False},
-        profile=shadow_profile
+        real_profile={},
+        shadow_profile={
+            "goal" : False,
+            "age" : False,
+            "savings" : False,
+            "salary" : False,
+            "location" : False
+        }
     )
     return session_id
 

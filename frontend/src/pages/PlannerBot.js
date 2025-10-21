@@ -28,7 +28,6 @@ export default function PlannerBot() {
   const [chatToDelete, setChatToDelete] = useState(null);
   const [typingText, setTypingText] = useState('');
   const [sessionId, setSessionId] = useState(null);
-  const [history, setHistory] = useState([]);
 
   const initialMessage = 'Hello! I am NestWiseAI. How can I help you today?';
 
@@ -44,7 +43,7 @@ export default function PlannerBot() {
 
   // --- Start backend chat session ---
   const startChatSession = React.useCallback(async () => {
-    await addBotMessage('Hello! I am your Planner Bot. How can I help you today?')
+    await addBotMessage('Hello! I am NestWiseAI. How can I help you today?')
 
     try {
       const res = await fetch('http://localhost:8000/chatbot/start', {

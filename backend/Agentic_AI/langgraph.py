@@ -231,9 +231,7 @@ for file_path in pdf_files:
     try:
         loader = PyPDFLoader(file_path)
         pages = loader.load()   # returns one Document per page
-        print(f"Loaded {file_path} -> {len(pages)} pages")
         loaded_docs.extend(pages)
-        print(f"Loaded {file_path} -> {len(pages)} pages")
     except Exception as e:
         print(f"Failed to load {file_path}: {e}")
 
@@ -243,7 +241,6 @@ splits = splitter.split_documents(loaded_docs)
 
 # Add to vector store
 _ = vector_store.add_documents(documents=splits)
-print("Added PDF documents to InMemoryVectorStore. Total chunks:", len(splits))
 
 # Define retriever tool
 @tool(response_format="content_and_artifact")
@@ -361,7 +358,7 @@ def run_summarizer(master_state: MasterState):
   ]
 
   summarizer_state["messages"] = [HumanMessage("Last Summary:" + summarizer_state.get("summary", "None"))] + chatbot_messages
-
+  
   # Run the summarizer subgraph
   summarizer_state["summary"] = summarizer_subgraph.invoke(summarizer_state)["summary"]
   chatbot_state["messages"] = [system_prompt_chatbot] + [HumanMessage("Summary:" + summarizer_state["summary"])] + chatbot_messages[-1:]
@@ -409,19 +406,11 @@ workflow.add_edge("planner", END)
 graph = workflow.compile()
 
 initialMessage = 'Hello! I am NestWiseAI. How can I help you today?'
-initial_state = MasterState(
-    messages=[],
-    chatbot={"messages": [AIMessage(content=initialMessage)]},
-    planner={"messages":[]},
-    extractor={"all_fields_filled": False},
-    profile=shadow_profile
-)
-print(initial_state)
 def start_session(session_id: str):
     global initial_state 
     initial_state= MasterState(
         messages=[],
-        chatbot={"messages": []},
+        chatbot={"messages": [AIMessage(content=initialMessage)]},
         planner={"messages":[]},
         extractor={"all_fields_filled": False},
         profile=shadow_profile

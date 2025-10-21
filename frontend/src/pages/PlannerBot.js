@@ -86,11 +86,13 @@ export default function PlannerBot() {
 
   const addBotMessage = async (content) => {
     const simulateTypingEffect = (text) => {
+
+      const chunkSize = Math.ceil(text.length / 10); // Larger chunk size for longer text
       let i = 0;
 
       return new Promise((resolve) => {
         const interval = setInterval(() => {
-          i++;
+          i += chunkSize;
           const partialText = text.slice(0, i);
 
           setMessages((prev) => {
@@ -114,12 +116,11 @@ export default function PlannerBot() {
 
           if (i >= text.length) {
             clearInterval(interval);
-            resolve(text); // Resolve when typing is complete
+            resolve(text); // Resolve when all chunks are displayed
           }
-        }, 50);
+        }, 100); // Adjust the interval time for chunk display speed
       });
     };
-
 
     // Simulate typing effect and finalize the bot message
     await simulateTypingEffect(content);

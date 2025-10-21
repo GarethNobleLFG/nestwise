@@ -18,6 +18,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import AppTheme from '../shared-theme/AppTheme';
 import AppBar from '../app-bar/AppBar';
+import { useRef } from 'react';
 
 export default function PlannerBot() {
   const [messages, setMessages] = useState([]);
@@ -32,13 +33,19 @@ export default function PlannerBot() {
   const initialMessage = 'Hello! I am your Planner Bot. How can I help you today?';
 
 
-  // Ensure messages is always an array
   const safeMessages = Array.isArray(messages) ? messages : []; // If coming from props
-  // OR
-  // const [messages, setMessages] = useState([]); // If using state
+
+
+
+
+
+
+
 
   // --- Start backend chat session ---
   const startChatSession = React.useCallback(async () => {
+    await addBotMessage('Hello! I am your Planner Bot. How can I help you today?')
+
     try {
       const res = await fetch('http://localhost:8000/chatbot/start', {
         method: 'POST',
@@ -55,6 +62,12 @@ export default function PlannerBot() {
     }
   }, []);
 
+
+
+
+
+  // DONT NEED USEEFFECT FOR NOW. KEPT RUNNING TWICE ON PAGE LOAD.
+  /*
   // Animate initial bot message
   useEffect(() => {
     let i = 0;
@@ -70,6 +83,8 @@ export default function PlannerBot() {
     }, 50);
     return () => clearInterval(interval);
   }, []);
+*/
+
 
 
 
@@ -147,39 +162,6 @@ export default function PlannerBot() {
 
 
 
-
-
-
-
-
-  // const handleSend = async () => {
-  //   if (!input.trim() || sending) return;
-
-  //   const userInput = input.trim();
-  //   setInput('');
-  //   setSending(true);
-
-
-  //   addUserMessage(userInput);
-
-
-
-  //   try {
-  //     const res = await fetch(`http://localhost:8000/`, { method: 'GET' });
-  //     if (!res.ok) throw new Error(`Server returned ${res.status}`);
-
-  //     const data = await res.json();
-  //     const botText = data?.message ?? 'No response from server.';
-
-  //     await addBotMessage(botText, true);
-
-  //   } catch (err) {
-  //     alert(`Error: ${err.message}`);
-  //   } finally {
-  //     setSending(false);
-  //   }
-  // };
-
   // --- Handle Send button ---
   const handleSend = async () => {
     if (!input.trim() || sending) return;
@@ -207,8 +189,8 @@ export default function PlannerBot() {
 
       const data = await res.json();
 
-      // Update history for next request
-      setHistory(data.history);
+      // Commented this out because it is saving all the chats.
+      //setHistory(data.history);
 
       // Show backend’s response
       await addBotMessage(data.response);
@@ -289,6 +271,21 @@ export default function PlannerBot() {
 
 
 
+
+
+  const initialized = useRef(false); // Flag to ensure it runs only once
+
+  if (!initialized.current) {
+    initialized.current = true; // Set the flag to true
+    startChatSession(); // Call the function directly
+  }
+
+
+
+
+
+
+
   return (
     <AppTheme>
       <CssBaseline />
@@ -363,9 +360,8 @@ export default function PlannerBot() {
               <Divider sx={{ borderBottomWidth: 2, mb: 1 }} />
 
               <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
-                {safeMessages.map((msg, idx) => (
+                {safeMessages.length > 0 && (
                   <Box
-                    key={idx}
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
@@ -380,14 +376,14 @@ export default function PlannerBot() {
                       '&:hover': { bgcolor: 'grey.400' },
                     }}
                   >
-                    <Typography variant="body2" noWrap onClick={() => console.log('Clicked chat', idx)}>
-                      {msg.content}
+                    <Typography variant="body2" noWrap onClick={() => console.log('Clicked chat', 0)}>
+                      {safeMessages[0].content}
                     </Typography>
-                    <IconButton size="small" onClick={() => handleDeleteClick(idx)}>
+                    <IconButton size="small" onClick={() => handleDeleteClick(0)}>
                       <DeleteIcon fontSize="small" sx={{ color: 'black' }} />
                     </IconButton>
                   </Box>
-                ))}
+                )}
               </Box>
             </Box>
 

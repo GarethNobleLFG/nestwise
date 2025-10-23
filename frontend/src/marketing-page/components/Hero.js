@@ -47,7 +47,7 @@ export default function Hero() {
               lineHeight: 1.2,
             }}
           >
-            Sign&nbsp;Up&nbsp;For&nbsp;A&nbsp;
+            Get A Personal Retirement Plan {' '}
             <Typography
               component="span"
               variant="h1"
@@ -59,7 +59,7 @@ export default function Hero() {
                 }),
               })}
             >
-              Personal Retirement Plan
+               Emailed To You
             </Typography>
           </Typography>
 

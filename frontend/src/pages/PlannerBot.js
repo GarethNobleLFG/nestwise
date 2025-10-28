@@ -306,7 +306,7 @@ export default function PlannerBot() {
             {/* Left sidebar */}
             <Box
               sx={{
-                width: '25%',
+                width: '20%',
                 bgcolor: 'grey.200',
                 p: 1,
                 borderRight: 1,
@@ -315,10 +315,12 @@ export default function PlannerBot() {
                 flexDirection: 'column',
               }}
             >
-              <Typography variant="h6" sx={{ mb: 1, textAlign: 'center', width: '100%' }}>
-                Chat History
-              </Typography>
 
+
+
+
+
+              {/*
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mb: 1 }}>
                 <Box
                   onClick={handleNewChat}
@@ -340,48 +342,217 @@ export default function PlannerBot() {
                     New Chat
                   </Typography>
                 </Box>
-
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontSize: '0.875rem', px: 0.5 }}>
-                  <SearchIcon fontSize="small" />
-                  <TextField
-                    size="small"
-                    placeholder="Search chats..."
-                    variant="standard"
-                    fullWidth
-                    sx={{ fontSize: '0.875rem' }}
-                  />
-                </Box>
               </Box>
+              */}
 
-              <Divider sx={{ borderBottomWidth: 2, mb: 1 }} />
 
-              <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
-                {safeMessages.length > 0 && (
+
+
+
+
+
+              <Box
+                sx={{
+                  // Card styling
+                  bgcolor: 'grey.50',
+                  borderRadius: 2,
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                  padding: 2,
+                  // Fixed size - half of the chat history box
+                  height: '155px',
+                  width: '100%',
+                  maxWidth: 'none',
+                  minWidth: 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+
+
+
+                {/* Fixed Header */}
+                <Typography variant="h6" sx={{ mb: 0.01, textAlign: 'left', width: '100%' }}>
+                  Select Plan To Edit
+                </Typography>
+
+
+
+                <Divider sx={{ borderBottomWidth: 2, mb: 1, mt: 1 }} />
+
+
+
+                {/* Scrollable Content */}
+                <Box
+                  sx={{
+                    overflowY: 'auto',
+                    flex: 1,
+                  }}
+                >
                   <Box
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
-                      mb: 1,
-                      p: 1,
+                      justifyContent: 'center',
+                      width: '100%',
+                      height: '40px',
+                      border: '2px solid #c47c1eff', // Brownish gold outline
                       borderRadius: 1,
-                      bgcolor: 'grey.300',
-                      color: 'black',
                       cursor: 'pointer',
-                      transition: 'background-color 0.2s ease',
-                      '&:hover': { bgcolor: 'grey.400' },
+                      backgroundColor: 'transparent',
+                      '&:hover': {
+                        backgroundColor: 'rgba(196, 124, 30, 0.1)', // Light brownish gold background on hover
+                      },
                     }}
                   >
-                    <Typography variant="body2" noWrap onClick={() => console.log('Clicked chat', 0)}>
-                      {safeMessages[0].content}
+
+                    <Typography
+                      sx={{
+                        fontSize: '24px',
+                        color: '#c47c1eff', // Brownish gold plus symbol
+                        fontWeight: 'bold',
+                        lineHeight: 1,
+                      }}
+                    >
+                      +
                     </Typography>
-                    <IconButton size="small" onClick={() => handleDeleteClick(0)}>
-                      <DeleteIcon fontSize="small" sx={{ color: 'black' }} />
-                    </IconButton>
+
+
+
                   </Box>
-                )}
+                </Box>
               </Box>
+
+
+
+              <Divider sx={{ borderBottomWidth: 2, mb: 1, mt: 1.5 }} />
+
+
+
+
+              <Box
+                sx={{
+                  // Card styling
+                  bgcolor: 'grey.50',
+                  borderRadius: 2,
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                  padding: 2,
+                  // Fixed size - half of the chat history box
+                  height: '100%',
+                  width: '100%',
+                  maxWidth: 'none',
+                  minWidth: 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                {/* Fixed Header */}
+                <Typography variant="h6" sx={{ mb: 0.01, textAlign: 'left', width: '100%' }}>
+                  Profile
+                </Typography>
+
+
+
+                <Divider sx={{ borderBottomWidth: 2, mb: 1, mt: 1 }} />
+
+
+
+                {/* Scrollable Content */}
+                <Box
+                  sx={{
+                    overflowY: 'auto',
+                    flex: 1,
+                  }}
+                >
+
+
+
+
+
+                  {/* Age Field */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                      Age:
+                    </Typography>
+                    <TextField
+                      size="small"
+                      type="number"
+                      placeholder="Enter age"
+                      variant="outlined"
+                      sx={{
+                        width: '120px',
+                        ml: 0.5,
+                        '& .MuiOutlinedInput-root': {
+                          height: '32px',
+                          fontSize: '0.875rem'
+                        }
+                      }}
+                    />
+                  </Box>
+
+
+
+
+
+
+                  {/* Goal Field */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                      Goal:
+                    </Typography>
+                    <TextField
+                      size="small"
+                      placeholder="I want to..."
+                      variant="outlined"
+                      sx={{
+                        width: '120px',
+                        ml: 0.5,
+                        '& .MuiOutlinedInput-root': {
+                          height: '32px',
+                          fontSize: '0.875rem'
+                        }
+                      }}
+                    />
+                  </Box>
+
+
+
+
+
+                  {/* Savings field */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                      Savings:
+                    </Typography>
+                    <TextField
+                      size="small"
+                      type="number"
+                      placeholder="$$$"
+                      variant="outlined"
+                      sx={{
+                        width: '120px',
+                        ml: 0.5,
+                        '& .MuiOutlinedInput-root': {
+                          height: '32px',
+                          fontSize: '0.875rem'
+                        }
+                      }}
+                    />
+                  </Box>
+
+
+
+
+                </Box>
+
+
+              </Box>
+
+
+
+
             </Box>
+
+
 
             {/* Right chat area */}
             <Box
@@ -474,21 +645,32 @@ export default function PlannerBot() {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  display: 'flex',
+                  display: 'left',
                   justifyContent: 'center',
                   py: 1.5,
                   background: 'transparent',
                 }}
               >
-                <Box sx={{ width: '90%', maxWidth: 800, display: 'flex', gap: 1 }}>
+                <Box sx={{ width: '95%', display: 'flex', gap: 1, justifyContent: 'flex-start' }}>
+
+
                   <Button
                     variant="outlined"
                     component="label"
-                    sx={{ minWidth: '80px', height: '50px', borderRadius: 3, fontWeight: 'bold' }}
+                    sx={{
+                      minWidth: '80px',
+                      height: '50px',
+                      borderRadius: 3,
+                      fontWeight: 'bold',
+                      alignSelf: 'flex-start', // Align button to the left
+                      mr: 1, // Push button to the left edge
+                    }}
                   >
                     Upload
                     <input type="file" hidden multiple onChange={handleFileUpload} />
                   </Button>
+
+
 
                   <Box
                     sx={{
@@ -500,10 +682,13 @@ export default function PlannerBot() {
                       px: 2,
                       py: 1,
                       flexGrow: 1,
+                      minWidth: 0,
                     }}
                   >
                     <TextField
                       fullWidth
+                      multiline
+                      maxRows={4}
                       placeholder="Type a message..."
                       variant="standard"
                       value={input}
@@ -523,6 +708,9 @@ export default function PlannerBot() {
                       <SendIcon />
                     </IconButton>
                   </Box>
+
+
+
                 </Box>
               </Box>
             </Box>

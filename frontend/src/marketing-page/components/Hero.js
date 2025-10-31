@@ -9,6 +9,8 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import visuallyHidden from '@mui/utils/visuallyHidden';
 
+
+
 export default function Hero() {
   return (
     <Box
@@ -47,20 +49,26 @@ export default function Hero() {
               lineHeight: 1.2,
             }}
           >
-            Sign&nbsp;Up&nbsp;For&nbsp;A&nbsp;
+            Welcome to{' '}
             <Typography
-              component="span"
               variant="h1"
-              sx={(theme) => ({
-                fontSize: 'inherit',
-                color: 'primary.main',
-                ...theme.applyStyles('dark', {
-                  color: 'primary.light',
-                }),
-              })}
+              component="span"
+              sx={{
+                color: '#FFD700', // Gold for "Nest"
+              }}
             >
-              Personal Retirement Plan
+              Nest
             </Typography>
+            <Typography
+              variant="h1"
+              component="span"
+              sx={{
+                color: '#c47c1eff', // Light Brown for "Wise"
+              }}
+            >
+              Wise
+            </Typography>
+            
           </Typography>
 
           {/* Optional subheading/description */}
@@ -71,7 +79,7 @@ export default function Hero() {
               width: { sm: '100%', md: '80%' },
             }}
           >
-            Plan your retirement with confidence, building a secure future tailored to your goals. Take control today with personalized strategies and expert guidance.
+            Plan your retirement with confidence, building a secure future tailored to your goals. Get a personalized plan sent straight to your email!
           </Typography>
 
           {/* Email input + button */}

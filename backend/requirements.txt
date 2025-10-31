@@ -1,2 +1,13 @@
 fastapi
 uvicorn[standard]
+langchain
+langchain-core
+langchain-community
+langchain-openai
+langgraph
+tiktoken
+numpy
+scikit-learn
+pypdf
+unstructured
+pdfminer.six

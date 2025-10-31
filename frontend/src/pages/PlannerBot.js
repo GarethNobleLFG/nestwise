@@ -18,17 +18,54 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import AppTheme from '../shared-theme/AppTheme';
 import AppBar from '../app-bar/AppBar';
+import { useRef } from 'react';
 
 export default function PlannerBot() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [sending, setSending] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [chatToDelete, setChatToDelete] = useState(null);
-  const [typingText, setTypingText] = useState(''); // for animated typing
+  const [typingText, setTypingText] = useState('');
+  const [sessionId, setSessionId] = useState(null);
 
-  const initialMessage = 'Hello! I am your Planner Bot. How can I help you today?';
+  const initialMessage = 'Hello! I am NestWiseAI. How can I help you today?';
 
-  // Animate the initial bot message
+
+  const safeMessages = Array.isArray(messages) ? messages : []; // If coming from props
+
+
+
+
+
+
+
+
+  // --- Start backend chat session ---
+  const startChatSession = React.useCallback(async () => {
+    await addBotMessage('Hello! I am NestWiseAI. How can I help you today?')
+
+    try {
+      const res = await fetch('http://localhost:8000/chatbot/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!res.ok) throw new Error('Failed to start session');
+      const data = await res.json();
+      setSessionId(data.session_id);
+    } catch (err) {
+      console.error(err);
+      await addBotMessage('Error starting session.');
+    }
+  }, []);
+
+
+
+
+
+  // DONT NEED USEEFFECT FOR NOW. KEPT RUNNING TWICE ON PAGE LOAD.
+  /*
+  // Animate initial bot message
   useEffect(() => {
     let i = 0;
     const interval = setInterval(() => {
@@ -36,46 +73,180 @@ export default function PlannerBot() {
       setTypingText(initialMessage.slice(0, i));
       if (i >= initialMessage.length) {
         clearInterval(interval);
-        setMessages([{ role: 'bot', content: initialMessage, initial: true }]);
+        setMessages((prev) => [...prev, { role: 'bot', content: initialMessage, initial: true }]);
         setTypingText('');
+        startChatSession(); // starting the chat session after initial message
       }
     }, 50);
     return () => clearInterval(interval);
   }, []);
+*/
 
-  const handleSend = () => {
-    if (!input.trim()) return;
 
-    // Add user message
-    setMessages((prev) =>
-      prev.map((msg) => ({ ...msg, initial: false })).concat({ role: 'user', content: input })
-    );
 
-    const userInput = input;
-    setInput('');
 
-    // Add bot placeholder
-    const botMessage = { role: 'bot', content: '', isTyping: true };
-    setMessages((prev) => [...prev, botMessage]);
 
-    // Animate bot response
-    let i = 0;
-    const fullText = `You said: "${userInput}"`;
-    const interval = setInterval(() => {
-      i++;
-      setMessages((prev) => {
-        const updated = [...prev];
-        updated[updated.length - 1] = { ...updated[updated.length - 1], content: fullText.slice(0, i) };
-        return updated;
-      });
-      if (i >= fullText.length) clearInterval(interval);
-    }, 50);
+  const addUserMessage = async (content) => {
+    setMessages((prev) => {
+      const safePrev = Array.isArray(prev) ? prev : [];
+      return [...safePrev, { role: 'user', content: content }];
+    });
   };
+
+
+
+
+  const addBotMessage = async (content) => {
+    const simulateTypingEffect = (text) => {
+
+      const chunkSize = Math.ceil(text.length / 10); // Larger chunk size for longer text
+      let i = 0;
+
+      return new Promise((resolve) => {
+        const interval = setInterval(() => {
+          i += chunkSize;
+          const partialText = text.slice(0, i);
+
+          setMessages((prev) => {
+            const safePrev = Array.isArray(prev) ? prev : [];
+            const updated = [...safePrev];
+            const lastIndex = updated.length - 1;
+
+            // Update the last bot message with the partial text
+            if (lastIndex >= 0 && updated[lastIndex].role === 'bot' && updated[lastIndex].isTyping) {
+              updated[lastIndex] = {
+                ...updated[lastIndex],
+                content: partialText,
+              };
+            } else {
+              // Add a new bot message if none exists
+              updated.push({ role: 'bot', content: partialText, isTyping: true });
+            }
+
+            return updated;
+          });
+
+          if (i >= text.length) {
+            clearInterval(interval);
+            resolve(text); // Resolve when all chunks are displayed
+          }
+        }, 100); // Adjust the interval time for chunk display speed
+      });
+    };
+
+    // Simulate typing effect and finalize the bot message
+    await simulateTypingEffect(content);
+
+    // Finalize the bot message
+    setMessages((prev) => {
+      const safePrev = Array.isArray(prev) ? prev : [];
+      const updated = [...safePrev];
+      const lastIndex = updated.length - 1;
+
+      if (lastIndex >= 0 && updated[lastIndex].role === 'bot') {
+        updated[lastIndex] = {
+          ...updated[lastIndex],
+          content,
+          isTyping: false,
+        };
+      }
+
+      return updated;
+    });
+  };
+
+
+
+
+
+  // --- Handle Send button ---
+  const handleSend = async () => {
+    if (!input.trim() || sending) return;
+
+    const userInput = input.trim();
+    setInput('');
+    setSending(true);
+    addUserMessage(userInput);
+
+    try {
+      if (!sessionId) throw new Error('Session not started');
+
+      // Send user input to backend
+      const res = await fetch('http://localhost:8000/chatbot/answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          message: userInput,
+        }),
+      });
+
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+
+      const data = await res.json();
+
+      // Commented this out because it is saving all the chats.
+      //setHistory(data.history);
+
+      // Show backend’s response
+      await addBotMessage(data.response);
+    } catch (err) {
+      console.error(err);
+      await addBotMessage(`Error: ${err.message}`);
+    } finally {
+      setSending(false);
+    }
+  };
+
+
+
+
+
+
 
   const handleFileUpload = (event) => {
     const files = event.target.files;
     if (files.length > 0) console.log('Uploaded files:', files);
   };
+
+
+
+
+
+
+  const handleDeleteClick = (idx) => {
+    setChatToDelete(idx);
+    setOpenDeleteDialog(true);
+  };
+
+
+
+
+
+
+
+  const handleConfirmDelete = () => {
+    if (chatToDelete !== null) {
+      setMessages((prev) => prev.filter((_, i) => i !== chatToDelete));
+      setChatToDelete(null);
+      setOpenDeleteDialog(false);
+    }
+  };
+
+
+
+
+
+
+
+
+  const handleCancelDelete = () => {
+    setChatToDelete(null);
+    setOpenDeleteDialog(false);
+  };
+
+
+
 
   const handleNewChat = () => {
     setMessages([]);
@@ -93,23 +264,23 @@ export default function PlannerBot() {
     }, 50);
   };
 
-  const handleDeleteClick = (idx) => {
-    setChatToDelete(idx);
-    setOpenDeleteDialog(true);
-  };
 
-  const handleConfirmDelete = () => {
-    if (chatToDelete !== null) {
-      setMessages((prev) => prev.filter((_, i) => i !== chatToDelete));
-      setChatToDelete(null);
-      setOpenDeleteDialog(false);
-    }
-  };
 
-  const handleCancelDelete = () => {
-    setChatToDelete(null);
-    setOpenDeleteDialog(false);
-  };
+
+
+
+  const initialized = useRef(false); // Flag to ensure it runs only once
+
+  if (!initialized.current) {
+    initialized.current = true; // Set the flag to true
+    startChatSession(); // Call the function directly
+  }
+
+
+
+
+
+
 
   return (
     <AppTheme>
@@ -135,7 +306,7 @@ export default function PlannerBot() {
             {/* Left sidebar */}
             <Box
               sx={{
-                width: '25%',
+                width: '20%',
                 bgcolor: 'grey.200',
                 p: 1,
                 borderRight: 1,
@@ -144,10 +315,12 @@ export default function PlannerBot() {
                 flexDirection: 'column',
               }}
             >
-              <Typography variant="h6" sx={{ mb: 1, textAlign: 'center', width: '100%' }}>
-                Chat History
-              </Typography>
 
+
+
+
+
+              {/*
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mb: 1 }}>
                 <Box
                   onClick={handleNewChat}
@@ -169,49 +342,217 @@ export default function PlannerBot() {
                     New Chat
                   </Typography>
                 </Box>
-
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, fontSize: '0.875rem', px: 0.5 }}>
-                  <SearchIcon fontSize="small" />
-                  <TextField
-                    size="small"
-                    placeholder="Search chats..."
-                    variant="standard"
-                    fullWidth
-                    sx={{ fontSize: '0.875rem' }}
-                  />
-                </Box>
               </Box>
+              */}
 
-              <Divider sx={{ borderBottomWidth: 2, mb: 1 }} />
 
-              <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
-                {messages.map((msg, idx) => (
+
+
+
+
+
+              <Box
+                sx={{
+                  // Card styling
+                  bgcolor: 'grey.50',
+                  borderRadius: 2,
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                  padding: 2,
+                  // Fixed size - half of the chat history box
+                  height: '155px',
+                  width: '100%',
+                  maxWidth: 'none',
+                  minWidth: 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+
+
+
+                {/* Fixed Header */}
+                <Typography variant="h6" sx={{ mb: 0.01, textAlign: 'left', width: '100%' }}>
+                  Select Plan To Edit
+                </Typography>
+
+
+
+                <Divider sx={{ borderBottomWidth: 2, mb: 1, mt: 1 }} />
+
+
+
+                {/* Scrollable Content */}
+                <Box
+                  sx={{
+                    overflowY: 'auto',
+                    flex: 1,
+                  }}
+                >
                   <Box
-                    key={idx}
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
-                      mb: 1,
-                      p: 1,
+                      justifyContent: 'center',
+                      width: '100%',
+                      height: '40px',
+                      border: '2px solid #c47c1eff', // Brownish gold outline
                       borderRadius: 1,
-                      bgcolor: 'grey.300',
-                      color: 'black',
                       cursor: 'pointer',
-                      transition: 'background-color 0.2s ease',
-                      '&:hover': { bgcolor: 'grey.400' },
+                      backgroundColor: 'transparent',
+                      '&:hover': {
+                        backgroundColor: 'rgba(196, 124, 30, 0.1)', // Light brownish gold background on hover
+                      },
                     }}
                   >
-                    <Typography variant="body2" noWrap onClick={() => console.log('Clicked chat', idx)}>
-                      {msg.content}
+
+                    <Typography
+                      sx={{
+                        fontSize: '24px',
+                        color: '#c47c1eff', // Brownish gold plus symbol
+                        fontWeight: 'bold',
+                        lineHeight: 1,
+                      }}
+                    >
+                      +
                     </Typography>
-                    <IconButton size="small" onClick={() => handleDeleteClick(idx)}>
-                      <DeleteIcon fontSize="small" sx={{ color: 'black' }} />
-                    </IconButton>
+
+
+
                   </Box>
-                ))}
+                </Box>
               </Box>
+
+
+
+              <Divider sx={{ borderBottomWidth: 2, mb: 1, mt: 1.5 }} />
+
+
+
+
+              <Box
+                sx={{
+                  // Card styling
+                  bgcolor: 'grey.50',
+                  borderRadius: 2,
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                  padding: 2,
+                  // Fixed size - half of the chat history box
+                  height: '100%',
+                  width: '100%',
+                  maxWidth: 'none',
+                  minWidth: 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                {/* Fixed Header */}
+                <Typography variant="h6" sx={{ mb: 0.01, textAlign: 'left', width: '100%' }}>
+                  Profile
+                </Typography>
+
+
+
+                <Divider sx={{ borderBottomWidth: 2, mb: 1, mt: 1 }} />
+
+
+
+                {/* Scrollable Content */}
+                <Box
+                  sx={{
+                    overflowY: 'auto',
+                    flex: 1,
+                  }}
+                >
+
+
+
+
+
+                  {/* Age Field */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                      Age:
+                    </Typography>
+                    <TextField
+                      size="small"
+                      type="number"
+                      placeholder="Enter age"
+                      variant="outlined"
+                      sx={{
+                        width: '120px',
+                        ml: 0.5,
+                        '& .MuiOutlinedInput-root': {
+                          height: '32px',
+                          fontSize: '0.875rem'
+                        }
+                      }}
+                    />
+                  </Box>
+
+
+
+
+
+
+                  {/* Goal Field */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                      Goal:
+                    </Typography>
+                    <TextField
+                      size="small"
+                      placeholder="I want to..."
+                      variant="outlined"
+                      sx={{
+                        width: '120px',
+                        ml: 0.5,
+                        '& .MuiOutlinedInput-root': {
+                          height: '32px',
+                          fontSize: '0.875rem'
+                        }
+                      }}
+                    />
+                  </Box>
+
+
+
+
+
+                  {/* Savings field */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                      Savings:
+                    </Typography>
+                    <TextField
+                      size="small"
+                      type="number"
+                      placeholder="$$$"
+                      variant="outlined"
+                      sx={{
+                        width: '120px',
+                        ml: 0.5,
+                        '& .MuiOutlinedInput-root': {
+                          height: '32px',
+                          fontSize: '0.875rem'
+                        }
+                      }}
+                    />
+                  </Box>
+
+
+
+
+                </Box>
+
+
+              </Box>
+
+
+
+
             </Box>
+
+
 
             {/* Right chat area */}
             <Box
@@ -229,7 +570,7 @@ export default function PlannerBot() {
               {/* Messages container - scrollable */}
               <Box sx={{ flex: 1, overflowY: 'auto', px: 2 }}>
                 {/* Initial bot message or typing */}
-                {(messages.length === 0 || messages.some(msg => msg.initial)) && (
+                {(safeMessages.length === 0 || safeMessages.some(msg => msg.initial)) && (
                   <Box
                     sx={{
                       bgcolor: 'white',
@@ -245,11 +586,11 @@ export default function PlannerBot() {
                       mt: 1,
                     }}
                   >
-                    <Typography variant="body1">{typingText || messages[0]?.content}</Typography>
+                    <Typography variant="body1">{typingText || safeMessages[0]?.content}</Typography>
                   </Box>
                 )}
 
-                {messages.map((msg, idx) => (
+                {safeMessages.map((msg, idx) => (
                   <Box
                     key={idx}
                     sx={{
@@ -304,21 +645,32 @@ export default function PlannerBot() {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  display: 'flex',
+                  display: 'left',
                   justifyContent: 'center',
                   py: 1.5,
                   background: 'transparent',
                 }}
               >
-                <Box sx={{ width: '90%', maxWidth: 800, display: 'flex', gap: 1 }}>
+                <Box sx={{ width: '95%', display: 'flex', gap: 1, justifyContent: 'flex-start' }}>
+
+
                   <Button
                     variant="outlined"
                     component="label"
-                    sx={{ minWidth: '80px', height: '50px', borderRadius: 3, fontWeight: 'bold' }}
+                    sx={{
+                      minWidth: '80px',
+                      height: '50px',
+                      borderRadius: 3,
+                      fontWeight: 'bold',
+                      alignSelf: 'flex-start', // Align button to the left
+                      mr: 1, // Push button to the left edge
+                    }}
                   >
                     Upload
                     <input type="file" hidden multiple onChange={handleFileUpload} />
                   </Button>
+
+
 
                   <Box
                     sx={{
@@ -330,19 +682,35 @@ export default function PlannerBot() {
                       px: 2,
                       py: 1,
                       flexGrow: 1,
+                      minWidth: 0,
                     }}
                   >
                     <TextField
                       fullWidth
+                      multiline
+                      maxRows={4}
                       placeholder="Type a message..."
                       variant="standard"
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
-                      onKeyPress={(e) => { if (e.key === 'Enter') handleSend(); }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleSend();
+                        }
+                      }}
                       InputProps={{ disableUnderline: true }}
                     />
-                    <IconButton color="primary" onClick={handleSend}><SendIcon /></IconButton>
+                    <IconButton
+                      color="primary"
+                      onClick={handleSend}
+                      disabled={sending || !input.trim()}
+                    >
+                      <SendIcon />
+                    </IconButton>
                   </Box>
+
+
+
                 </Box>
               </Box>
             </Box>

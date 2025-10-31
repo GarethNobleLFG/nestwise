@@ -411,19 +411,22 @@ graph = workflow.compile()
 
 initialMessage = 'Hello! I am NestWiseAI. How can I help you today?'
 def start_session(session_id: str):
-    global initial_state 
-    initial_state= MasterState(
+    """
+    Initialize a new session and store its MasterState in the global sessions dict.
+    """
+    global state
+    state = MasterState(
         messages=[],
         chatbot={"messages": [AIMessage(content=initialMessage)]},
-        planner={"messages":[]},
+        planner={"messages": []},
         extractor={"all_fields_filled": False},
-        real_profile={},
+        real_profile={},  # <-- this is what /profile will update
         shadow_profile={
-            "goal" : False,
-            "age" : False,
-            "savings" : False,
-            "salary" : False,
-            "location" : False
+            "goal": False,
+            "age": False,
+            "savings": False,
+            "salary": False,
+            "location": False
         }
     )
     return session_id
@@ -435,21 +438,27 @@ def chat_step(user_message: str, session_id: str):
     else:
         human_message = None
     
-    global initial_state
+    global state
     global prev_assistant_message
-    
+
     # Run the graph
-    initial_state["messages"].append(human_message)
-    initial_state = graph.invoke(initial_state)
+    state["messages"].append(human_message)
+    state = graph.invoke(state)
 
     # Print the assistant's reply
-    assistant_message = initial_state['chatbot']['messages'][-1]
+    assistant_message = state['chatbot']['messages'][-1]
     
     if assistant_message == prev_assistant_message:
-        planner_message = initial_state['planner']['messages'][-1]
-        return planner_message.content
-    prev_assistant_message = assistant_message
-    return assistant_message.content 
-  
+        planner_message = state['planner']['messages'][-1]
+        response_text = planner_message.content
+    else:
+        response_text = assistant_message.content
+        prev_assistant_message = assistant_message
 
- 
+    # Always include the latest real_profile
+    profile_data = state.get("real_profile", {})
+
+    return {
+        "response": response_text,
+        "real_profile": profile_data
+    } 

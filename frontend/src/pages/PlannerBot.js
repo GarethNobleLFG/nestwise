@@ -29,6 +29,12 @@ export default function PlannerBot() {
   const [typingText, setTypingText] = useState('');
   const [sessionId, setSessionId] = useState(null);
 
+  const [profile, setProfile] = useState({
+    age: '',
+    goal: '',
+    savings: ''
+  });
+
   const initialMessage = 'Hello! I am NestWiseAI. How can I help you today?';
 
 
@@ -185,6 +191,10 @@ export default function PlannerBot() {
 
       const data = await res.json();
 
+      if (data.real_profile) {
+        setProfile((prev) => ({ ...prev, ...data.real_profile }));
+      }
+      
       // Commented this out because it is saving all the chats.
       //setHistory(data.history);
 
@@ -199,6 +209,29 @@ export default function PlannerBot() {
   };
 
 
+  const updateProfile = async () => {
+    if (!sessionId) {
+      console.warn('Session not started, cannot update profile yet');
+      return;
+    }
+  
+    try {
+      const res = await fetch('http://localhost:8000/chatbot/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          profile
+        })
+      });
+  
+      if (!res.ok) throw new Error('Failed to update profile');
+      const data = await res.json();
+      console.log('Profile updated:', data);
+    } catch (err) {
+      console.error('Error updating profile:', err);
+    }
+  };  
 
 
 
@@ -478,6 +511,9 @@ export default function PlannerBot() {
                       type="number"
                       placeholder="Enter age"
                       variant="outlined"
+                      value={profile.age}
+                      onChange={(e) => setProfile({ ...profile, age: e.target.value })}
+                      onBlur={updateProfile}
                       sx={{
                         width: '120px',
                         ml: 0.5,
@@ -503,6 +539,9 @@ export default function PlannerBot() {
                       size="small"
                       placeholder="I want to..."
                       variant="outlined"
+                      value={profile.goal}
+                      onChange={(e) => setProfile({ ...profile, goal: e.target.value })}
+                      onBlur={updateProfile}
                       sx={{
                         width: '120px',
                         ml: 0.5,
@@ -528,6 +567,9 @@ export default function PlannerBot() {
                       type="number"
                       placeholder="$$$"
                       variant="outlined"
+                      value={profile.savings}
+                      onChange={(e) => setProfile({ ...profile, savings: e.target.value })}
+                      onBlur={updateProfile}
                       sx={{
                         width: '120px',
                         ml: 0.5,

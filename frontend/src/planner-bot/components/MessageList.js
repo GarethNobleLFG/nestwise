@@ -7,8 +7,6 @@ export default function MessageList({ safeMessages }) {
   return (
     <Box
       sx={{
-        flex: 1,
-        overflowY: 'auto',
         px: 2,
         py: 1,
         display: 'flex',
@@ -40,7 +38,6 @@ export default function MessageList({ safeMessages }) {
           </Box>
         </Grow>
       ))}
-      <Box sx={{ height: '86px' }} />
     </Box>
   );
 }

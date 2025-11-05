@@ -9,7 +9,7 @@ export default function Sidebar({ animationTriggered, profileData }) {
   return (
     <Box
       sx={{
-        width: '100%',
+        width: '85%',
         bgcolor: 'grey.200',
         p: 1,
         borderRight: 1,

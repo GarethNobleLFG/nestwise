@@ -3,7 +3,7 @@ import SvgIcon from '@mui/material/SvgIcon';
 
 export default function NestWiseIcon() {
   return (
-    <SvgIcon sx={{ height: 21, width: 120, mr: 2 }}>
+    <SvgIcon sx={{ height: 29, width: 180, mr: 2 }}>
       <svg
         width={120}
         height={25}

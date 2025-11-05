@@ -16,15 +16,16 @@ export default function ChatContainer({
   sending
 }) {
   return (
-    <Box sx={{ width: '100%', maxWidth: '1200px', px: 2 }}>
+    <Box sx={{ width: '100%', height: '100%' }}> {/* Removed maxWidth and px constraints */}
       <Zoom in={animationTriggered} timeout={1000}>
         <Box
           sx={{
             display: 'flex',
-            height: '80vh',
+            height: '100%', // Changed from '80vh' to '100%'
+            width: '100%',  // Added full width
             border: 1,
             borderColor: 'divider',
-            borderRadius: 3,
+            borderRadius: 0, // Made edges sharp
             overflow: 'hidden',
             position: 'relative',
             bgcolor: '#f7f7f8',

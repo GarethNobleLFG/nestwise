@@ -18,12 +18,18 @@ export default function ChatInput({
         position: 'sticky',
         bottom: 0,
         display: 'flex',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         py: 1.5,
         background: 'transparent',
       }}
     >
-      <Box sx={{ width: '95%', display: 'flex', gap: 1 }}>
+      <Box sx={{ 
+        width: '70%', 
+        maxWidth: '800px', 
+        display: 'flex', 
+        gap: 1,
+        ml: '225px'  // Change this pixel value to position it exactly where you want
+      }}>
         <Button
           variant="outlined"
           component="label"
@@ -58,7 +64,8 @@ export default function ChatInput({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();  // Prevent new line
                 handleSend();
               }
             }}

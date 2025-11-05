@@ -29,11 +29,9 @@ export default function PlannerBot() {
   const [typingText, setTypingText] = useState('');
   const [sessionId, setSessionId] = useState(null);
 
-  const [profile, setProfile] = useState({
-    age: '',
-    goal: '',
-    savings: ''
-  });
+
+  // Add this to your state declarations at the top
+  const [profileData, setProfileData] = useState({});
 
   const initialMessage = 'Hello! I am NestWiseAI. How can I help you today?';
 
@@ -67,26 +65,6 @@ export default function PlannerBot() {
 
 
 
-
-
-  // DONT NEED USEEFFECT FOR NOW. KEPT RUNNING TWICE ON PAGE LOAD.
-  /*
-  // Animate initial bot message
-  useEffect(() => {
-    let i = 0;
-    const interval = setInterval(() => {
-      i++;
-      setTypingText(initialMessage.slice(0, i));
-      if (i >= initialMessage.length) {
-        clearInterval(interval);
-        setMessages((prev) => [...prev, { role: 'bot', content: initialMessage, initial: true }]);
-        setTypingText('');
-        startChatSession(); // starting the chat session after initial message
-      }
-    }, 50);
-    return () => clearInterval(interval);
-  }, []);
-*/
 
 
 
@@ -192,9 +170,9 @@ export default function PlannerBot() {
       const data = await res.json();
 
       if (data.real_profile) {
-        setProfile((prev) => ({ ...prev, ...data.real_profile }));
+        setProfileData(data.real_profile);
       }
-      
+
       // Commented this out because it is saving all the chats.
       //setHistory(data.history);
 
@@ -208,30 +186,6 @@ export default function PlannerBot() {
     }
   };
 
-
-  const updateProfile = async () => {
-    if (!sessionId) {
-      console.warn('Session not started, cannot update profile yet');
-      return;
-    }
-  
-    try {
-      const res = await fetch('http://localhost:8000/chatbot/profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          session_id: sessionId,
-          profile
-        })
-      });
-  
-      if (!res.ok) throw new Error('Failed to update profile');
-      const data = await res.json();
-      console.log('Profile updated:', data);
-    } catch (err) {
-      console.error('Error updating profile:', err);
-    }
-  };  
 
 
 
@@ -276,25 +230,6 @@ export default function PlannerBot() {
   const handleCancelDelete = () => {
     setChatToDelete(null);
     setOpenDeleteDialog(false);
-  };
-
-
-
-
-  const handleNewChat = () => {
-    setMessages([]);
-    setTypingText('');
-
-    let i = 0;
-    const interval = setInterval(() => {
-      i++;
-      setTypingText(initialMessage.slice(0, i));
-      if (i >= initialMessage.length) {
-        clearInterval(interval);
-        setMessages([{ role: 'bot', content: initialMessage, initial: true }]);
-        setTypingText('');
-      }
-    }, 50);
   };
 
 
@@ -348,41 +283,6 @@ export default function PlannerBot() {
                 flexDirection: 'column',
               }}
             >
-
-
-
-
-
-              {/*
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mb: 1 }}>
-                <Box
-                  onClick={handleNewChat}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.5,
-                    cursor: 'pointer',
-                    fontSize: '0.875rem',
-                    mb: 1,
-                    px: 0.5,
-                    py: 0.5,
-                    borderRadius: 1,
-                    '&:hover': { bgcolor: 'grey.400' },
-                  }}
-                >
-                  <AddCircleOutlineIcon fontSize="small" />
-                  <Typography variant="body2" fontWeight="bold">
-                    New Chat
-                  </Typography>
-                </Box>
-              </Box>
-              */}
-
-
-
-
-
-
 
               <Box
                 sx={{
@@ -480,7 +380,7 @@ export default function PlannerBot() {
               >
                 {/* Fixed Header */}
                 <Typography variant="h6" sx={{ mb: 0.01, textAlign: 'left', width: '100%' }}>
-                  Profile
+                  Data For Your Plan:
                 </Typography>
 
 
@@ -498,99 +398,45 @@ export default function PlannerBot() {
                 >
 
 
-
-
-
-                  {/* Age Field */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                      Age:
+                  {/* Display JSON data with formatted values */}
+                  {Object.entries(profileData).length > 0 ? (
+                    Object.entries(profileData).map(([key, value]) => (
+                      <Box key={key} sx={{ mb: 1 }}>
+                        <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between', color: 'text.secondary', fontStyle: 'italic' }}>
+                          <span style={{}}>
+                            {key.charAt(0).toUpperCase() + key.slice(1)}:
+                          </span>
+                          <span style={{ color: '#666' }}>
+                            {typeof value === 'number' && key.toLowerCase().includes('savings')
+                              ? `$${value.toLocaleString()}`
+                              : value || 'N/A'
+                            }
+                          </span>
+                        </Typography>
+                      </Box>
+                    ))
+                  ) : (
+                    <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
+                      No profile data available
                     </Typography>
-                    <TextField
-                      size="small"
-                      type="number"
-                      placeholder="Enter age"
-                      variant="outlined"
-                      value={profile.age}
-                      onChange={(e) => setProfile({ ...profile, age: e.target.value })}
-                      onBlur={updateProfile}
-                      sx={{
-                        width: '120px',
-                        ml: 0.5,
-                        '& .MuiOutlinedInput-root': {
-                          height: '32px',
-                          fontSize: '0.875rem'
-                        }
-                      }}
-                    />
-                  </Box>
-
-
-
-
-
-
-                  {/* Goal Field */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                      Goal:
-                    </Typography>
-                    <TextField
-                      size="small"
-                      placeholder="I want to..."
-                      variant="outlined"
-                      value={profile.goal}
-                      onChange={(e) => setProfile({ ...profile, goal: e.target.value })}
-                      onBlur={updateProfile}
-                      sx={{
-                        width: '120px',
-                        ml: 0.5,
-                        '& .MuiOutlinedInput-root': {
-                          height: '32px',
-                          fontSize: '0.875rem'
-                        }
-                      }}
-                    />
-                  </Box>
-
-
-
-
-
-                  {/* Savings field */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                      Savings:
-                    </Typography>
-                    <TextField
-                      size="small"
-                      type="number"
-                      placeholder="$$$"
-                      variant="outlined"
-                      value={profile.savings}
-                      onChange={(e) => setProfile({ ...profile, savings: e.target.value })}
-                      onBlur={updateProfile}
-                      sx={{
-                        width: '120px',
-                        ml: 0.5,
-                        '& .MuiOutlinedInput-root': {
-                          height: '32px',
-                          fontSize: '0.875rem'
-                        }
-                      }}
-                    />
-                  </Box>
-
-
-
+                  )}
 
                 </Box>
 
+                <Typography
+                  variant="caption"
+                  sx={{
+                    textAlign: 'left',
+                    color: 'text.secondary',
+                    fontSize: '0.75rem',
+                    mt: 'auto', // Pushes it to the bottom
+                    pt: 1, // Small padding top
+                  }}
+                >
+                  Tell chatbot if data is not accurate.
+                </Typography>
 
               </Box>
-
-
-
 
             </Box>
 

@@ -33,9 +33,6 @@ export default function PlannerBot() {
   // Add this to your state declarations at the top
   const [profileData, setProfileData] = useState({});
 
-  const initialMessage = 'Hello! I am NestWiseAI. How can I help you today?';
-
-
   const safeMessages = Array.isArray(messages) ? messages : []; // If coming from props
 
 
@@ -194,16 +191,6 @@ export default function PlannerBot() {
   const handleFileUpload = (event) => {
     const files = event.target.files;
     if (files.length > 0) console.log('Uploaded files:', files);
-  };
-
-
-
-
-
-
-  const handleDeleteClick = (idx) => {
-    setChatToDelete(idx);
-    setOpenDeleteDialog(true);
   };
 
 

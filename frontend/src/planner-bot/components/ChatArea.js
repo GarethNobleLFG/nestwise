@@ -83,7 +83,7 @@ export default function ChatArea({
             backgroundColor: 'rgba(247, 247, 248, 0.95)',  // Semi-transparent background
             paddingTop: '5px',
             paddingBottom: '5px',
-            ml: '195px' 
+            ml: '178px' 
           }}
         >
           NestWise can make mistakes. Check important info.

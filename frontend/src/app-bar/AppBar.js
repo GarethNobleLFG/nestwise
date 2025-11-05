@@ -53,7 +53,12 @@ export default function AppBarComponent() {
         <StyledToolbar variant="dense" disableGutters>
           {/* Left side: Sitemark + buttons */}
           <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', px: 0 }}>
-            <Sitemark />
+            <Box
+              onClick={() => navigate('/')}
+              sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+            >
+              <Sitemark />
+            </Box>
 
             {/* Desktop navigation buttons evenly spaced */}
             <Box sx={{ display: { xs: 'none', md: 'flex' }, width: '100%' }}>

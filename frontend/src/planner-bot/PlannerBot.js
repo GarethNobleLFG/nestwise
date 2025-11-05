@@ -555,7 +555,7 @@ export default function PlannerBot() {
                       display: 'flex',
                       alignItems: 'center',
                       px: 2,
-                      py: 1,
+                      py: 0.1,
                       flexGrow: 1,
                       minWidth: 0,
                     }}
@@ -584,10 +584,29 @@ export default function PlannerBot() {
                     </IconButton>
                   </Box>
 
-
-
                 </Box>
+
+
+
               </Box>
+
+
+              <Typography
+                variant="caption"
+                sx={{
+                  textAlign: 'center',
+                  color: 'text.secondary',
+                  fontSize: '0.75rem',
+                  mt: 'auto', // Keep this to push it to the bottom
+                  pt: 0.05, // Even smaller top padding
+                  pb: 0.05, // Even smaller bottom padding
+                }}
+              >
+                NestWise can make mistakes. Check important info.
+              </Typography>
+
+
+
             </Box>
           </Box>
 

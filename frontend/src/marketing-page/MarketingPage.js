@@ -14,7 +14,7 @@ import Footer from './components/Footer';
 
 export default function MarketingPage(props) {
   return (
-    <AppTheme {...props}>
+    <AppTheme >
       <CssBaseline enableColorScheme />
       <AppBar />
       <Hero />

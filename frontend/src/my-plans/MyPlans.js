@@ -1,115 +1,246 @@
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
+import Toolbar from '@mui/material/Toolbar';
+import Slide from '@mui/material/Slide';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import Button from '@mui/material/Button';
 import AppTheme from '../shared-theme/AppTheme';
 import AppBar from '../app-bar/AppBar';
+import ChatContainer from './components/ChatContainer';
+import { useRef } from 'react';
 
-export default function MyPlans() {
-  const plans = ['Plan 1', 'Plan 2', 'Plan 3'];
+export default function PlannerBot() {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [sending, setSending] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [chatToDelete, setChatToDelete] = useState(null);
+  const [typingText, setTypingText] = useState('');
+  const [sessionId, setSessionId] = useState(null);
+  const [profileData, setProfileData] = useState({});
+  const [animationTriggered, setAnimationTriggered] = useState(false);
+  const initialized = useRef(false);
 
-  const financialData = [
-    { label: 'Total Balance', value: '$45,000' },
-    { label: 'Monthly Income', value: '$5,000' },
-    { label: 'Monthly Expenses', value: '$3,200' },
-    { label: 'Savings Rate', value: '15%' },
-    { label: 'Investments', value: '$20,000' },
-    { label: 'Debt', value: '$5,000' },
-  ];
+  const safeMessages = Array.isArray(messages) ? messages : [];
 
-  const handlePlanClick = (plan) => {
-    console.log('Clicked plan:', plan);
-    // Implement navigation or other actions
+
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimationTriggered(true);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+
+
+  const startChatSession = React.useCallback(async () => {
+    await addBotMessage('Hello! I am NestWiseAI. How can I help you today?')
+
+    try {
+      const res = await fetch('http://localhost:8000/chatbot/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!res.ok) throw new Error('Failed to start session');
+      const data = await res.json();
+      setSessionId(data.session_id);
+    } catch (err) {
+      console.error(err);
+      await addBotMessage('Error starting session.');
+    }
+  }, []);
+
+
+
+
+  // Start chat session only after animation completes
+  React.useEffect(() => {
+    if (animationTriggered && !initialized.current) {
+      initialized.current = true;
+
+      const chatSessionTimer = setTimeout(() => {
+        startChatSession();
+      }, 800); // Reduced from 1600 to 800
+
+      return () => clearTimeout(chatSessionTimer);
+    }
+  }, [animationTriggered, startChatSession]);
+
+
+
+
+
+
+  const addUserMessage = async (content) => {
+    setMessages((prev) => {
+      const safePrev = Array.isArray(prev) ? prev : [];
+      return [...safePrev, { role: 'user', content: content }];
+    });
   };
 
+
+
+
+
+
+
+  const addBotMessage = async (content) => {
+    const simulateTypingEffect = (text) => {
+      const chunkSize = Math.ceil(text.length / 10);
+      let i = 0;
+
+      return new Promise((resolve) => {
+        const interval = setInterval(() => {
+          i += chunkSize;
+          const partialText = text.slice(0, i);
+
+          setMessages((prev) => {
+            const safePrev = Array.isArray(prev) ? prev : [];
+            const updated = [...safePrev];
+            const lastIndex = updated.length - 1;
+
+            if (lastIndex >= 0 && updated[lastIndex].role === 'bot' && updated[lastIndex].isTyping) {
+              updated[lastIndex] = {
+                ...updated[lastIndex],
+                content: partialText,
+              };
+            } else {
+              updated.push({ role: 'bot', content: partialText, isTyping: true });
+            }
+
+            return updated;
+          });
+
+          if (i >= text.length) {
+            clearInterval(interval);
+            resolve(text);
+          }
+        }, 100);
+      });
+    };
+
+    await simulateTypingEffect(content);
+
+    setMessages((prev) => {
+      const safePrev = Array.isArray(prev) ? prev : [];
+      const updated = [...safePrev];
+      const lastIndex = updated.length - 1;
+
+      if (lastIndex >= 0 && updated[lastIndex].role === 'bot') {
+        updated[lastIndex] = {
+          ...updated[lastIndex],
+          content,
+          isTyping: false,
+        };
+      }
+
+      return updated;
+    });
+  };
+
+
+
+
+
+
+
+
+  const handleSend = async () => {
+    if (!input.trim() || sending) return;
+
+    const userInput = input.trim();
+    setInput('');
+    setSending(true);
+    addUserMessage(userInput);
+
+    try {
+      if (!sessionId) throw new Error('Session not started');
+
+      const res = await fetch('http://localhost:8000/chatbot/answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          message: userInput,
+        }),
+      });
+
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+
+      const data = await res.json();
+
+      if (data.real_profile) {
+        setProfileData(data.real_profile);
+      }
+
+      await addBotMessage(data.response);
+    } catch (err) {
+      console.error(err);
+      await addBotMessage(`Error: ${err.message}`);
+    } finally {
+      setSending(false);
+    }
+  };
+
+
+
+
+
+
+
+
+
+  const handleFileUpload = (event) => {
+    const files = event.target.files;
+    if (files.length > 0) console.log('Uploaded files:', files);
+  };
+
+
+
+
+
+
+
+
+
+
+
   return (
-    <AppTheme>
-      <CssBaseline />
-      <AppBar />
+  <AppTheme>
+    <CssBaseline />
+    <AppBar />
 
-      <Box sx={{ mt: 8, px: 2, width: '100%', display: 'flex', justifyContent: 'center' }}>
-        <Box sx={{ width: '100%', maxWidth: 1200, display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {/* Top: User Profile + Financial Data */}
-          <Box
-            sx={{
-              p: 4,
-              borderRadius: 3,
-              bgcolor: 'grey.100',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-            }}
-          >
-            <Typography variant="h5" sx={{ mb: 2, textDecoration: 'underline' }}>
-              John Doe
-            </Typography>
-
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
-                gap: 3,
-              }}
-            >
-              {financialData.map((item, idx) => (
-                <Box key={idx} sx={{ display: 'flex', flexDirection: 'column' }}>
-                  <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                    • {item.label}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {item.value}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
-          </Box>
-
-          {/* Bottom: Plans */}
-          <Box
-            sx={{
-              p: 4,
-              borderRadius: 3,
-              bgcolor: 'grey.100',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-            }}
-          >
-            <Typography variant="h6" sx={{ mb: 3 }}>
-              Your Plans
-            </Typography>
-            <Divider sx={{ mb: 4 }} />
-
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-around',
-                gap: 3,
-                flexWrap: 'wrap',
-              }}
-            >
-              {plans.map((plan, idx) => (
-                <Button
-                  key={idx}
-                  onClick={() => handlePlanClick(plan)}
-                  sx={{
-                    flex: '1 1 30%',
-                    minWidth: 200,
-                    height: 150,
-                    bgcolor: 'primary.light',
-                    color: 'primary.contrastText',
-                    fontSize: '1.25rem',
-                    fontWeight: 'bold',
-                    borderRadius: 3,
-                    boxShadow: 3,
-                    '&:hover': { bgcolor: 'primary.main' },
-                  }}
-                >
-                  {plan}
-                </Button>
-              ))}
-            </Box>
-          </Box>
+    <Box 
+      sx={{ 
+        position: 'fixed',
+        top: 48, // Dense AppBar is typically 48px instead of 64px
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100vw',
+        height: 'calc(100vh - 48px)', // Adjusted for dense AppBar
+        overflow: 'hidden'
+      }}
+    >
+      <Slide direction="up" in={animationTriggered} timeout={800}>
+        <Box sx={{ width: '100%', height: '100%', display: 'flex' }}>
+          <ChatContainer
+            animationTriggered={animationTriggered}
+            profileData={profileData}
+            safeMessages={safeMessages}
+            input={input}
+            setInput={setInput}
+            handleSend={handleSend}
+            handleFileUpload={handleFileUpload}
+            sending={sending}
+          />
         </Box>
-      </Box>
-    </AppTheme>
-  );
+      </Slide>
+    </Box>
+
+  </AppTheme>
+);
+
+
 }

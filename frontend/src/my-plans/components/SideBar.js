@@ -2,7 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Grow from '@mui/material/Grow';
-import PlanSelector from './PlanSelector';
+import DisplayedPlans from './DisplayedPlans';
 
 export default function Sidebar({ animationTriggered, profileData }) {
   return (
@@ -19,7 +19,7 @@ export default function Sidebar({ animationTriggered, profileData }) {
     >
       <Grow in={animationTriggered} timeout={1400}>
         <Box sx={{ width: '100%' }}>
-          <PlanSelector animationTriggered={animationTriggered} />
+          <DisplayedPlans animationTriggered={animationTriggered} />
         </Box>
       </Grow>
 

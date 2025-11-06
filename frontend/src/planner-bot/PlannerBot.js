@@ -154,6 +154,29 @@ export default function PlannerBot() {
     setSending(true);
     addUserMessage(userInput);
 
+    // Add thinking animation before the API call
+    const addThinkingMessage = () => {
+      setMessages((prev) => {
+        const safePrev = Array.isArray(prev) ? prev : [];
+        return [...safePrev, {
+          role: 'bot',
+          content: '',
+          isThinking: true,
+          id: Date.now() // unique ID for the thinking message
+        }];
+      });
+    };
+
+    const removeThinkingMessage = () => {
+      setMessages((prev) => {
+        const safePrev = Array.isArray(prev) ? prev : [];
+        return safePrev.filter(msg => !msg.isThinking);
+      });
+    };
+
+    // Show thinking animation
+    addThinkingMessage();
+
     try {
       if (!sessionId) throw new Error('Session not started');
 
@@ -174,10 +197,17 @@ export default function PlannerBot() {
         setProfileData(data.real_profile);
       }
 
+      removeThinkingMessage();
       await addBotMessage(data.response);
+
+
     } catch (err) {
+      
       console.error(err);
+      removeThinkingMessage();
       await addBotMessage(`Error: ${err.message}`);
+
+
     } finally {
       setSending(false);
     }
@@ -207,40 +237,40 @@ export default function PlannerBot() {
 
 
   return (
-  <AppTheme>
-    <CssBaseline />
-    <AppBar />
+    <AppTheme>
+      <CssBaseline />
+      <AppBar />
 
-    <Box 
-      sx={{ 
-        position: 'fixed',
-        top: 48, // Dense AppBar is typically 48px instead of 64px
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: '100vw',
-        height: 'calc(100vh - 48px)', // Adjusted for dense AppBar
-        overflow: 'hidden'
-      }}
-    >
-      <Slide direction="up" in={animationTriggered} timeout={800}>
-        <Box sx={{ width: '100%', height: '100%', display: 'flex' }}>
-          <ChatContainer
-            animationTriggered={animationTriggered}
-            profileData={profileData}
-            safeMessages={safeMessages}
-            input={input}
-            setInput={setInput}
-            handleSend={handleSend}
-            handleFileUpload={handleFileUpload}
-            sending={sending}
-          />
-        </Box>
-      </Slide>
-    </Box>
+      <Box
+        sx={{
+          position: 'fixed',
+          top: 48, // Dense AppBar is typically 48px instead of 64px
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100vw',
+          height: 'calc(100vh - 48px)', // Adjusted for dense AppBar
+          overflow: 'hidden'
+        }}
+      >
+        <Slide direction="up" in={animationTriggered} timeout={800}>
+          <Box sx={{ width: '100%', height: '100%', display: 'flex' }}>
+            <ChatContainer
+              animationTriggered={animationTriggered}
+              profileData={profileData}
+              safeMessages={safeMessages}
+              input={input}
+              setInput={setInput}
+              handleSend={handleSend}
+              handleFileUpload={handleFileUpload}
+              sending={sending}
+            />
+          </Box>
+        </Slide>
+      </Box>
 
-  </AppTheme>
-);
+    </AppTheme>
+  );
 
 
 }

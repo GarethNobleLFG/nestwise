@@ -28,7 +28,7 @@ export default function ChatInput({
         maxWidth: '800px', 
         display: 'flex', 
         gap: 1,
-        ml: '225px'  // Change this pixel value to position it exactly where you want
+        ml: '190px'  // Change this pixel value to position it exactly where you want
       }}>
         <Button
           variant="outlined"

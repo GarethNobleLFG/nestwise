@@ -18,7 +18,7 @@ const ThinkingAnimation = () => (
     }}
   >
     <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
-      NestWise Bot is thinking
+      NestWise Bot Is Thinking
     </Typography>
     <Box sx={{ display: 'flex', gap: 0.25 }}>
       {[0, 1, 2].map((i) => (

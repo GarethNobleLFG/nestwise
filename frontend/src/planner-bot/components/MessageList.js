@@ -2,8 +2,9 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grow from '@mui/material/Grow';
+import ReactMarkdown from 'react-markdown';
 
-// Add the ThinkingAnimation component
+// ThinkingAnimation component
 const ThinkingAnimation = () => (
   <Box
     sx={{
@@ -16,7 +17,7 @@ const ThinkingAnimation = () => (
     }}
   >
     <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>
-      NestWise Bot is thinking
+      NestWiseAI is thinking
     </Typography>
     <Box sx={{ display: 'flex', gap: 0.25 }}>
       {[0, 1, 2].map((i) => (
@@ -45,6 +46,8 @@ const ThinkingAnimation = () => (
     </Box>
   </Box>
 );
+
+
 
 
 
@@ -81,11 +84,108 @@ export default function MessageList({ safeMessages }) {
               maxWidth: '75%',
             }}
           >
-            {/* Check if it's a thinking message */}
             {msg.isThinking ? (
               <ThinkingAnimation />
-            ) : (
+            ) : msg.role === 'user' ? (
               <Typography variant="body1">{msg.content}</Typography>
+            ) : (
+              <ReactMarkdown
+                components={{
+                  h1: ({ children }) => (
+                    <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 2, mb: 1, color: 'text.primary' }}>
+                      {children}
+                    </Typography>
+                  ),
+                  h2: ({ children }) => (
+                    <Typography variant="h5" sx={{ fontWeight: 'bold', mt: 1.5, mb: 0.5, color: 'text.primary' }}>
+                      {children}
+                    </Typography>
+                  ),
+                  h3: ({ children }) => (
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1, mb: 0.5, color: 'text.primary' }}>
+                      {children}
+                    </Typography>
+                  ),
+                  p: ({ children }) => (
+                    <Typography variant="body1" sx={{ mb: 1, color: 'text.primary', lineHeight: 1.6 }}>
+                      {children}
+                    </Typography>
+                  ),
+                  li: ({ children }) => (
+                    <Typography component="li" variant="body1" sx={{ ml: 2, mb: 0.5, color: 'text.primary' }}>
+                      {children}
+                    </Typography>
+                  ),
+                  ul: ({ children }) => (
+                    <Box component="ul" sx={{ pl: 2, mb: 1 }}>
+                      {children}
+                    </Box>
+                  ),
+                  ol: ({ children }) => (
+                    <Box component="ol" sx={{ pl: 2, mb: 1 }}>
+                      {children}
+                    </Box>
+                  ),
+                  strong: ({ children }) => (
+                    <Box component="span" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
+                      {children}
+                    </Box>
+                  ),
+                  em: ({ children }) => (
+                    <Box component="span" sx={{ fontStyle: 'italic', color: 'text.primary' }}>
+                      {children}
+                    </Box>
+                  ),
+                  code: ({ children }) => (
+                    <Box 
+                      component="code"
+                      sx={{ 
+                        backgroundColor: '#f5f5f5', 
+                        padding: '2px 4px', 
+                        borderRadius: '3px',
+                        fontFamily: 'monospace',
+                        fontSize: '0.875em',
+                        color: 'text.primary'
+                      }}
+                    >
+                      {children}
+                    </Box>
+                  ),
+                  pre: ({ children }) => (
+                    <Box
+                      component="pre"
+                      sx={{
+                        backgroundColor: '#f5f5f5',
+                        padding: '12px',
+                        borderRadius: '6px',
+                        overflow: 'auto',
+                        marginBottom: '8px',
+                        fontFamily: 'monospace',
+                        color: 'text.primary'
+                      }}
+                    >
+                      {children}
+                    </Box>
+                  ),
+                  blockquote: ({ children }) => (
+                    <Box
+                      component="blockquote"
+                      sx={{
+                        borderLeft: '4px solid #ddd',
+                        pl: 2,
+                        ml: 0,
+                        mb: 1,
+                        fontStyle: 'italic',
+                        color: 'text.secondary'
+                      }}
+                    >
+                      {children}
+                    </Box>
+                  ),
+                }}
+              >
+                {msg.content}
+              </ReactMarkdown>
             )}
           </Box>
         </Grow>

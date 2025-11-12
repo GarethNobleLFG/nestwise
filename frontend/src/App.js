@@ -10,7 +10,6 @@ import MyPlans from './my-plans/MyPlans'; // <-- import MyPlans page
 function App() {
   return (
     <>
-      <AppBar /> {/* Navigation bar */}
       <Routes>
         {/* Default route now goes to MarketingPage */}
         <Route path="/" element={<MarketingPage />} />

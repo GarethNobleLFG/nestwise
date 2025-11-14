@@ -38,13 +38,18 @@ services:
     image: mongo:6.0
     container_name: nestwise-mongo
     restart: unless-stopped
+    command: ["mongod", "--config", "/etc/mongod.conf"]
+    volumes:
+    - ./mongo/mongod.conf:/etc/mongod.conf:ro
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 5
+  
     ports:
       - "27017:27017"
+
 
 networks:
   default:

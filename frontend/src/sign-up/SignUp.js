@@ -115,20 +115,45 @@ export default function SignUp(props) {
 
     return isValid;
   };
+  
+  const handleSubmit = async (event) => {
+    event.preventDefault(); // always prevent default at start
 
-  const handleSubmit = (event) => {
     if (nameError || emailError || passwordError) {
-      event.preventDefault();
       return;
     }
-    const data = new FormData(event.currentTarget);
-    console.log({
-      name: data.get('name'),
-      lastName: data.get('lastName'),
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+
+    const formData = new FormData(event.currentTarget);
+    const userData = {
+      //name: formData.get('name'),        // optional if your backend needs it
+      //lastName: formData.get('lastName'),// optional
+      email: formData.get('email'),
+      password: formData.get('password'),
+    };
+
+    try {
+      const response = await fetch('http://localhost:8000/userauth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to sign up');
+      }
+
+      const result = await response.json();
+      console.log('Sign up successful:', result);
+      // Handle successful signup (redirect, show success, etc.)
+    } catch (error) {
+      console.error('Error during sign up:', error.message);
+      // Show error to user
+    }
   };
+
 
   return (
     <AppTheme {...props}>

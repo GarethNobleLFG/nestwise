@@ -2,6 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers.chatBot import router
+from routers.userAuth import router
 
 app = FastAPI(title="Basic FastAPI App")
 
@@ -19,6 +20,7 @@ async def home():
     return {"message": "Hello, FastAPI is running!"}
 
 app.include_router(router, prefix="/chatbot", tags=["chatBot"])
+app.include_router(router, prefix="/userauth", tags=["userAuth"])
 
 if __name__ == "__main__":
     import uvicorn

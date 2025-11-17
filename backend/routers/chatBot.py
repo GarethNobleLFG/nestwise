@@ -82,17 +82,17 @@ async def answer_question(payload: AnswerRequest) -> AnswerResponse:
         ) from exc
 
 # --- Update user profile ---
-@router.post("/profile")
-async def update_profile(payload: ProfileUpdateRequest):
-    from Agentic_AI.langgraph import state  # using the same global session state you maintain
+# @router.post("/profile")
+# async def update_profile(payload: ProfileUpdateRequest):
+#     from Agentic_AI.langgraph import state  # using the same global session state you maintain
 
-    if not payload.session_id:
-        raise HTTPException(status_code=400, detail="Missing session_id")
+#     if not payload.session_id:
+#         raise HTTPException(status_code=400, detail="Missing session_id")
 
-    # Merge new data into the real_profile
-    existing_profile = state.get("real_profile", {})
-    updated_profile = {**existing_profile, **payload.profile}
-    state["real_profile"] = updated_profile
+#     # Merge new data into the real_profile
+#     existing_profile = state.get("real_profile", {})
+#     updated_profile = {**existing_profile, **payload.profile}
+#     state["real_profile"] = updated_profile
 
-    print(state["real_profile"])  # For debugging
-    return {"message": "Profile updated", "real_profile": updated_profile}
+#     print(state["real_profile"])  # For debugging
+#     return {"message": "Profile updated", "real_profile": updated_profile}

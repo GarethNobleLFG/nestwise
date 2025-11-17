@@ -1,5 +1,5 @@
 # routers/userAuth.py
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, status
 from pydantic import BaseModel, EmailStr
 from pymongo import MongoClient
 from jose import JWTError, jwt
@@ -26,7 +26,7 @@ pwd_hasher = PasswordHasher()
 # JWT configuration
 SECRET_KEY = "your_secret_key"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 5 
 
 router = APIRouter()
 
@@ -65,7 +65,7 @@ def authenticate_user(email: str, password: str):
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/userauth/signin")
 
 # Routes
-@router.post("/signup", response_model=dict)
+@router.post("/signup", response_model=dict, status_code=status.HTTP_201_CREATED)
 async def sign_up(user: User):
     if users_collection.find_one({"email": user.email}):
         raise HTTPException(status_code=400, detail="Email already registered")

@@ -115,9 +115,11 @@ def call_extractor(state: ExtractorState):
   Your task is to:
   1. Examine the conversation history that follows.
 
-  2. For every field currently marked as false, check if the user has provided information that can fill that field.
+  2. For every field, check if the user has provided information that can fill that field. Update if necessary
 
   3. If the user has supplied the missing information, extract it accurately.
+
+  4. If the user has supplied the information to update the true fields, exrtact the new value and update it.
 
   Respond only with a JSON object containing ONLY the previously false fields that you can now populate, using this exact structure:
   {{

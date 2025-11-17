@@ -9,7 +9,7 @@ import logging
 from Agentic_AI.langgraph import chat_step, start_session
 
 logger = logging.getLogger(__name__)
-router = APIRouter()
+chatRouter = APIRouter()
 
 
 # --- Schemas ---
@@ -31,7 +31,7 @@ class ProfileUpdateRequest(BaseModel):
     profile: dict
 
 # --- Start a new session ---
-@router.post("/start", response_model=StartResponse)
+@chatRouter.post("/start", response_model=StartResponse)
 async def start_chat() -> StartResponse:
     """
     Start a new chat session and return a unique session_id.
@@ -50,7 +50,7 @@ async def start_chat() -> StartResponse:
 
 
 # --- Send a message and get a response ---
-@router.post("/answer", response_model=AnswerResponse)
+@chatRouter.post("/answer", response_model=AnswerResponse)
 async def answer_question(payload: AnswerRequest) -> AnswerResponse:
     """
     Handle a user message for the given session_id and return the assistant's response.

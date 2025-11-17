@@ -28,7 +28,7 @@ SECRET_KEY = "your_secret_key" #Replace with a secure key in production
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 5 
 
-router = APIRouter()
+authRouter = APIRouter()
 
 # Pydantic models
 class User(BaseModel):
@@ -65,7 +65,7 @@ def authenticate_user(email: str, password: str):
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/userauth/signin")
 
 # Routes
-@router.post("/signup", response_model=dict, status_code=status.HTTP_201_CREATED)
+@authRouter.post("/signup", response_model=dict, status_code=status.HTTP_201_CREATED)
 async def sign_up(user: User):
     if users_collection.find_one({"email": user.email}):
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -74,7 +74,7 @@ async def sign_up(user: User):
     result = users_collection.insert_one(user_data)
     return {"message": "User created successfully", "user_id": str(result.inserted_id)}
 
-@router.post("/signin", response_model=Token)
+@authRouter.post("/signin", response_model=Token)
 async def sign_in(user: User):
     db_user = authenticate_user(user.email, user.password)
     if not db_user:
@@ -82,7 +82,7 @@ async def sign_in(user: User):
     access_token = create_access_token(data={"sub": db_user["email"]})
     return {"access_token": access_token, "token_type": "bearer"}
 
-@router.get("/me", response_model=dict)
+@authRouter.get("/getUser", response_model=dict)
 async def read_users_me(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

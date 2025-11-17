@@ -109,19 +109,41 @@ export default function SignIn(props) {
     return isValid;
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (!validateInputs()) return;
 
-    const data = new FormData(event.currentTarget);
-    const email = data.get('email');
-    const password = data.get('password');
+    const formData = new FormData(event.currentTarget);
+    const userData = {
+      //name: formData.get('name'),        // optional if your backend needs it
+      //lastName: formData.get('lastName'),// optional
+      email: formData.get('email'),
+      password: formData.get('password'),
+    };
 
-    console.log({ email, password });
+    try {
+      const response = await fetch('http://localhost:8000/userauth/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
 
-    // Replace this with actual authentication logic
-    if (email && password) {
-      navigate('/dashboard'); // Redirect after successful login
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to sign in');
+      }
+
+      const data = await response.json();
+      console.log('Sign-in successful:', data);
+
+      // Handle successful sign-in (e.g., save token, redirect)
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Error signing in:', error.message);
+      setEmailError(true);
+      setEmailErrorMessage('Invalid email or password.');
     }
   };
 

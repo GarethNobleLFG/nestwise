@@ -3,6 +3,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers.chatBot import chatRouter
 from routers.userAuth import authRouter
+from pymongo import MongoClient
+
+
+
 
 app = FastAPI(title="Basic FastAPI App")
 
@@ -22,6 +26,28 @@ async def home():
 app.include_router(chatRouter, prefix="/chatbot", tags=["chatBot"])
 app.include_router(authRouter, prefix="/userauth", tags=["userAuth"])
 
+
+
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+
+
+
+
+
+# MongoDB setup
+client = MongoClient("mongodb://nestwise-mongo:27017/")
+db = client["nestwise_db"]
+users_collection = db["users"]
+
+
+
+# Test MongoDB connection
+try:
+    client.admin.command("ping")
+    print("MongoDB connected successfully!")
+except Exception as e:
+    print("MongoDB connection failed:", e)

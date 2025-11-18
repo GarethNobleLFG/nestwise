@@ -79,6 +79,10 @@ export default function SignUp(props) {
     setChecked(true);
   }, []);
 
+
+
+
+
   const validateInputs = () => {
     const email = document.getElementById('email');
     const password = document.getElementById('password');
@@ -115,18 +119,21 @@ export default function SignUp(props) {
 
     return isValid;
   };
-  
+
+
+
+
+
   const handleSubmit = async (event) => {
     event.preventDefault(); // always prevent default at start
 
-    if (nameError || emailError || passwordError) {
-      return;
+    if (!validateInputs()) {
+      return; // Stop if validation fails
     }
 
     const formData = new FormData(event.currentTarget);
     const userData = {
-      //name: formData.get('name'),        // optional if your backend needs it
-      //lastName: formData.get('lastName'),// optional
+      name: formData.get('name'),       
       email: formData.get('email'),
       password: formData.get('password'),
     };
@@ -142,7 +149,7 @@ export default function SignUp(props) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to sign up');
+        throw new Error(errorData.detail || 'Failed to sign up');
       }
 
       const result = await response.json();
@@ -150,9 +157,11 @@ export default function SignUp(props) {
       // Handle successful signup (redirect, show success, etc.)
     } catch (error) {
       console.error('Error during sign up:', error.message);
-      // Show error to user
+      alert(`Sign up failed: ${error.message}`); // Show error to user
     }
   };
+
+
 
 
   return (
@@ -251,7 +260,6 @@ export default function SignUp(props) {
                       type="submit"
                       fullWidth
                       variant="contained"
-                      onClick={validateInputs}
                     >
                       Sign up
                     </Button>

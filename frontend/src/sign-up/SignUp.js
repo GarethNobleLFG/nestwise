@@ -20,6 +20,9 @@ import Sitemark from './components/SitemarkIcon';
 import Fade from '@mui/material/Fade';
 import Slide from '@mui/material/Slide';
 import Zoom from '@mui/material/Zoom';
+import { useNavigate } from 'react-router-dom';
+import CircularProgress from '@mui/material/CircularProgress';
+import Backdrop from '@mui/material/Backdrop';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -64,6 +67,10 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignUp(props) {
+  const navigate = useNavigate();
+
+
+
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
@@ -71,8 +78,16 @@ export default function SignUp(props) {
   const [nameError, setNameError] = React.useState(false);
   const [nameErrorMessage, setNameErrorMessage] = React.useState('');
 
+
+
   // Animation state
   const [checked, setChecked] = React.useState(false);
+
+  // Loading and success states
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isSuccess, setIsSuccess] = React.useState(false);
+
+
 
   // Trigger animations when component mounts
   React.useEffect(() => {
@@ -133,7 +148,7 @@ export default function SignUp(props) {
 
     const formData = new FormData(event.currentTarget);
     const userData = {
-      name: formData.get('name'),       
+      name: formData.get('name'),
       email: formData.get('email'),
       password: formData.get('password'),
     };
@@ -154,7 +169,21 @@ export default function SignUp(props) {
 
       const result = await response.json();
       console.log('Sign up successful:', result);
-      // Handle successful signup (redirect, show success, etc.)
+
+
+
+
+
+      // ----------HANDLING OF SUCCESSFUL SIGN-UP----------
+
+      setIsLoading(false);
+      setIsSuccess(true);
+
+      setTimeout(() => {
+        navigate('/');
+      }, 1500);
+
+
     } catch (error) {
       console.error('Error during sign up:', error.message);
       alert(`Sign up failed: ${error.message}`); // Show error to user
@@ -168,145 +197,164 @@ export default function SignUp(props) {
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
       <SignUpContainer direction="column" justifyContent="space-between">
+
+        {/* Success Overlay */}
+        <Backdrop
+          sx={{
+            color: '#FFD700',
+            zIndex: (theme) => theme.zIndex.modal + 1,
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0
+          }}
+          open={isSuccess}
+        >
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+            <CircularProgress color="inherit" size={60} />
+            <Typography variant="h6">Account Created Successfully!</Typography>
+            <Typography variant="body1">Redirecting to home page...</Typography>
+          </Box>
+        </Backdrop>
+
         <Fade in={checked} timeout={800}>
-          <Slide direction="up" in={checked} timeout={600}>
-            <Card variant="outlined" sx={{
-              alignItems: 'flex-start',
-              maxWidth: '1000px',
-              minHeight: 'auto',
-              height: 'auto',
-              overflow: 'visible'
-            }}>
+          <Card variant="outlined" sx={{
+            alignItems: 'flex-start',
+            maxWidth: '1000px',
+            minHeight: 'auto',
+            height: 'auto',
+            overflow: 'visible'
+          }}>
 
-              <Sitemark />
+            <Sitemark />
 
-              <Divider sx={{
-                backgroundColor: '#828282ff',
-                height: '1px',
-                border: 'none',
-                opacity: 0.5,
-                my: 0.1,
-                width: '100%',
-                borderRadius: '5px'
-              }} />
+            <Divider sx={{
+              backgroundColor: '#828282ff',
+              height: '1px',
+              border: 'none',
+              opacity: 0.5,
+              my: 0.1,
+              width: '100%',
+              borderRadius: '5px'
+            }} />
 
-              <Typography
-                component="h1"
-                variant="h4"
-                sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-              >
-                Sign Up
-              </Typography>
+            <Typography
+              component="h1"
+              variant="h4"
+              sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+            >
+              Sign Up
+            </Typography>
 
-              {/* Main content layout with form on left, social on right */}
-              <Box sx={{ display: 'flex', gap: 4, width: '100%', alignItems: 'flex-start' }}>
-                {/* Left side - Main sign up form */}
-                <Box sx={{ flex: 1, minWidth: '300px' }}>
-                  <Box
-                    component="form"
-                    onSubmit={handleSubmit}
-                    sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
-                  >
-                    <FormControl>
-                      <FormLabel htmlFor="name">Full name</FormLabel>
-                      <TextField
-                        autoComplete="name"
-                        name="name"
-                        required
-                        fullWidth
-                        id="name"
-                        placeholder="Jon Snow"
-                        error={nameError}
-                        helperText={nameErrorMessage}
-                        color={nameError ? 'error' : 'primary'}
-                      />
-                    </FormControl>
-                    <FormControl>
-                      <FormLabel htmlFor="email">Email</FormLabel>
-                      <TextField
-                        required
-                        fullWidth
-                        id="email"
-                        placeholder="your@email.com"
-                        name="email"
-                        autoComplete="email"
-                        variant="outlined"
-                        error={emailError}
-                        helperText={emailErrorMessage}
-                        color={passwordError ? 'error' : 'primary'}
-                      />
-                    </FormControl>
-                    <FormControl>
-                      <FormLabel htmlFor="password">Password</FormLabel>
-                      <TextField
-                        required
-                        fullWidth
-                        name="password"
-                        placeholder="••••••"
-                        type="password"
-                        id="password"
-                        autoComplete="new-password"
-                        variant="outlined"
-                        error={passwordError}
-                        helperText={passwordErrorMessage}
-                        color={passwordError ? 'error' : 'primary'}
-                      />
-                    </FormControl>
-                    <FormControlLabel
-                      control={<Checkbox value="allowExtraEmails" color="primary" />}
-                      label="I want to receive updates via email."
-                    />
-                    <Button
-                      type="submit"
+            {/* Main content layout with form on left, social on right */}
+            <Box sx={{ display: 'flex', gap: 4, width: '100%', alignItems: 'flex-start' }}>
+              {/* Left side - Main sign up form */}
+              <Box sx={{ flex: 1, minWidth: '300px' }}>
+                <Box
+                  component="form"
+                  onSubmit={handleSubmit}
+                  sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+                >
+                  <FormControl>
+                    <FormLabel htmlFor="name">Full name</FormLabel>
+                    <TextField
+                      autoComplete="name"
+                      name="name"
+                      required
                       fullWidth
-                      variant="contained"
-                    >
-                      Sign up
-                    </Button>
-                  </Box>
-                </Box>
-
-                {/* Right side - social signup and signin */}
-                <Box sx={{
-                  flex: 1,
-                  minWidth: '250px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 2
-                }}>
-                  <Divider sx={{ mb: 1 }}>
-                    <Typography sx={{ color: 'text.secondary' }}>or</Typography>
-                  </Divider>
+                      id="name"
+                      placeholder="Jon Snow"
+                      error={nameError}
+                      helperText={nameErrorMessage}
+                      color={nameError ? 'error' : 'primary'}
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel htmlFor="email">Email</FormLabel>
+                    <TextField
+                      required
+                      fullWidth
+                      id="email"
+                      placeholder="your@email.com"
+                      name="email"
+                      autoComplete="email"
+                      variant="outlined"
+                      error={emailError}
+                      helperText={emailErrorMessage}
+                      color={emailError ? 'error' : 'primary'}
+                    />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel htmlFor="password">Password</FormLabel>
+                    <TextField
+                      required
+                      fullWidth
+                      name="password"
+                      placeholder="••••••"
+                      type="password"
+                      id="password"
+                      autoComplete="new-password"
+                      variant="outlined"
+                      error={passwordError}
+                      helperText={passwordErrorMessage}
+                      color={passwordError ? 'error' : 'primary'}
+                    />
+                  </FormControl>
+                  <FormControlLabel
+                    control={<Checkbox value="allowExtraEmails" color="primary" />}
+                    label="I want to receive updates via email."
+                  />
                   <Button
+                    type="submit"
                     fullWidth
-                    variant="outlined"
-                    onClick={() => alert('Sign up with Google')}
-                    startIcon={<GoogleIcon />}
+                    variant="contained"
                   >
-                    Sign up with Google
+                    Sign up
                   </Button>
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    onClick={() => alert('Sign up with Facebook')}
-                    startIcon={<FacebookIcon />}
-                  >
-                    Sign up with Facebook
-                  </Button>
-                  <Typography sx={{ textAlign: 'center', mt: 1 }}>
-                    Already have an account?{' '}
-                    <Link
-                      href="/material-ui/getting-started/templates/sign-in/"
-                      variant="body2"
-                      sx={{ alignSelf: 'center' }}
-                    >
-                      Sign in
-                    </Link>
-                  </Typography>
                 </Box>
               </Box>
-            </Card>
-          </Slide>
+
+              {/* Right side - social signup and signin */}
+              <Box sx={{
+                flex: 1,
+                minWidth: '250px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2
+              }}>
+                <Divider sx={{ mb: 1 }}>
+                  <Typography sx={{ color: 'text.secondary' }}>or</Typography>
+                </Divider>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={() => alert('Sign up with Google')}
+                  startIcon={<GoogleIcon />}
+                >
+                  Sign up with Google
+                </Button>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={() => alert('Sign up with Facebook')}
+                  startIcon={<FacebookIcon />}
+                >
+                  Sign up with Facebook
+                </Button>
+                <Typography sx={{ textAlign: 'center', mt: 1 }}>
+                  Already have an account?{' '}
+                  <Link
+                    href="/material-ui/getting-started/templates/sign-in/"
+                    variant="body2"
+                    sx={{ alignSelf: 'center' }}
+                  >
+                    Sign in
+                  </Link>
+                </Typography>
+              </Box>
+            </Box>
+          </Card>
         </Fade>
       </SignUpContainer>
     </AppTheme>

@@ -944,7 +944,11 @@ def chat_step(user_message: str, session_id: str):
     conversation_title = state["conversation_title"]
 
     # Always include the latest real_profile
-    profile_data = state.get("real_profile", {})
+    profile_data = {
+        field: state["real_profile"].get(field, False)
+        for field in state["shadow_profile"]
+    }
+    #print(profile_data)
 
     return {
         "response": response_text,

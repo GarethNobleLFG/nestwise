@@ -115,8 +115,7 @@ export default function SignIn(props) {
 
     const formData = new FormData(event.currentTarget);
     const userData = {
-      //name: formData.get('name'),        // optional if your backend needs it
-      //lastName: formData.get('lastName'),// optional
+      name: ('NestWise User'),
       email: formData.get('email'),
       password: formData.get('password'),
     };

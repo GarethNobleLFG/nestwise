@@ -8,27 +8,11 @@ import logging
 # Import your langgraph functions and shared sessions
 from Agentic_AI.langgraph import chat_step, start_session
 
+#import models
+from models.chat import StartResponse, AnswerRequest, AnswerResponse, ProfileUpdateRequest
+
 logger = logging.getLogger(__name__)
 chatRouter = APIRouter()
-
-
-# --- Schemas ---
-class StartResponse(BaseModel):
-    session_id: str
-
-
-class AnswerRequest(BaseModel):
-    session_id: str
-    message: str
-
-
-class AnswerResponse(BaseModel):
-    response: str
-    real_profile: dict | None = None
-
-class ProfileUpdateRequest(BaseModel):
-    session_id: str
-    profile: dict
 
 # --- Start a new session ---
 @chatRouter.post("/start", response_model=StartResponse)
@@ -68,7 +52,8 @@ async def answer_question(payload: AnswerRequest) -> AnswerResponse:
         if isinstance(result, dict):
             return AnswerResponse(
                 response=result.get("response", ""),
-                real_profile=result.get("real_profile", {})
+                real_profile=result.get("real_profile", {}),
+                conversation_title=result.get("conversation_title", None)
             )
         else:
             # backward compatibility fallback

@@ -1,4 +1,3 @@
-// frontend/src/my-plans/components/ContentViewer.js
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -7,6 +6,8 @@ import Grow from '@mui/material/Grow';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import Button from '@mui/material/Button';
+import { useNavigate } from 'react-router-dom';
 
 export default function ContentViewer({
     animationTriggered = true,
@@ -16,6 +17,7 @@ export default function ContentViewer({
     topBoxHeight = 400,
     bottomBoxHeight = 250
 }) {
+    const navigate = useNavigate();
 
     return (
         <Box
@@ -25,7 +27,6 @@ export default function ContentViewer({
                 gap: 2,
                 width: '100%',
                 padding: 2,
-                // Removed fixed height constraint
             }}
         >
             {/* Top Box - PDF Viewer */}
@@ -36,7 +37,7 @@ export default function ContentViewer({
                         borderRadius: 2,
                         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
                         padding: 2,
-                        height: `${topBoxHeight}px`, // Fixed height for PDF viewer
+                        height: `${topBoxHeight}px`,
                         display: 'flex',
                         flexDirection: 'column',
                     }}
@@ -110,7 +111,7 @@ export default function ContentViewer({
                 sx={{
                     display: 'flex',
                     gap: 2,
-                    height: `${bottomBoxHeight}px`, // Fixed height for bottom boxes
+                    height: `${bottomBoxHeight}px`,
                 }}
             >
                 {/* Left Data Box */}
@@ -223,6 +224,33 @@ export default function ContentViewer({
                     </Box>
                 </Grow>
             </Box>
+
+            {/* Button to edit plan!! */}
+            <Button
+                variant="contained"
+                color="primary"
+                size="small"
+                fullWidth
+                sx={{
+                    mt: 1,
+                    backgroundColor: '#c47c1eff',
+                    color: '#fff',
+                    fontWeight: 600,
+                    borderRadius: 2,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                    maxWidth: '400px',
+                    alignSelf: 'center',
+                    '&:hover': {
+                        backgroundColor: '#a05e13',
+                    },
+                }}
+                onClick={() => {
+                    navigate('/plannerbot');
+                    console.log('Edit Plan in Planner Bot clicked');
+                }}
+            >
+                Edit Plan in Planner Bot
+            </Button>
         </Box>
     );
 }

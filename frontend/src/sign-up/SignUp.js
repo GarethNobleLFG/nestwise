@@ -201,7 +201,7 @@ export default function SignUp(props) {
         {/* Success Overlay */}
         <Backdrop
           sx={{
-            color: '#FFD700',
+            color: '#c47c1eff',
             zIndex: (theme) => theme.zIndex.modal + 1,
             position: 'fixed',
             top: 0,

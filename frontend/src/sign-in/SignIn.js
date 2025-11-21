@@ -21,6 +21,9 @@ import { useNavigate } from 'react-router-dom';
 import Sitemark from './components/SitemarkIcon';
 import Fade from '@mui/material/Fade';
 import Slide from '@mui/material/Slide';
+import CircularProgress from '@mui/material/CircularProgress';
+import Backdrop from '@mui/material/Backdrop';
+
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -83,6 +86,16 @@ export default function SignIn(props) {
     setChecked(true);
   }, []);
 
+
+
+  // Loading and success states
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isSuccess, setIsSuccess] = React.useState(false);
+
+
+
+
+
   const validateInputs = () => {
     const email = document.getElementById('email');
     const password = document.getElementById('password');
@@ -137,8 +150,19 @@ export default function SignIn(props) {
       const data = await response.json();
       console.log('Sign-in successful:', data);
 
-      // Handle successful sign-in (e.g., save token, redirect)
-      navigate('/dashboard');
+
+
+      // ----------HANDLING OF SUCCESSFUL SIGN-UP----------
+
+      setIsLoading(false);
+      setIsSuccess(true);
+
+      setTimeout(() => {
+        navigate('/');
+      }, 1500);
+
+
+
     } catch (error) {
       console.error('Error signing in:', error.message);
       setEmailError(true);
@@ -150,6 +174,32 @@ export default function SignIn(props) {
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
       <SignInContainer direction="column" justifyContent="space-between">
+
+
+        {/* Success Overlay */}
+        <Backdrop
+          sx={{
+            color: '#c47c1eff',
+            zIndex: (theme) => theme.zIndex.modal + 1,
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0
+          }}
+          open={isSuccess}
+        >
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+            <CircularProgress color="inherit" size={60} />
+            <Typography variant="h6">Logging you in.</Typography>
+            <Typography variant="body1">Redirecting to home page...</Typography>
+          </Box>
+        </Backdrop>
+
+
+
+
+
         <Fade in={checked} timeout={800}>
           <Slide direction="up" in={checked}>
             <Card variant="outlined" sx={{

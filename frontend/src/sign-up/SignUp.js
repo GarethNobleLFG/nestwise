@@ -180,7 +180,7 @@ export default function SignUp(props) {
       setIsSuccess(true);
 
       setTimeout(() => {
-        navigate('/');
+        navigate('/signin');
       }, 1500);
 
 
@@ -214,7 +214,7 @@ export default function SignUp(props) {
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
             <CircularProgress color="inherit" size={60} />
             <Typography variant="h6">Account Created Successfully!</Typography>
-            <Typography variant="body1">Redirecting to home page...</Typography>
+            <Typography variant="body1">Redirecting To Sign-In...</Typography>
           </Box>
         </Backdrop>
 

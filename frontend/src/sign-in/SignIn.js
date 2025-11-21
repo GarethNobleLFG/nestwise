@@ -128,7 +128,6 @@ export default function SignIn(props) {
 
     const formData = new FormData(event.currentTarget);
     const userData = {
-      name: ('NestWise User'),
       email: formData.get('email'),
       password: formData.get('password'),
     };
@@ -144,10 +143,11 @@ export default function SignIn(props) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to sign in');
+        throw new Error(errorData.detail || 'Failed to sign in');
       }
 
       const data = await response.json();
+      localStorage.setItem('access_token', data.access_token);
       console.log('Sign-in successful:', data);
 
 

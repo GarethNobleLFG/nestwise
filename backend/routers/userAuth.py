@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 
 # import models
-from models.user import User, Token
+from models.user import User, Token, UserSignIn
 
 
 # import contollers
@@ -37,7 +37,7 @@ async def sign_up(user: User):
 
 
 @authRouter.post("/signin", response_model=Token)
-async def sign_in(user: User):
+async def sign_in(user: UserSignIn):
     """Authenticate user and return access token"""
     db_user = authenticate_user(user.email, user.password)
     if not db_user:

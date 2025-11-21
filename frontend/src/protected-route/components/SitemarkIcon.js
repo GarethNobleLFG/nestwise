@@ -3,7 +3,7 @@ import SvgIcon from '@mui/material/SvgIcon';
 
 export default function NestWiseIcon() {
   return (
-    <SvgIcon sx={{ height: 29, width: 180, mr: 2 }}>
+    <SvgIcon sx={{ height: 60, width: 200, mr: 0, display: 'block' }}>
       <svg
         width={120}
         height={25}
@@ -13,7 +13,7 @@ export default function NestWiseIcon() {
       >
         {/* "Nest" in Gold */}
         <text
-          x="-10"
+          x="0"
           y="20"
           fill="#FFD700"
           fontFamily="Arial, sans-serif"
@@ -25,7 +25,7 @@ export default function NestWiseIcon() {
 
         {/* "Wise" in Light Brown */}
         <text
-          x="45"
+          x="55"
           y="20"
           fill="#c47c1eff"  // light brown / tan
           fontFamily="Arial, sans-serif"

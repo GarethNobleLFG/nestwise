@@ -11,3 +11,8 @@ scikit-learn
 pypdf
 unstructured
 pdfminer.six
+pymongo
+python-jose[cryptography]
+argon2-cffi
+pydantic[email]
+dnspython

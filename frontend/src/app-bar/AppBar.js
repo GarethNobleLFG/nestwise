@@ -14,6 +14,9 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ColorModeIconDropdown from '../shared-theme/ColorModeIconDropdown';
 import Sitemark from './SitemarkIcon';
 import { useNavigate } from 'react-router-dom';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+
+
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: 'flex',
@@ -31,13 +34,77 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   padding: '8px 12px',
 }));
 
+
+
+
+
+
+function checkTokenValidity(token) {
+  if (!token) {
+    return false;
+  }
+
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp * 1000 > Date.now();
+  }
+  catch {
+    return false;
+  }
+}
+
+
+
+function getUserFromToken(token) {
+  if (!token) {
+    return null;
+  }
+  try {
+
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return { email: payload.sub, name: payload.name || payload.sub };
+  }
+  catch {
+    return null;
+  }
+}
+
+
+
+
+
+
+
+
+
 export default function AppBarComponent() {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
 
+  //  Get user based off of their token validity.
+  const token = localStorage.getItem('token');
+  console.log('token:', token);
+  const isAuthenticated = checkTokenValidity(token);
+  console.log('isAuthenticated:', isAuthenticated);
+  const user = isAuthenticated ? getUserFromToken(token) : null;
+  console.log('user:', user);
+
+
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/signin');
+  };
+
+
+
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
+
+
+
+
 
   return (
     <AppBar
@@ -76,51 +143,94 @@ export default function AppBarComponent() {
           </Box>
         </Box>
 
+
+
         {/* Desktop buttons */}
         <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, alignItems: 'center' }}>
-          <Button
-            color="info"
-            variant="text"
-            size="small"
-            onClick={() => navigate('/signin')}
-            sx={{
-              color: 'primary',
-              '&:hover': {
-                backgroundColor: 'rgba(187, 15, 15, 0.04)',
-              }
-            }}
-          >
-            Sign in
-          </Button>
-          <Button
-            variant="contained"
-            size="small"
-            onClick={() => navigate('/signup')}
-            sx={{
-              backgroundColor: 'hsl(30, 40%, 50%) !important',
-              color: 'white !important',
-              boxShadow: 'none !important',
-              border: '1px solid hsl(30, 40%, 50%) !important',
-              '&:hover': {
-                backgroundColor: 'hsl(30, 50%, 40%) !important',
-                boxShadow: 'none !important',
-              },
-              '&:active': {
-                backgroundColor: 'hsl(30, 50%, 30%) !important',
-              },
-              '&:focus': {
-                backgroundColor: 'hsl(30, 40%, 50%) !important',
-                boxShadow: 'none !important',
-              },
-              '&.Mui-focusVisible': {
-                backgroundColor: 'hsl(30, 40%, 50%) !important',
-                boxShadow: '0 0 0 3px rgba(139, 69, 19, 0.3) !important',
-              }
-            }}
-          >
-            Sign up
-          </Button>
-          <ColorModeIconDropdown />
+          {isAuthenticated ? (
+            <>
+              <AccountCircleIcon sx={{ color: '#c47c1eff', mr: 1 }} />
+
+              <Box sx={{ fontWeight: 600, color: '#333', mr: 2 }}>
+                {user?.name}
+              </Box>
+
+              <Button
+                variant="contained"
+                size="small"
+                onClick={handleLogout}
+                sx={{
+                  backgroundColor: 'hsl(30, 40%, 50%) !important',
+                  color: 'white !important',
+                  boxShadow: 'none !important',
+                  border: '1px solid hsl(30, 40%, 50%) !important',
+                  '&:hover': {
+                    backgroundColor: 'hsl(30, 50%, 40%) !important',
+                    boxShadow: 'none !important',
+                  },
+                  '&:active': {
+                    backgroundColor: 'hsl(30, 50%, 30%) !important',
+                  },
+                  '&:focus': {
+                    backgroundColor: 'hsl(30, 40%, 50%) !important',
+                    boxShadow: 'none !important',
+                  },
+                  '&.Mui-focusVisible': {
+                    backgroundColor: 'hsl(30, 40%, 50%) !important',
+                    boxShadow: '0 0 0 3px rgba(139, 69, 19, 0.3) !important',
+                  }
+                }}
+              >
+                Logout
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                color="info"
+                variant="text"
+                size="small"
+                onClick={() => navigate('/signin')}
+                sx={{
+                  color: 'primary',
+                  '&:hover': {
+                    backgroundColor: 'rgba(187, 15, 15, 0.04)',
+                  }
+                }}
+              >
+                Sign in
+              </Button>
+              <Button
+                variant="contained"
+                size="small"
+                onClick={() => navigate('/signup')}
+                sx={{
+                  backgroundColor: 'hsl(30, 40%, 50%) !important',
+                  color: 'white !important',
+                  boxShadow: 'none !important',
+                  border: '1px solid hsl(30, 40%, 50%) !important',
+                  '&:hover': {
+                    backgroundColor: 'hsl(30, 50%, 40%) !important',
+                    boxShadow: 'none !important',
+                  },
+                  '&:active': {
+                    backgroundColor: 'hsl(30, 50%, 30%) !important',
+                  },
+                  '&:focus': {
+                    backgroundColor: 'hsl(30, 40%, 50%) !important',
+                    boxShadow: 'none !important',
+                  },
+                  '&.Mui-focusVisible': {
+                    backgroundColor: 'hsl(30, 40%, 50%) !important',
+                    boxShadow: '0 0 0 3px rgba(139, 69, 19, 0.3) !important',
+                  }
+                }}
+              >
+                Sign up
+              </Button>
+              <ColorModeIconDropdown />
+            </>
+          )}
         </Box>
 
 

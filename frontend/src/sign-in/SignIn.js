@@ -147,7 +147,7 @@ export default function SignIn(props) {
       }
 
       const data = await response.json();
-      localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem('token', data.access_token);
       console.log('Sign-in successful:', data);
 
 

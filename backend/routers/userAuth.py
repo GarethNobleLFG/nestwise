@@ -43,7 +43,10 @@ async def sign_in(user: UserSignIn):
     if not db_user:
         raise HTTPException(status_code=401, detail="Invalid email or password")
     
-    access_token = create_access_token(data={"sub": db_user["email"]})
+    access_token = create_access_token(data={
+        "sub": db_user["email"],
+        "name": db_user["name"]
+    })
     return {"access_token": access_token, "token_type": "bearer"}
 
 

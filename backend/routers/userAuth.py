@@ -75,19 +75,17 @@ async def update_user(
         new_name=update.new_name
     )
 
-    if update.new_email or update.new_name:
-        # Get the updated user data
-        final_email = update.new_email if update.new_email else current_email
-        updated_user = get_user_by_email(final_email)
+   
+    updated_user = get_user_by_email(update.new_email)
         
-        new_token = create_access_token(data={
-            "sub": updated_user["email"],
-            "name": updated_user["name"]
-        })
+    new_token = create_access_token(data={
+        "sub": updated_user["email"],
+        "name": updated_user["name"]
+    })
         
-        return {
-            "message": "Profile updated successfully",
-            "new_token": new_token  # Return the new token directly
-        }
+    return {
+        "message": "Profile updated successfully",
+        "new_token": new_token  # Return the new token directly
+    }
     
-    return result
+

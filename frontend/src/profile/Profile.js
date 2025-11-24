@@ -20,6 +20,7 @@ import Card from '@mui/material/Card';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import Grow from '@mui/material/Grow';
 
 export default function Profile() {
     const [editMode, setEditMode] = useState({ name: false, email: false });
@@ -164,181 +165,183 @@ export default function Profile() {
                         justifyContent: 'center',
                     }}
                 >
-                    <Card
-                        sx={{
-                            maxWidth: 420,
-                            width: '100%',
-                            mx: 'auto',
-                            mt: 2,
-                            p: 4,
-                            borderRadius: 4,
-                            boxShadow: 6,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            bgcolor: '#fff',
-                        }}
-                    >
-                        {/* Large Profile Icon */}
-                        <Box
+                    <Grow in={true} timeout={700}>
+                        <Card
                             sx={{
-                                bgcolor: '#fff3e0',
-                                color: '#c47c1eff',
-                                width: 96,
-                                height: 96,
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                mb: 2,
-                                fontSize: 64,
-                                boxShadow: 2,
-                            }}
-                        >
-                            <PersonIcon sx={{ fontSize: 64 }} />
-                        </Box>
-
-                        <Typography variant="h5" fontWeight={700} textAlign="center" mb={2} color="#c47c1eff">
-                            Profile
-                        </Typography>
-
-                        {/* Name Field */}
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%', px: 1, py: 1 }}>
-                            <PersonIcon sx={{ color: '#c47c1eff' }} />
-                            {editMode.name ? (
-                                <>
-                                    <TextField
-                                        value={profile.name}
-                                        onChange={(e) => handleChange('name', e.target.value)}
-                                        size="small"
-                                        variant="standard"
-                                        sx={{ flex: 1, input: { color: '#a05e13' } }}
-                                        autoFocus
-                                    />
-                                    <IconButton onClick={() => handleSave('name')} color="success">
-                                        <SaveIcon />
-                                    </IconButton>
-                                </>
-                            ) : (
-                                <>
-                                    <Typography sx={{ flex: 1, color: '#a05e13', fontWeight: 500 }}>{profile.name}</Typography>
-                                    <IconButton onClick={() => handleEdit('name')} sx={{ color: '#c47c1eff' }}>
-                                        <EditIcon />
-                                    </IconButton>
-                                </>
-                            )}
-                        </Box>
-
-                        <Divider sx={{ width: '90%', mx: 'auto', bgcolor: '#ffe0b3', my: -1 }} />
-
-                        {/* Email Field */}
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%', px: 1, py: 1 }}>
-                            <EmailIcon sx={{ color: '#c47c1eff' }} />
-                            {editMode.email ? (
-                                <>
-                                    <TextField
-                                        value={profile.email}
-                                        onChange={(e) => handleChange('email', e.target.value)}
-                                        size="small"
-                                        variant="standard"
-                                        sx={{ flex: 1, input: { color: '#a05e13' } }}
-                                        autoFocus
-                                    />
-                                    <IconButton onClick={() => handleSave('email')} color="success">
-                                        <SaveIcon />
-                                    </IconButton>
-                                </>
-                            ) : (
-                                <>
-                                    <Typography sx={{ flex: 1, color: '#a05e13', fontWeight: 500 }}>{profile.email}</Typography>
-                                    <IconButton onClick={() => handleEdit('email')} sx={{ color: '#c47c1eff' }}>
-                                        <EditIcon />
-                                    </IconButton>
-                                </>
-                            )}
-                        </Box>
-
-
-
-
-
-
-                        {/* Update Profile Button */}
-                        <Button
-                            variant="contained"
-                            fullWidth
-                            disabled={!edited}
-                            sx={{
-                                mt: 3,
-                                bgcolor: edited ? '#c47c1eff' : '#ffe0b3',
-                                color: edited ? '#fff' : '#a05e13',
-                                fontWeight: 600,
-                                boxShadow: edited ? 2 : 0,
-                                transition: 'all 0.2s',
-                                maxWidth: 300,
-                            }}
-                            onClick={handleUpdateProfile}
-                        >
-                            Update Profile
-                        </Button>
-
-
-
-
-
-
-
-
-                        {/* Subscription Area */}
-                        <Box
-                            sx={{
+                                maxWidth: 420,
                                 width: '100%',
-                                maxWidth: 350,
                                 mx: 'auto',
-                                my: 6,
-                                p: 2,
-                                bgcolor: '#fff3e0',
-                                borderRadius: 2,
+                                mt: 2,
+                                p: 4,
+                                borderRadius: 4,
+                                boxShadow: 6,
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
-                                boxShadow: 1,
-                                gap: 1.5,
+                                bgcolor: '#fff',
                             }}
                         >
-                            <CardMembershipIcon sx={{ color: '#c47c1eff', fontSize: 36, mb: 1 }} />
-                            <Typography variant="subtitle1" fontWeight={600} color="#a05e13">
-                                Current Subscription
-                            </Typography>
-                            <Typography variant="body1" color="#333">
-                                Premium Plan
-                            </Typography>
-                            <Chip
-                                label="Active"
-                                color="success"
-                                size="small"
-                                sx={{ fontWeight: 600, mt: 0.5 }}
-                            />
-                            <Button
-                                variant="outlined"
-                                startIcon={<CreditCardIcon />}
+                            {/* Large Profile Icon */}
+                            <Box
                                 sx={{
-                                    mt: 1,
-                                    borderColor: '#c47c1eff',
+                                    bgcolor: '#fff3e0',
                                     color: '#c47c1eff',
-                                    fontWeight: 600,
-                                    '&:hover': {
-                                        backgroundColor: '#ffe0b3',
-                                        borderColor: '#a05e13',
-                                        color: '#a05e13',
-                                    },
+                                    width: 96,
+                                    height: 96,
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    mb: 2,
+                                    fontSize: 64,
+                                    boxShadow: 2,
                                 }}
-                                onClick={() => alert('Manage subscription coming soon!')}
                             >
-                                Manage Subscription
+                                <PersonIcon sx={{ fontSize: 64 }} />
+                            </Box>
+
+                            <Typography variant="h5" fontWeight={700} textAlign="center" mb={2} color="#c47c1eff">
+                                Profile
+                            </Typography>
+
+                            {/* Name Field */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%', px: 1, py: 1 }}>
+                                <PersonIcon sx={{ color: '#c47c1eff' }} />
+                                {editMode.name ? (
+                                    <>
+                                        <TextField
+                                            value={profile.name}
+                                            onChange={(e) => handleChange('name', e.target.value)}
+                                            size="small"
+                                            variant="standard"
+                                            sx={{ flex: 1, input: { color: '#a05e13' } }}
+                                            autoFocus
+                                        />
+                                        <IconButton onClick={() => handleSave('name')} color="success">
+                                            <SaveIcon />
+                                        </IconButton>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Typography sx={{ flex: 1, color: '#a05e13', fontWeight: 500 }}>{profile.name}</Typography>
+                                        <IconButton onClick={() => handleEdit('name')} sx={{ color: '#c47c1eff' }}>
+                                            <EditIcon />
+                                        </IconButton>
+                                    </>
+                                )}
+                            </Box>
+
+                            <Divider sx={{ width: '90%', mx: 'auto', bgcolor: '#ffe0b3', my: -1 }} />
+
+                            {/* Email Field */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%', px: 1, py: 1 }}>
+                                <EmailIcon sx={{ color: '#c47c1eff' }} />
+                                {editMode.email ? (
+                                    <>
+                                        <TextField
+                                            value={profile.email}
+                                            onChange={(e) => handleChange('email', e.target.value)}
+                                            size="small"
+                                            variant="standard"
+                                            sx={{ flex: 1, input: { color: '#a05e13' } }}
+                                            autoFocus
+                                        />
+                                        <IconButton onClick={() => handleSave('email')} color="success">
+                                            <SaveIcon />
+                                        </IconButton>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Typography sx={{ flex: 1, color: '#a05e13', fontWeight: 500 }}>{profile.email}</Typography>
+                                        <IconButton onClick={() => handleEdit('email')} sx={{ color: '#c47c1eff' }}>
+                                            <EditIcon />
+                                        </IconButton>
+                                    </>
+                                )}
+                            </Box>
+
+
+
+
+
+
+                            {/* Update Profile Button */}
+                            <Button
+                                variant="contained"
+                                fullWidth
+                                disabled={!edited}
+                                sx={{
+                                    mt: 3,
+                                    bgcolor: edited ? '#c47c1eff' : '#ffe0b3',
+                                    color: edited ? '#fff' : '#a05e13',
+                                    fontWeight: 600,
+                                    boxShadow: edited ? 2 : 0,
+                                    transition: 'all 0.2s',
+                                    maxWidth: 300,
+                                }}
+                                onClick={handleUpdateProfile}
+                            >
+                                Update Profile
                             </Button>
-                        </Box>
-                    </Card>
+
+
+
+
+
+
+
+
+                            {/* Subscription Area */}
+                            <Box
+                                sx={{
+                                    width: '100%',
+                                    maxWidth: 350,
+                                    mx: 'auto',
+                                    my: 6,
+                                    p: 2,
+                                    bgcolor: '#fff3e0',
+                                    borderRadius: 2,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    boxShadow: 1,
+                                    gap: 1.5,
+                                }}
+                            >
+                                <CardMembershipIcon sx={{ color: '#c47c1eff', fontSize: 36, mb: 1 }} />
+                                <Typography variant="subtitle1" fontWeight={600} color="#a05e13">
+                                    Current Subscription
+                                </Typography>
+                                <Typography variant="body1" color="#333">
+                                    Premium Plan
+                                </Typography>
+                                <Chip
+                                    label="Active"
+                                    color="success"
+                                    size="small"
+                                    sx={{ fontWeight: 600, mt: 0.5 }}
+                                />
+                                <Button
+                                    variant="outlined"
+                                    startIcon={<CreditCardIcon />}
+                                    sx={{
+                                        mt: 1,
+                                        borderColor: '#c47c1eff',
+                                        color: '#c47c1eff',
+                                        fontWeight: 600,
+                                        '&:hover': {
+                                            backgroundColor: '#ffe0b3',
+                                            borderColor: '#a05e13',
+                                            color: '#a05e13',
+                                        },
+                                    }}
+                                    onClick={() => alert('Manage subscription coming soon!')}
+                                >
+                                    Manage Subscription
+                                </Button>
+                            </Box>
+                        </Card>
+                    </Grow>
                 </Box>
 
 

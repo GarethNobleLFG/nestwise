@@ -301,13 +301,22 @@ def call_chatbot(state: ChatbotState):
     Missing fields sorted by importance:
     {missing_fields_text}
 
-    Your job:
-    1. Identify which field is most important and still missing.
-    2. Ask the user about that specific field.
-    3. If all fields are collected, respond with: "All necessary info collected. Proceeding to generate your plan."
+    ## Your Task:
+    1. **If fields are missing**: Ask about the MOST important missing field in a conversational way
+    2. **If all collected**: Respond with "All necessary info collected. Proceeding to generate your plan."
 
-    Return only the next chatbot message — no explanations, no JSON.
+    ## Response Format Requirements:
+    - Use **markdown formatting** with headers, bullet points, and emphasis
+    - Structure your response with clear sections using `##` or `###` headers
+    - Use **bold** for important terms and *italics* for emphasis
+    - Include bullet points (`-` or `*`) for lists
+    - Use `>` for important callouts or tips
+    - Keep the tone friendly and conversational
+    - Make questions engaging and easy to understand
+    
     """
+
+
     state["messages"].append(HumanMessage(content=profile_prompt))
 
     # Debug print (optional)

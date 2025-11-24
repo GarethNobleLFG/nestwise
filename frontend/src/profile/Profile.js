@@ -32,6 +32,7 @@ export default function Profile() {
 
 
     // --------------PROFILE EDITING FUNCTIONS--------------
+
     const handleEdit = (field) => {
         setEditMode((prev) => ({ ...prev, [field]: true }));
     };
@@ -45,10 +46,7 @@ export default function Profile() {
         setEditMode((prev) => ({ ...prev, [field]: false }));
     };
 
-    const handleUpdateProfile = () => {
-        setEdited(false);
-        setEditMode({ name: false, email: false });
-    };
+
 
 
 
@@ -56,6 +54,7 @@ export default function Profile() {
 
 
     // --------------TOKEN CHECKING--------------
+
     function checkTokenValidity(token) {
         if (!token) {
             return false;
@@ -107,6 +106,75 @@ export default function Profile() {
 
     const token = localStorage.getItem('token');
     const [profile, setProfile] = useState(getUserFromToken(token));
+
+
+
+
+
+
+
+    // --------------UPDATE PROFILE--------------
+
+    const handleUpdateProfile = async () => {
+        setEdited(false);
+        setEditMode({ name: false, email: false });
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            return;
+        }
+        const userFromToken = getUserFromToken(token);
+
+
+        const uploadToBackend = {};
+        if (profile.name) {
+            uploadToBackend.new_name = profile.name;
+        }
+        if (profile.email) {
+            uploadToBackend.new_email = profile.email;
+        }
+        if (userFromToken && userFromToken.email) {
+            uploadToBackend.current_email = userFromToken.email;
+        }
+
+
+
+        try {
+            const response = await fetch('http://localhost:8000/userauth/updateUser', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify(uploadToBackend),
+            });
+
+
+            if (!response.ok) {
+                const error = await response.json();
+                alert(error.detail || 'Failed to update profile.');
+                return;
+            }
+
+
+            const newToken = await response.json();
+
+
+            if (newToken.new_token) {
+                localStorage.setItem('token', newToken.new_token);
+                setProfile(getUserFromToken(newToken.new_token));
+            }
+        }
+        catch (error) {
+            alert('An error occurred.');
+            console.log('The try block broke.');
+        }
+    };
+
+
+
+
+
 
 
 

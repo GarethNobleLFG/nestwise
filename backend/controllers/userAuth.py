@@ -121,3 +121,40 @@ def verify_token(token: str):
         return email
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
+    
+
+
+
+
+
+def update_user_profile(current_email: str, new_email: str = None, new_name: str = None):
+        update_fields = {}
+
+        # If the current and new email are the same, just skip this section entirely
+        if new_email and new_email != current_email:
+            # Check if the new email is already taken
+            existing_user = app.users_collection.find_one({"email": new_email})
+            if not existing_user:
+              update_fields["email"] = new_email
+            else:
+                raise HTTPException(status_code=400, detail="Email already in use.")
+                
+
+        if new_name:
+            update_fields["name"] = new_name
+    
+        if not update_fields:
+            raise HTTPException(status_code=400, detail="No update fields provided")
+        
+        update_fields["updated_at"] = datetime.utcnow()
+
+
+        result = app.users_collection.update_one(
+            {"email": current_email},
+            {"$set": update_fields}
+        )
+
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        return {"message": "Profile updated successfully"}

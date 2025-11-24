@@ -15,6 +15,8 @@ import ColorModeIconDropdown from '../shared-theme/ColorModeIconDropdown';
 import Sitemark from './SitemarkIcon';
 import { useNavigate } from 'react-router-dom';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { useEffect } from 'react';
+
 
 
 
@@ -80,6 +82,19 @@ function getUserFromToken(token) {
 export default function AppBarComponent() {
   const [open, setOpen] = React.useState(false);
   const navigate = useNavigate();
+  const [, setRerender] = React.useState(0);
+
+
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setRerender(val => val + 1);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  
+
 
   //  Get user based off of their token validity.
   const token = localStorage.getItem('token');
@@ -149,7 +164,19 @@ export default function AppBarComponent() {
         <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, alignItems: 'center' }}>
           {isAuthenticated ? (
             <>
-              <AccountCircleIcon sx={{ color: '#c47c1eff', mr: 1 }} />
+              <AccountCircleIcon
+                onClick={() => navigate('/profile')}
+                sx={{
+                  color: '#c47c1eff',
+                  mr: 1,
+                  transition: 'background 0.2s, border-radius 0.2s',
+                  '&:hover': {
+                    backgroundColor: 'hsl(30, 50%, 40%) !important',
+                    borderRadius: '50%',
+                    boxShadow: 'none !important',
+                  },
+                }}
+              />
 
               <Box sx={{ fontWeight: 600, color: '#333', mr: 2 }}>
                 {user?.name}

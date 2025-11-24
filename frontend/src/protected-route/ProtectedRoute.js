@@ -3,21 +3,57 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import Zoom from '@mui/material/Zoom';
 import SitemarkIcon from './components/SitemarkIcon';
+import { useEffect } from 'react';
+
 
 
 export default function ProtectedRoute({ children }) {
-    const token = localStorage.getItem('access_token');
     const navigate = useNavigate();
     const [show, setShow] = React.useState(false);
 
 
-    React.useEffect(() => {
-        if (!token) setShow(true);
-        else setShow(false);
-    }, [token]);
+
+
+    // --------------TOKEN CHECKING--------------
+
+    function checkTokenValidity(token) {
+        if (!token) {
+            return false;
+        }
+
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.exp * 1000 > Date.now();
+        }
+        catch {
+            return false;
+        }
+    }
 
 
 
+
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+
+            const token = localStorage.getItem('token');
+            if (!checkTokenValidity(token)) {
+                setShow(true);
+            }
+            else {
+                setShow(false);
+            }
+
+        }, 2000); // checks every 2 seconds
+
+        return () => clearInterval(interval);
+
+    }, [checkTokenValidity, navigate]);
+
+
+
+    const token = localStorage.getItem('token');
 
 
     return (
@@ -72,7 +108,7 @@ export default function ProtectedRoute({ children }) {
                             <div style={{ fontSize: '2rem', fontWeight: 600, marginBottom: 24 }}>
                                 Please log in to use this feature of
                             </div>
-                            
+
                             <div
                                 style={{
                                     display: 'flex',
@@ -82,8 +118,8 @@ export default function ProtectedRoute({ children }) {
                                     fontWeight: 600,
                                     marginBottom: 24,
                                 }}
-                            >                                
-                            <SitemarkIcon></SitemarkIcon>
+                            >
+                                <SitemarkIcon></SitemarkIcon>
                             </div>
 
 

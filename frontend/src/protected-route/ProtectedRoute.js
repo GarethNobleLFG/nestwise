@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 export default function ProtectedRoute({ children }) {
     const navigate = useNavigate();
     const [show, setShow] = React.useState(false);
+    const [isAuthenticated, setIsAuthenticated] = React.useState(false);
 
 
 
@@ -34,32 +35,37 @@ export default function ProtectedRoute({ children }) {
 
 
 
+    // --------------USEEFFECT FOR PAGE RE-RENDERS IF TOKEN IS BAD--------------
+
     useEffect(() => {
-        const interval = setInterval(() => {
-
+        const checkAuth = () => {
             const token = localStorage.getItem('token');
-            if (!checkTokenValidity(token)) {
-                setShow(true);
-            }
-            else {
-                setShow(false);
-            }
 
-        }, 2000); // checks every 2 seconds
+            // Trigger re-render if bad token.
+            setShow(!checkTokenValidity(token));
+        };
 
+        // Check if token is vaild once.
+        checkAuth();
+        const interval = setInterval(checkAuth, 2000); // Repeat check.
         return () => clearInterval(interval);
-
-    }, [checkTokenValidity, navigate]);
+    }, []);
 
 
 
     const token = localStorage.getItem('token');
 
 
+
+
+
     return (
         <>
+        
             {children}
-            {!token && (
+
+            {/* If token is bad, render protector. Else, don't render. */}
+            {!checkTokenValidity(token) && ( 
                 <div
                     style={{
                         position: 'fixed',

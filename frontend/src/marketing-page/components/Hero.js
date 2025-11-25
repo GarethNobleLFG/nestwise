@@ -11,14 +11,80 @@ import Fade from '@mui/material/Fade';
 import Slide from '@mui/material/Slide';
 import Zoom from '@mui/material/Zoom';
 import visuallyHidden from '@mui/utils/visuallyHidden';
+import { useEffect, useState } from 'react';
+
 
 export default function Hero() {
   const [checked, setChecked] = React.useState(false);
+  const [isTokenValid, setIsTokenValid] = React.useState(true);
 
   // Trigger animations when component mounts
   React.useEffect(() => {
     setChecked(true);
   }, []);
+
+
+
+
+
+
+  // --------------TOKEN CHECKING--------------
+  function checkTokenValidity(token) {
+    if (!token) {
+      return false;
+    }
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.exp * 1000 > Date.now();
+    }
+    catch {
+      return false;
+    }
+  }
+
+
+
+  // --------------GET USER INFO WITH TOKEN--------------
+  function getUserFromToken(token) {
+    if (!token) {
+      return;
+    }
+    try {
+
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return { email: payload.sub, name: payload.name || payload.sub };
+    }
+    catch {
+      return null;
+    }
+  }
+
+
+
+
+
+  // --------------USEEFFECT FOR PAGE RE-RENDERS IF TOKEN IS BAD--------------
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem('token');
+
+      setIsTokenValid(checkTokenValidity(token));
+    };
+    // Check if token is vaild once.
+    checkAuth();
+    const interval = setInterval(checkAuth, 2000); // Repeat check.
+    return () => clearInterval(interval);
+  }, []);
+
+
+
+
+  // --------------STATE FOR USER DATA--------------
+  const token = localStorage.getItem('token');
+  const [profile, setProfile] = useState(getUserFromToken(token));
+
+
 
   return (
     <Box
@@ -48,87 +114,128 @@ export default function Hero() {
           useFlexGap
           sx={{ alignItems: 'center', width: { xs: '100%', sm: '70%' } }}
         >
-          {/* Large heading with slide animation */}
-          <Slide direction="down" in={checked} timeout={1000}>
-            <Typography
-              variant="h1"
-              sx={{
-                fontSize: 'clamp(3rem, 10vw, 3.5rem)',
-                textAlign: 'center',
-                lineHeight: 1.2,
-              }}
-            >
-              Welcome to{' '}
-              <Typography
-                variant="h1"
-                component="span"
-                sx={{
-                  color: '#FFD700', // Gold for "Nest"
-                }}
-              >
-                Nest
-              </Typography>
-              <Typography
-                variant="h1"
-                component="span"
-                sx={{
-                  color: '#c47c1eff', // Light Brown for "Wise"
-                }}
-              >
-                Wise
-              </Typography>
-            </Typography>
-          </Slide>
 
-          {/* Subheading with fade animation */}
-          <Fade in={checked} timeout={1500}>
-            <Typography
-              sx={{
-                textAlign: 'center',
-                color: 'text.secondary',
-                width: { sm: '100%', md: '80%' },
-              }}
-            >
-              Plan your retirement with confidence, building a secure future tailored to your goals. Get a personalized plan sent straight to your email!
-            </Typography>
-          </Fade>
 
-          {/* Email input + button with zoom animation */}
-          <Zoom in={checked} timeout={2000}>
-            <Stack
-              direction={{ xs: 'column', sm: 'row' }}
-              spacing={1}
-              useFlexGap
-              sx={{ pt: 2, width: { xs: '100%', sm: '350px' } }}
-            >
-              <InputLabel htmlFor="email-hero" sx={visuallyHidden}>
-                Email
-              </InputLabel>
-              <TextField
-                id="email-hero"
-                hiddenLabel
-                size="small"
-                variant="outlined"
-                aria-label="Enter your email address"
-                placeholder="Your email address"
-                fullWidth
-                slotProps={{
-                  htmlInput: {
-                    autoComplete: 'off',
-                    'aria-label': 'Enter your email address',
-                  },
-                }}
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                size="small"
-                sx={{ minWidth: 'fit-content' }}
-              >
-                Start now
-              </Button>
-            </Stack>
-          </Zoom>
+          {isTokenValid ? (
+
+            <React.Fragment>
+              {/* Large heading with slide animation */}
+              <Slide direction="down" in={checked} timeout={1000}>
+
+
+                <Typography
+                  variant="h1"
+                  sx={{
+                    fontSize: 'clamp(3rem, 10vw, 3.5rem)',
+                    textAlign: 'center',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  Welcome back, {' '}
+                  <Typography
+                    variant="h0.5"
+                    component="span"
+                    sx={{
+                      color: '#c47c1eff', // Light Brown for "Wise"
+                    }}
+                  >
+                    {profile?.name || 'User'}!
+                  </Typography>
+                </Typography>
+              </Slide>
+            </React.Fragment>
+
+          ) : (
+
+            <React.Fragment>
+              {/* Large heading with slide animation */}
+              <Slide direction="down" in={checked} timeout={1000}>
+                <Typography
+                  variant="h1"
+                  sx={{
+                    fontSize: 'clamp(3rem, 10vw, 3.5rem)',
+                    textAlign: 'center',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  Welcome to {' '}
+                  <Typography
+                    variant="h0.5"
+                    component="span"
+                    sx={{
+                      color: '#FFD700', // Gold for "Nest"
+                    }}
+                  >
+                    Nest
+                  </Typography>
+                  <Typography
+                    variant="h0.5"
+                    component="span"
+                    sx={{
+                      color: '#c47c1eff', // Light Brown for "Wise"
+                    }}
+                  >
+                    Wise
+                  </Typography>
+                </Typography>
+              </Slide>
+
+              <Fade in={checked} timeout={1500}>
+                <Typography
+                  sx={{
+                    textAlign: 'center',
+                    color: 'text.secondary',
+                    width: { sm: '100%', md: '80%' },
+                  }}
+                >
+                  Plan your retirement with confidence, building a secure future tailored to your goals. Get a personalized plan sent straight to your email!
+                </Typography>
+              </Fade>
+
+
+
+              {/* Email input + button with zoom animation */}
+              <Zoom in={checked} timeout={2000}>
+                <Stack
+                  direction={{ xs: 'column', sm: 'row' }}
+                  spacing={1}
+                  useFlexGap
+                  sx={{ pt: 2, width: { xs: '100%', sm: '350px' } }}
+                >
+                  <InputLabel htmlFor="email-hero" sx={visuallyHidden}>
+                    Email
+                  </InputLabel>
+                  <TextField
+                    id="email-hero"
+                    hiddenLabel
+                    size="small"
+                    variant="outlined"
+                    aria-label="Enter your email address"
+                    placeholder="Your email address"
+                    fullWidth
+                    slotProps={{
+                      htmlInput: {
+                        autoComplete: 'off',
+                        'aria-label': 'Enter your email address',
+                      },
+                    }}
+                  />
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    sx={{ minWidth: 'fit-content' }}
+                  >
+                    Start now
+                  </Button>
+                </Stack>
+              </Zoom>
+            </React.Fragment>
+
+          )}
+
+
+
 
           {/* Terms and conditions with slide from bottom */}
           <Slide direction="up" in={checked} timeout={2500}>

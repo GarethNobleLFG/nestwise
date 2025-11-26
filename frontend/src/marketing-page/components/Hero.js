@@ -12,11 +12,15 @@ import Slide from '@mui/material/Slide';
 import Zoom from '@mui/material/Zoom';
 import visuallyHidden from '@mui/utils/visuallyHidden';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 
 
 export default function Hero() {
   const [checked, setChecked] = React.useState(false);
   const [isTokenValid, setIsTokenValid] = React.useState(true);
+  const navigate = useNavigate();
+
 
   // Trigger animations when component mounts
   React.useEffect(() => {
@@ -143,6 +147,45 @@ export default function Hero() {
                   </Typography>
                 </Typography>
               </Slide>
+
+
+              <Zoom in={checked} timeout={1500}>
+                <Typography
+                  sx={{
+                    textAlign: 'center',
+                    color: 'text.secondary',
+                    width: { sm: '100%', md: '80%' },
+                  }}
+                >
+                  Let's continue building your personalized retirement plans!
+                </Typography>
+              </Zoom>
+
+
+
+              {/* Email input + button with zoom animation */}
+              <Zoom in={checked} timeout={2000}>
+                <Stack
+                  direction={{ xs: 'column', sm: 'row' }}
+                  spacing={1}
+                  useFlexGap
+                  sx={{ pt: 1, width: { xs: '100%', sm: '350px' }, alignItems: 'center', justifyContent: 'center' }}
+                >
+
+
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    sx={{ minWidth: '20%' }}
+                    onClick={() => navigate('/myplans')}
+                  >
+                    go to my plans
+                  </Button>
+                </Stack>
+              </Zoom>
+
+
             </React.Fragment>
 
           ) : (
@@ -180,7 +223,7 @@ export default function Hero() {
                 </Typography>
               </Slide>
 
-              <Fade in={checked} timeout={1500}>
+              <Zoom in={checked} timeout={1500}>
                 <Typography
                   sx={{
                     textAlign: 'center',
@@ -190,7 +233,7 @@ export default function Hero() {
                 >
                   Plan your retirement with confidence, building a secure future tailored to your goals. Get a personalized plan sent straight to your email!
                 </Typography>
-              </Fade>
+              </Zoom>
 
 
 
@@ -200,33 +243,18 @@ export default function Hero() {
                   direction={{ xs: 'column', sm: 'row' }}
                   spacing={1}
                   useFlexGap
-                  sx={{ pt: 2, width: { xs: '100%', sm: '350px' } }}
+                  sx={{ pt: 1, width: { xs: '100%', sm: '350px' }, alignItems: 'center', justifyContent: 'center' }}
                 >
-                  <InputLabel htmlFor="email-hero" sx={visuallyHidden}>
-                    Email
-                  </InputLabel>
-                  <TextField
-                    id="email-hero"
-                    hiddenLabel
-                    size="small"
-                    variant="outlined"
-                    aria-label="Enter your email address"
-                    placeholder="Your email address"
-                    fullWidth
-                    slotProps={{
-                      htmlInput: {
-                        autoComplete: 'off',
-                        'aria-label': 'Enter your email address',
-                      },
-                    }}
-                  />
+
+
                   <Button
                     variant="contained"
                     color="primary"
                     size="small"
-                    sx={{ minWidth: 'fit-content' }}
+                    sx={{ minWidth: '20%' }}
+                    onClick={() => navigate('/signin')}
                   >
-                    Start now
+                    sign up today!
                   </Button>
                 </Stack>
               </Zoom>
@@ -244,7 +272,7 @@ export default function Hero() {
               color="text.secondary"
               sx={{ textAlign: 'center' }}
             >
-              By clicking &quot;Start now&quot; you agree to our&nbsp;
+              Please read our&nbsp;
               <Link href="#" color="primary">
                 Terms & Conditions
               </Link>

@@ -228,7 +228,7 @@ export default function PlannerBot() {
 
 
 
-
+  //  GET LAST CHAT RESPONSE FOR CONTEXT IN OTHER FUNCTIONS
   const getLastChatbotResponse = () => {
     const lastBotMessage = safeMessages
       .filter(msg => msg.role === 'bot' && !msg.isThinking)

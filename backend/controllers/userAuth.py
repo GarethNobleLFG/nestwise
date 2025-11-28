@@ -18,7 +18,7 @@ pwd_hasher = PasswordHasher()
 # JWT configuration
 SECRET_KEY = "your_secret_key"  # Replace with a secure key in production
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 5
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 
 

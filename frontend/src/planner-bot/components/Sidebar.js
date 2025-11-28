@@ -5,7 +5,7 @@ import Grow from '@mui/material/Grow';
 import PlanSelector from './PlanSelector';
 import ProfileData from './ProfileData';
 
-export default function Sidebar({ animationTriggered, profileData }) {
+export default function Sidebar({ animationTriggered, profileData, lastChatbotResponse }) {
   return (
     <Box
       sx={{
@@ -28,7 +28,11 @@ export default function Sidebar({ animationTriggered, profileData }) {
 
       <Grow in={animationTriggered} timeout={1800}>
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <ProfileData animationTriggered={animationTriggered} profileData={profileData} />
+          <ProfileData 
+          animationTriggered={animationTriggered} 
+          profileData={profileData} 
+          lastChatbotResponse={lastChatbotResponse}  
+          />
         </Box>
       </Grow>
     </Box>

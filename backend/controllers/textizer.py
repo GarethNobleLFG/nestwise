@@ -28,10 +28,9 @@ def textizer(data: Dict[str, Any], last_chatbot_response: str = "") -> Dict[str,
     5. For percentages: Format with % symbol (e.g., "7.5%")
     6. For locations: Proper Title Case (e.g., "New York", "San Francisco", "Los Angeles")
     7. For text descriptions: Title Case Every Word (e.g., "Retirement Planning Goals")
+    8. American locations are the most common, so base your checking on that.
 
     SPELL CHECKING RULES:
-    1. DO NOT change proper nouns like city/state names unless obviously misspelled
-    2. Fix common misspellings:
     - "retirment" → "Retirement"
     - "savigns" → "Savings"
     - "anual" → "Annual"
@@ -44,9 +43,8 @@ def textizer(data: Dict[str, Any], last_chatbot_response: str = "") -> Dict[str,
     - "new york city" → "New York City"
     - "monthly income target" → "Monthly Income Target"
 
-    IF there is no value, retrun nothing for the value.
 
-    Return ONLY a JSON object with formatted key-value pairs. No other text.
+    Return ONLY a JSON object with formatted key-value pairs. No other text. All keys and values must be returned, IF there is no value, return nothing for the value.
     """
 
     try:

@@ -116,20 +116,24 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
           Object.entries(formattedData).map(([key, value], index) => (
             <Fade in={animationTriggered} timeout={2000 + (index * 200)} key={key}>
               <Box sx={{
-                mb: 0.5,
+                mb: 2,
                 width: '80%',
-                maxWidth: '300px',
-                ml: '0px',
+                maxWidth: '200px',
+                ml: '16px',
                 mt: '0px',
               }}>
                 <Typography
                   variant="body2"
                   sx={{
                     display: 'flex',
-                    justifyContent: 'space-between',
                     color: 'text.secondary',
                     fontStyle: 'italic',
+                    mb: 0.5,
                     ml: '0px',
+                    '&::before': {
+                      content: '"•"',
+                      marginRight: '6px',
+                    }
                   }}
                 >
                   {key}:
@@ -140,12 +144,14 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
                   sx={{
                     color: '#666',
                     fontWeight: 'bold',
+                    ml: '12px', 
+                    mt: '4px',
                   }}
                 >
                   {value}
                 </Typography>
 
-                <Divider sx={{ mt: 0.75 }} />
+                <Divider sx={{ mt: 0.5 }} /> {/* Reduced divider spacing */}
               </Box>
             </Fade>
           ))
@@ -173,6 +179,6 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
         Tell chatbot if data is not accurate.
       </Typography>
 
-    </Box>
+    </Box >
   );
 }

@@ -142,7 +142,7 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
                     fontWeight: 'bold',
                   }}
                 >
-                  {value === false || value === null || value === "" ? "" : String(value)}
+                  {value}
                 </Typography>
 
                 <Divider sx={{ mt: 0.75 }} />
@@ -158,7 +158,7 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
             No data available yet.
           </Typography>
 
-          
+
         )}
 
       </Box>

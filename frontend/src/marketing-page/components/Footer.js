@@ -16,10 +16,7 @@ import SitemarkIcon from '../../app-bar/SitemarkIcon';
 function Copyright() {
   return (
     <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
-      {'Copyright © '}
-      <Link color="text.secondary" href="https://mui.com/">
-        Sitemark
-      </Link>
+      {'Copyright © NestWise'}
       &nbsp;
       {new Date().getFullYear()}
     </Typography>
@@ -186,7 +183,7 @@ export default function Footer() {
           <IconButton
             color="inherit"
             size="small"
-            href="https://github.com/mui"
+            href="https://github.com/GarethNobleLFG/NestWise"
             aria-label="GitHub"
             sx={{ alignSelf: 'center' }}
           >

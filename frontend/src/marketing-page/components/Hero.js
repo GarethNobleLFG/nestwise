@@ -157,7 +157,7 @@ export default function Hero() {
                     width: { sm: '100%', md: '80%' },
                   }}
                 >
-                  Let's continue building your personalized retirement plans!
+                  <strong>Let's continue building your personalized retirement plans!</strong>
                 </Typography>
               </Zoom>
 
@@ -231,7 +231,7 @@ export default function Hero() {
                     width: { sm: '100%', md: '80%' },
                   }}
                 >
-                  Plan your retirement with confidence, building a secure future tailored to your goals. Get a personalized plan sent straight to your email!
+                  <strong>Plan your retirement with confidence, building a secure future tailored to your goals. Get a personalized plan sent straight to your email!</strong>
                 </Typography>
               </Zoom>
 

@@ -68,3 +68,19 @@ async def update_user(update: UserUpdate, token: str = Depends(oauth2_scheme)):
         "updated_name": updated_user["name"],
         "new_token": new_token
     }
+
+@authRouter.post("/validateToken")
+async def validate_token(token: str = Depends(oauth2_scheme)):
+    """
+    Validates a JWT token and returns user identity if valid.
+    """
+    email = verify_token(token)
+    user = get_user_by_email(email)
+
+    return {
+        "valid": True,
+        "email": user["email"],
+        "name": user["name"],
+        "user_id": user["user_id"]
+    }
+

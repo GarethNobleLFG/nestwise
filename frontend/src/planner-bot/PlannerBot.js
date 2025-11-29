@@ -8,6 +8,7 @@ import AppTheme from '../shared-theme/AppTheme';
 import AppBar from '../app-bar/AppBar';
 import ChatContainer from './components/ChatContainer';
 import { useRef } from 'react';
+import { validateToken } from '../validateToken';
 
 export default function PlannerBot() {
   const [messages, setMessages] = useState([]);
@@ -35,6 +36,13 @@ export default function PlannerBot() {
 
 
   const startChatSession = React.useCallback(async () => {
+    const tokenCheck = await validateToken();
+
+    if (!tokenCheck.valid) {
+        alert("Your session has expired. Please log in again.");
+        localStorage.removeItem("token");
+        return;
+    }
     await addBotMessage('Hello! I am NestWiseAI. How can I help you today?')
     const token = localStorage.getItem('token'); 
 
@@ -46,6 +54,13 @@ export default function PlannerBot() {
           'Content-Type': 'application/json'
         },
       });
+
+      if (res.status === 401) {
+            alert("Your session has expired. Please log in again.");
+            localStorage.removeItem("token");
+            return;
+        }
+
       if (!res.ok) throw new Error('Failed to start session');
       const data = await res.json();
       setSessionId(data.session_id);
@@ -151,6 +166,14 @@ export default function PlannerBot() {
 
 
   const handleSend = async () => {
+    const tokenCheck = await validateToken();
+
+    if (!tokenCheck.valid) {
+        alert("Your session has expired. Please log in again.");
+        localStorage.removeItem("token");
+        window.location.href = "/signin";
+        return;
+    }
     if (!input.trim() || sending) return;
 
     const userInput = input.trim();
@@ -196,6 +219,13 @@ export default function PlannerBot() {
           message: userInput,
         }),
       });
+
+      if (res.status === 401) {
+            removeThinkingMessage();
+            alert("Your session has expired. Please log in again.");
+            localStorage.removeItem("token");
+            return;
+        }
 
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
 

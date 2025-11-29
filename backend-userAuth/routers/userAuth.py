@@ -1,13 +1,13 @@
-# routers/userAuth.py
 from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer
 
 
 # import models
-from models.user import User, Token, UserSignIn, UserUpdate
+from models.user import User, Token, UserUpdate
 
 
 # import contollers
+from models.user import User, Token
 from controllers.userAuth import (
     authenticate_user,
     create_user,
@@ -17,29 +17,17 @@ from controllers.userAuth import (
     update_user_profile
 )
 
-
-
-
 authRouter = APIRouter()
 
-
-# OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/userauth/signin")
 
-
-
-# -------------------- Routes -----------------------------------
-@authRouter.post("/signup", response_model=dict, status_code=status.HTTP_201_CREATED)
+@authRouter.post("/signup", status_code=status.HTTP_201_CREATED)
 async def sign_up(user: User):
-    """Register a new user"""
     return create_user(user.email, user.name, user.password)
 
 
-
-
 @authRouter.post("/signin", response_model=Token)
-async def sign_in(user: UserSignIn):
-    """Authenticate user and return access token"""
+async def sign_in(user: User):
     db_user = authenticate_user(user.email, user.password)
     if not db_user:
         raise HTTPException(status_code=401, detail="Invalid email or password")
@@ -51,41 +39,32 @@ async def sign_in(user: UserSignIn):
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-
-
 @authRouter.get("/getUser", response_model=dict)
 async def read_users_me(token: str = Depends(oauth2_scheme)):
-    """Get current user information from token"""
     email = verify_token(token)
     return get_user_by_email(email)
 
 
-
-
-
 @authRouter.put("/updateUser", response_model=dict)
-async def update_user(
-        update: UserUpdate,
-        token: str = Depends(oauth2_scheme)
-):
+async def update_user(update: UserUpdate, token: str = Depends(oauth2_scheme)):
     current_email = verify_token(token)
-    result = update_user_profile(
+
+    #Apply profile changes
+    updated_user = update_user_profile(
         current_email=current_email,
         new_email=update.new_email,
         new_name=update.new_name
     )
 
-   
-    updated_user = get_user_by_email(update.new_email)
-        
+    #ALWAYS return a fresh token if the email or name changed
     new_token = create_access_token(data={
         "sub": updated_user["email"],
         "name": updated_user["name"]
     })
-        
+
     return {
         "message": "Profile updated successfully",
-        "new_token": new_token  # Return the new token directly
+        "updated_email": updated_user["email"],
+        "updated_name": updated_user["name"],
+        "new_token": new_token
     }
-    
-

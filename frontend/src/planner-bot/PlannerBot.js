@@ -36,11 +36,15 @@ export default function PlannerBot() {
 
   const startChatSession = React.useCallback(async () => {
     await addBotMessage('Hello! I am NestWiseAI. How can I help you today?')
+    const token = localStorage.getItem('token'); 
 
     try {
       const res = await fetch('http://localhost:8000/chatbot/start', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          "Authorization": `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
       });
       if (!res.ok) throw new Error('Failed to start session');
       const data = await res.json();
@@ -176,13 +180,17 @@ export default function PlannerBot() {
 
     // Show thinking animation
     addThinkingMessage();
+    const token = localStorage.getItem('token');
 
     try {
       if (!sessionId) throw new Error('Session not started');
 
       const res = await fetch('http://localhost:8000/chatbot/answer', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          "Authorization": `Bearer ${token}`,
+          'Content-Type': 'application/json' 
+        },
         body: JSON.stringify({
           session_id: sessionId,
           message: userInput,

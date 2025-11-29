@@ -1,9 +1,10 @@
 # routers/chatBot.py
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel
 import time
 import logging
+from auth import verify_access_token
 
 # Import your langgraph functions and shared sessions
 from Agentic_AI.langgraph import chat_step, start_session
@@ -16,7 +17,7 @@ chatRouter = APIRouter()
 
 # --- Start a new session ---
 @chatRouter.post("/start", response_model=StartResponse)
-async def start_chat() -> StartResponse:
+async def start_chat(user_email: str = Depends(verify_access_token)) -> StartResponse:
     """
     Start a new chat session and return a unique session_id.
     """
@@ -35,7 +36,7 @@ async def start_chat() -> StartResponse:
 
 # --- Send a message and get a response ---
 @chatRouter.post("/answer", response_model=AnswerResponse)
-async def answer_question(payload: AnswerRequest) -> AnswerResponse:
+async def answer_question(payload: AnswerRequest, user_email: str = Depends(verify_access_token)) -> AnswerResponse:
     """
     Handle a user message for the given session_id and return the assistant's response.
     """

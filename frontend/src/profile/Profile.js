@@ -133,14 +133,11 @@ export default function Profile() {
         if (profile.email) {
             uploadToBackend.new_email = profile.email;
         }
-        if (userFromToken && userFromToken.email) {
-            uploadToBackend.current_email = userFromToken.email;
-        }
 
 
 
         try {
-            const response = await fetch('http://localhost:8000/userauth/updateUser', {
+            const response = await fetch('http://localhost:7001/userauth/updateUser', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

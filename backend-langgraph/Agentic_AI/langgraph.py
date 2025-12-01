@@ -1,4 +1,4 @@
-# backend/Agentic_AI/langgraph.py
+# backend_langgraph/Agentic_AI/langgraph.py
 import os
 from getpass import getpass
 from langchain_community.chat_models import ChatOpenAI
@@ -251,6 +251,18 @@ def normalize_collected(value):
         return False
     return False  # everything else -> not collected
 
+
+## Removed formatting from profile prompt:
+"""
+  ## Response Format Requirements:
+    - Use **markdown formatting** with headers, bullet points, and emphasis
+    - Structure your response with clear sections using `##` or `###` headers
+    - Use **bold** for important terms and *italics* for emphasis
+    - Include bullet points (`-` or `*`) for lists
+    - Use `>` for important callouts or tips
+    - Keep the tone friendly and conversational
+    - Make questions engaging and easy to understand
+"""
 def call_chatbot(state: ChatbotState):
     # Ensure static system message is present only once at the start
     msgs = state.get("messages", [])
@@ -305,14 +317,7 @@ def call_chatbot(state: ChatbotState):
     1. **If fields are missing**: Ask about the MOST important missing field in a conversational way
     2. **If all collected**: Respond with "All necessary info collected. Proceeding to generate your plan."
 
-    ## Response Format Requirements:
-    - Use **markdown formatting** with headers, bullet points, and emphasis
-    - Structure your response with clear sections using `##` or `###` headers
-    - Use **bold** for important terms and *italics* for emphasis
-    - Include bullet points (`-` or `*`) for lists
-    - Use `>` for important callouts or tips
-    - Keep the tone friendly and conversational
-    - Make questions engaging and easy to understand
+  
     
     """
 
@@ -896,7 +901,38 @@ workflow.add_edge("planner", END)
 
 graph = workflow.compile()
 
+#-------------------Fromatter to format the Planner's output--------------------
+system_prompt_formatter = SystemMessage(content="""
+You are a Formatter Assistant.
+You receive raw JSON output from the Planner Agent.
+Convert this raw JSON into a well-formatted, human-readable report.
+Use the following guidelines:
+1. Structure the report with clear sections and headings.
+2. Use bullet points and numbered lists for clarity.
+3. Highlight key recommendations and action items.
+4. Ensure the report is easy to read and understand for a non-technical audience.
+""")
+def call_formatter(raw_json_str: str):
+   
 
+    model_formatter = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    
+    # Defensive parsing: if the input is already a string, parse to dict
+    try:
+        parsed = json.loads(raw_json_str)
+        formatted_json = json.dumps(parsed, indent=2)
+    except json.JSONDecodeError:
+        formatted_json = raw_json_str  # fallback
+
+    messages = [
+        system_prompt_formatter,
+        HumanMessage(content=formatted_json)
+    ]
+
+    response = model_formatter.invoke(messages)
+    return response.content
+
+state = None
 initialMessage = 'Hello! I am NestWiseAI. How can I help you today?'
 def start_session(session_id: str):
     """
@@ -944,11 +980,17 @@ def chat_step(user_message: str, session_id: str):
     
     if assistant_message == prev_assistant_message:
         planner_message = state['planner']['messages'][-1]
-        response_text = planner_message.content
+        raw_json = planner_message.content
+
+        # Call the formatter agent
+        response_text = call_formatter(raw_json)
+        
+
     else:
         response_text = assistant_message.content
         prev_assistant_message = assistant_message
 
+    
     ## Pass to the frontend.
     conversation_title = state["conversation_title"]
 

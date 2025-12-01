@@ -54,7 +54,6 @@ export default function Profile() {
 
 
     // --------------TOKEN CHECKING--------------
-
     function checkTokenValidity(token) {
         if (!token) {
             return false;
@@ -114,7 +113,6 @@ export default function Profile() {
 
 
     // --------------UPDATE PROFILE--------------
-
     const handleUpdateProfile = async () => {
         setEdited(false);
         setEditMode({ name: false, email: false });

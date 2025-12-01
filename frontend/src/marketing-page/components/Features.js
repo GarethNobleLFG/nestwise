@@ -8,36 +8,40 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 
-import DevicesRoundedIcon from '@mui/icons-material/DevicesRounded';
-import EdgesensorHighRoundedIcon from '@mui/icons-material/EdgesensorHighRounded';
-import ViewQuiltRoundedIcon from '@mui/icons-material/ViewQuiltRounded';
+import ChatIcon from '@mui/icons-material/Chat';
+import DashboardIcon from '@mui/icons-material/Dashboard'; 
+import FileDownloadIcon from '@mui/icons-material/FileDownload'; 
 
 const items = [
   {
-    icon: <ViewQuiltRoundedIcon />,
-    title: 'Dashboard',
+    icon: <ChatIcon />,
+    title: 'Planner Bot',
     description:
-      'This item could provide a snapshot of the most important metrics or data points related to the product.',
-    imageLight: `url("${process.env.TEMPLATE_IMAGE_URL || 'https://mui.com'}/static/images/templates/templates-images/dash-light.png")`,
-    imageDark: `url("${process.env.TEMPLATE_IMAGE_URL || 'https://mui.com'}/static/images/templates/templates-images/dash-dark.png")`,
+      `Your personal AI retirement advisor. Chat naturally about your goals while our bot builds a personalized retirement plan 
+      with smart insights and expert recommendations—planning made effortless.`,
+    imageLight: `url("/images/planner-bot.png")`,
+    imageDark: `url("/images/planner-bot.png")`,
   },
   {
-    icon: <EdgesensorHighRoundedIcon />,
-    title: 'Mobile integration',
+    icon: <DashboardIcon />,
+    title: 'My Plans',
     description:
-      'This item could provide information about the mobile app version of the product.',
-    imageLight: `url("${process.env.TEMPLATE_IMAGE_URL || 'https://mui.com'}/static/images/templates/templates-images/mobile-light.png")`,
-    imageDark: `url("${process.env.TEMPLATE_IMAGE_URL || 'https://mui.com'}/static/images/templates/templates-images/mobile-dark.png")`,
+      'View, manage, and track all your retirement plans in one organized dashboard. Monitor your progress, compare different strategies, and make adjustments as your goals evolve—keeping your financial future on track.',
+    imageLight: `url("/images/my-plans.png")`,
+    imageDark: `url("/images/my-plans.png")`,
   },
   {
-    icon: <DevicesRoundedIcon />,
-    title: 'Available on all platforms',
+    icon: <FileDownloadIcon />,
+    title: 'Download Your Plan',
     description:
-      'This item could let users know the product is available on all platforms, such as web, mobile, and desktop.',
-    imageLight: `url("${process.env.TEMPLATE_IMAGE_URL || 'https://mui.com'}/static/images/templates/templates-images/devices-light.png")`,
-    imageDark: `url("${process.env.TEMPLATE_IMAGE_URL || 'https://mui.com'}/static/images/templates/templates-images/devices-dark.png")`,
+      'Get your retirement plan as a downloadable PDF. Perfect for sharing with advisors, printing for records, or keeping offline copies of your financial strategy.',
+    imageLight: `url("/images/download.png")`,
+    imageDark: `url("/images/download.png")`,
   },
 ];
+
+
+
 
 const Chip = styled(MuiChip)(({ theme }) => ({
   variants: [
@@ -59,10 +63,17 @@ const Chip = styled(MuiChip)(({ theme }) => ({
   ],
 }));
 
+
+
+
 function MobileLayout({ selectedItemIndex, handleItemClick, selectedFeature }) {
   if (!items[selectedItemIndex]) {
     return null;
   }
+
+
+
+
 
   return (
     <Box
@@ -98,9 +109,9 @@ function MobileLayout({ selectedItemIndex, handleItemClick, selectedFeature }) {
           style={
             items[selectedItemIndex]
               ? {
-                  '--items-imageLight': items[selectedItemIndex].imageLight,
-                  '--items-imageDark': items[selectedItemIndex].imageDark,
-                }
+                '--items-imageLight': items[selectedItemIndex].imageLight,
+                '--items-imageDark': items[selectedItemIndex].imageDark,
+              }
               : {}
           }
         />
@@ -120,6 +131,8 @@ function MobileLayout({ selectedItemIndex, handleItemClick, selectedFeature }) {
   );
 }
 
+
+
 MobileLayout.propTypes = {
   handleItemClick: PropTypes.func.isRequired,
   selectedFeature: PropTypes.shape({
@@ -132,7 +145,11 @@ MobileLayout.propTypes = {
   selectedItemIndex: PropTypes.number.isRequired,
 };
 
+
+
 export { MobileLayout };
+
+
 
 export default function Features() {
   const [selectedItemIndex, setSelectedItemIndex] = React.useState(0);
@@ -145,7 +162,9 @@ export default function Features() {
 
   return (
     <Container id="features" sx={{ py: { xs: 8, sm: 16 } }}>
-      <Box sx={{ width: { sm: '100%', md: '60%' } }}>
+      <Box sx={{ width: { sm: '100%', md: '80%' } }}>
+
+
         <Typography
           component="h2"
           variant="h4"
@@ -154,14 +173,25 @@ export default function Features() {
         >
           How it works.
         </Typography>
+
+
+
         <Typography
           variant="body1"
-          sx={{ color: 'text.secondary', mb: { xs: 2, sm: 4 } }}
+          sx={{
+            color: 'text.secondary',
+            mb: { xs: 2, sm: 4 },
+            maxWidth: '100%',
+            whiteSpace: 'normal',
+            wordBreak: 'break-word',
+            lineHeight: 1.6
+          }}
         >
-          Provide a brief overview of the key features of the product. For example,
-          you could list the number of features, their types or benefits, and
-          add-ons.
+          <strong>Retirement planning made simple!</strong> Read below to understand how NestWise achieves this:
         </Typography>
+
+
+
       </Box>
       <Box
         sx={{
@@ -188,7 +218,7 @@ export default function Features() {
                   (theme) => ({
                     p: 2,
                     height: '100%',
-                    width: '100%',
+                    width: '500px',
                     '&:hover': {
                       backgroundColor: (theme.vars || theme).palette.action.hover,
                     },
@@ -248,20 +278,19 @@ export default function Features() {
             <Box
               sx={(theme) => ({
                 m: 'auto',
-                width: 420,
-                height: 500,
-                backgroundSize: 'contain',
+                width: 600,
+                height: 600,
+                backgroundSize: 'contain', // Fills the box, crops if needed
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
                 backgroundImage: 'var(--items-imageLight)',
-                ...theme.applyStyles('dark', {
-                  backgroundImage: 'var(--items-imageDark)',
-                }),
               })}
               style={
                 items[selectedItemIndex]
                   ? {
-                      '--items-imageLight': items[selectedItemIndex].imageLight,
-                      '--items-imageDark': items[selectedItemIndex].imageDark,
-                    }
+                    '--items-imageLight': items[selectedItemIndex].imageLight,
+                    '--items-imageDark': items[selectedItemIndex].imageDark,
+                  }
                   : {}
               }
             />

@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers.chatBot import chatRouter
 from routers.userAuth import authRouter
+from routers.textizer import router as textizer_router
 from pymongo import MongoClient
 
 
@@ -25,6 +26,7 @@ async def home():
 
 app.include_router(chatRouter, prefix="/chatbot", tags=["chatBot"])
 app.include_router(authRouter, prefix="/userauth", tags=["userAuth"])
+app.include_router(textizer_router, prefix="/textizer", tags=["textizer"])  
 
 
 

@@ -10,13 +10,10 @@ import { useEffect } from 'react';
 export default function ProtectedRoute({ children }) {
     const navigate = useNavigate();
     const [show, setShow] = React.useState(false);
-    const [isAuthenticated, setIsAuthenticated] = React.useState(false);
-
 
 
 
     // --------------TOKEN CHECKING--------------
-
     function checkTokenValidity(token) {
         if (!token) {
             return false;
@@ -36,7 +33,6 @@ export default function ProtectedRoute({ children }) {
 
 
     // --------------USEEFFECT FOR PAGE RE-RENDERS IF TOKEN IS BAD--------------
-
     useEffect(() => {
         const checkAuth = () => {
             const token = localStorage.getItem('token');
@@ -53,19 +49,13 @@ export default function ProtectedRoute({ children }) {
 
 
 
-    const token = localStorage.getItem('token');
-
-
-
-
-
     return (
         <>
         
             {children}
 
             {/* If token is bad, render protector. Else, don't render. */}
-            {!checkTokenValidity(token) && ( 
+            {show && ( 
                 <div
                     style={{
                         position: 'fixed',

@@ -202,7 +202,7 @@ export default function PlannerBot() {
 
 
     } catch (err) {
-      
+
       console.error(err);
       removeThinkingMessage();
       await addBotMessage(`Error: ${err.message}`);
@@ -228,8 +228,13 @@ export default function PlannerBot() {
 
 
 
-
-
+  //  GET LAST CHAT RESPONSE FOR CONTEXT IN OTHER FUNCTIONS
+  const getLastChatbotResponse = () => {
+    const lastBotMessage = safeMessages
+      .filter(msg => msg.role === 'bot' && !msg.isThinking)
+      .slice(-1)[0];
+    return lastBotMessage ? lastBotMessage.content : '';
+  };
 
 
 
@@ -258,6 +263,7 @@ export default function PlannerBot() {
             <ChatContainer
               animationTriggered={animationTriggered}
               profileData={profileData}
+              lastChatbotResponse={getLastChatbotResponse()}
               safeMessages={safeMessages}
               input={input}
               setInput={setInput}

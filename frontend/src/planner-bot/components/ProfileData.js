@@ -3,8 +3,69 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import Fade from '@mui/material/Fade';
+import { useState, useEffect } from 'react';
 
-export default function ProfileData({ animationTriggered, profileData }) {
+export default function ProfileData({ animationTriggered, profileData, lastChatbotResponse }) {
+  const [formattedData, setFormattedData] = useState({});
+  const [isFormatting, setIsFormatting] = useState(false);
+
+  // FORMAT TEXT
+  const textizer = async () => {
+    if (Object.keys(profileData).length === 0) {
+      return;
+    }
+
+    if (isFormatting) {
+      return;
+    }
+
+    setIsFormatting(true);
+
+
+    try {
+      const response = await fetch('http://localhost:8000/textizer/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          profileData: profileData,
+          lastChatbotResponse: lastChatbotResponse
+        })
+      });
+
+
+      if (!response.ok) {
+        throw new Error('Textizer API call failed.');
+      }
+
+
+      const textizerReturn = await response.json();
+      setFormattedData(textizerReturn);
+    }
+    catch (error) {
+      // FALL BACK FORMATTING IF THIS BREAKS
+      console.error('Textizer API error:', error);
+      const fallback = {};
+      Object.entries(profileData).forEach(([key, value]) => {
+        fallback[key] = value === false || value === null ? "" : String(value);
+      });
+      setFormattedData(fallback);
+    }
+    finally {
+      setIsFormatting(false);
+    }
+  };
+
+
+
+  // FORMAT ON RE-RENDER
+  useEffect(() => {
+    textizer();
+  }, [profileData, lastChatbotResponse]);
+
+
+
   return (
     <Box
       sx={{
@@ -35,62 +96,77 @@ export default function ProfileData({ animationTriggered, profileData }) {
         mt: 1,
         ml: '0px', // Pixel positioning control
       }} />
-      <Box sx={{
-        overflowY: 'auto',
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        px: 2,
-        ml: '0px', // Pixel positioning control
-        mt: '0px', // Pixel positioning control
-      }}>
-        {Object.entries(profileData).length > 0 ? (
-          Object.entries(profileData).map(([key, value], index) => (
+      <Box
+        className="profile-data-scroll"
+        sx={{
+          overflowY: 'auto',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          px: 2,
+          ml: '0px', // Pixel positioning control
+          mt: '0px', // Pixel positioning control
+          maxHeight: '300px',
+
+        }}>
+
+
+        {Object.keys(formattedData).length !== 0 ? (
+          Object.entries(formattedData).map(([key, value], index) => (
             <Fade in={animationTriggered} timeout={2000 + (index * 200)} key={key}>
               <Box sx={{
-                mb: 0.5,
+                mb: 2,
                 width: '80%',
-                maxWidth: '300px',
-                ml: '0px', // Pixel positioning control
-                mt: '0px', // Pixel positioning control
+                maxWidth: '200px',
+                ml: '16px',
+                mt: '0px',
               }}>
                 <Typography
                   variant="body2"
                   sx={{
                     display: 'flex',
-                    justifyContent: 'space-between',
                     color: 'text.secondary',
                     fontStyle: 'italic',
-                    ml: '0px', // Pixel positioning control
+                    mb: 0.5,
+                    ml: '0px',
+                    '&::before': {
+                      content: '"•"',
+                      marginRight: '6px',
+                    }
                   }}
                 >
-                  <span>
-                    {key.charAt(0).toUpperCase() + key.slice(1)}:
-                  </span>
-                  <span style={{ color: '#666' }}>
-                    {typeof value === 'number' && key.toLowerCase().includes('savings')
-                      ? `$${value.toLocaleString()}`
-                      : value || 'N/A'
-                    }
-                  </span>
+                  {key}:
                 </Typography>
+
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: '#666',
+                    fontWeight: 'bold',
+                    ml: '12px', 
+                    mt: '4px',
+                  }}
+                >
+                  {value}
+                </Typography>
+
+                <Divider sx={{ mt: 0.5 }} /> {/* Reduced divider spacing */}
               </Box>
             </Fade>
           ))
+
+
         ) : (
-          <Fade in={animationTriggered} timeout={2000}>
-            <Typography variant="body2" sx={{
-              color: 'text.secondary',
-              fontStyle: 'italic',
-              textAlign: 'center',
-              ml: '0px', // Pixel positioning control
-              mt: '0px', // Pixel positioning control
-            }}>
-              No data available yet.
-            </Typography>
-          </Fade>
+
+
+          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 2 }}>
+            No data available yet.
+          </Typography>
+
+
         )}
+
       </Box>
 
       <Typography variant="caption" sx={{
@@ -103,6 +179,6 @@ export default function ProfileData({ animationTriggered, profileData }) {
         Tell chatbot if data is not accurate.
       </Typography>
 
-    </Box>
+    </Box >
   );
 }

@@ -59,10 +59,13 @@ export default function FAQ() {
             <Typography
               variant="body2"
               gutterBottom
-              sx={{ maxWidth: { sm: '100%', md: '70%' } }}
+              sx={{
+                maxWidth: { sm: '100%', md: '70%' },
+                fontWeight: 'bold'
+              }}
             >
               You can reach our customer support team by emailing&nbsp;
-              <Link href="mailto:support@email.com">support@email.com</Link>
+              <Link href="mailto:support@email.com">support@nestwise.com</Link>
               &nbsp;or calling our toll-free number. We&apos;re here to assist you
               promptly.
             </Typography>
@@ -78,18 +81,22 @@ export default function FAQ() {
             id="panel2d-header"
           >
             <Typography component="span" variant="subtitle2">
-              Can I return the product if it doesn&apos;t meet my expectations?
+              Can I edit my plan if it doesn&apos;t meet my expectations?
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Typography
               variant="body2"
               gutterBottom
-              sx={{ maxWidth: { sm: '100%', md: '70%' } }}
+              sx={{
+                maxWidth: { sm: '100%', md: '70%' },
+                fontWeight: 'bold'
+              }}
             >
-              Absolutely! We offer a hassle-free return policy. If you&apos;re not
-              completely satisfied, you can return the product within [number of
-              days] days for a full refund or exchange.
+              Absolutely! Your retirement plan is completely editable. Simply use the "Edit Plan in Planner Bot"
+              feature to modify your current plan with our AI assistant. Chat about what you'd like to
+              change—whether it's your goals, timeline, income, or investment preferences. The bot will
+              instantly generate an updated plan that better matches your needs.
             </Typography>
           </AccordionDetails>
         </Accordion>
@@ -110,11 +117,16 @@ export default function FAQ() {
             <Typography
               variant="body2"
               gutterBottom
-              sx={{ maxWidth: { sm: '100%', md: '70%' } }}
+              sx={{
+                maxWidth: { sm: '100%', md: '70%' },
+                fontWeight: 'bold'
+              }}
             >
-              Our product distinguishes itself through its adaptability, durability,
-              and innovative features. We prioritize user satisfaction and
-              continually strive to exceed expectations in every aspect.
+              NestWise stands out with its AI-powered conversational approach to retirement planning.
+              Unlike traditional calculators, our intelligent chatbot learns about your unique situation
+              through natural conversation, automatically formats and organizes your data, and creates
+              personalized plans you can edit anytime. We make complex financial planning feel as easy
+              as having a conversation with a trusted advisor.
             </Typography>
           </AccordionDetails>
         </Accordion>
@@ -128,19 +140,22 @@ export default function FAQ() {
             id="panel4d-header"
           >
             <Typography component="span" variant="subtitle2">
-              Is there a warranty on the product, and what does it cover?
+              Is all data concurrent and up to date?
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Typography
               variant="body2"
               gutterBottom
-              sx={{ maxWidth: { sm: '100%', md: '70%' } }}
+              sx={{
+                maxWidth: { sm: '100%', md: '70%' },
+                fontWeight: 'bold'
+              }}
             >
-              Yes, our product comes with a [length of warranty] warranty. It covers
-              defects in materials and workmanship. If you encounter any issues
-              covered by the warranty, please contact our customer support for
-              assistance.
+              Yes! NestWise uses advanced technology called RAG (Retrieval-Augmented Generation) to ensure
+              our planning recommendations are based on the most current and relevant information available.
+              This means when you chat with our planner bot, it's not just using old data—it's actively
+              pulling from up-to-date sources to give you accurate, timely advice for your retirement planning.
             </Typography>
           </AccordionDetails>
         </Accordion>

@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers.chatBot import chatRouter
+from routers.textizer import textizer_router       
 import os
 
 
@@ -21,3 +22,4 @@ async def home():
 
 # Routers
 app.include_router(chatRouter, prefix="/chatbot", tags=["chatBot"])
+app.include_router(textizer_router, prefix="/textizer", tags=["textizer"])  

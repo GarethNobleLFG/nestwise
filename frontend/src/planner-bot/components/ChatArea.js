@@ -87,7 +87,7 @@ export default function ChatArea({
             paddingTop: '5px',
             paddingBottom: '5px',
             width: '80%',
-            ml: '59%' 
+            ml: '55%' 
           }}
         >
           NestWise can make mistakes. Check important info.

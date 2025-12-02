@@ -107,7 +107,7 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
           px: 2,
           ml: '0px', // Pixel positioning control
           mt: '0px', // Pixel positioning control
-          maxHeight: '300px',
+          maxHeight: '1000px',
 
         }}>
 
@@ -174,7 +174,7 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
         fontSize: '0.7rem',
         textAlign: 'center',
         ml: '0px', // Pixel positioning control
-        mt: '0px', // Pixel positioning control
+        mt: 'auto', // Pixel positioning control
       }}>
         Tell chatbot if data is not accurate.
       </Typography>

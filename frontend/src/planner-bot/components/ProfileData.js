@@ -107,7 +107,7 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
           px: 2,
           ml: '0px', // Pixel positioning control
           mt: '0px', // Pixel positioning control
-          maxHeight: '1000px',
+          maxHeight: '100%',
 
         }}>
 

@@ -23,12 +23,13 @@ export default function ChatArea({
       position: 'relative',
       height: '100%',
       overflow: 'hidden',
-      ml: '0px'
+      ml: '1%'
     }}>
       {/* Scrollable Messages Area */}
       <Fade in={animationTriggered} timeout={1600}>
         <Box sx={{
           flex: 1,
+          //left: '40%',
           display: 'flex',
           flexDirection: 'column',
           overflowY: 'auto',
@@ -51,7 +52,7 @@ export default function ChatArea({
         <div style={{
           position: 'absolute',
           bottom: '30px',  // Moved up to make room for text below
-          left: '10%',
+          left: '8%',
           right: 0,
           transform: 'translateX(-50%)', // Centers the element
           width: '80%', // Control the width

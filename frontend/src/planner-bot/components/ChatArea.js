@@ -76,7 +76,7 @@ export default function ChatArea({
           sx={{
             position: 'absolute',
             bottom: '0px',  
-            left: '55%',
+            left: '60%',
             transform: 'translateX(-50%)', 
             right: 0,
             textAlign: 'center',

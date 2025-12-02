@@ -24,9 +24,8 @@ app.add_middleware(
 async def home():
     return {"message": "Hello, FastAPI is running!"}
 
-app.include_router(chatRouter, prefix="/chatbot", tags=["chatBot"])
 app.include_router(authRouter, prefix="/userauth", tags=["userAuth"])
-app.include_router(textizer_router, prefix="/textizer", tags=["textizer"])  
+
 
 
 

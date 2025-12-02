@@ -154,7 +154,7 @@ export default function SignUp(props) {
     };
 
     try {
-      const response = await fetch('http://localhost:8000/userauth/signup', {
+      const response = await fetch('http://localhost:7001/userauth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

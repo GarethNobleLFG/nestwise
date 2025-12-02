@@ -75,9 +75,8 @@ export default function ChatArea({
         <Typography
           variant="caption"
           sx={{
-            position: 'absolute',
             bottom: '0px',  
-            left: '58%',
+            //left: '80%',
             transform: 'translateX(-50%)', 
             right: 0,
             textAlign: 'center',
@@ -88,7 +87,7 @@ export default function ChatArea({
             paddingTop: '5px',
             paddingBottom: '5px',
             width: '80%',
-            //ml: '60%' 
+            ml: '59%' 
           }}
         >
           NestWise can make mistakes. Check important info.

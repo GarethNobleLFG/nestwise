@@ -3,27 +3,59 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import Zoom from '@mui/material/Zoom';
 import SitemarkIcon from './components/SitemarkIcon';
+import { useEffect } from 'react';
+
 
 
 export default function ProtectedRoute({ children }) {
-    const token = localStorage.getItem('access_token');
     const navigate = useNavigate();
     const [show, setShow] = React.useState(false);
 
 
-    React.useEffect(() => {
-        if (!token) setShow(true);
-        else setShow(false);
-    }, [token]);
+
+    // --------------TOKEN CHECKING--------------
+    function checkTokenValidity(token) {
+        if (!token) {
+            return false;
+        }
+
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.exp * 1000 > Date.now();
+        }
+        catch {
+            return false;
+        }
+    }
 
 
+
+
+
+    // --------------USEEFFECT FOR PAGE RE-RENDERS IF TOKEN IS BAD--------------
+    useEffect(() => {
+        const checkAuth = () => {
+            const token = localStorage.getItem('token');
+
+            // Trigger re-render if bad token.
+            setShow(!checkTokenValidity(token));
+        };
+
+        // Check if token is vaild once.
+        checkAuth();
+        const interval = setInterval(checkAuth, 2000); // Repeat check.
+        return () => clearInterval(interval);
+    }, []);
 
 
 
     return (
         <>
+        
             {children}
-            {!token && (
+
+            {/* If token is bad, render protector. Else, don't render. */}
+            {show && ( 
                 <div
                     style={{
                         position: 'fixed',
@@ -72,7 +104,7 @@ export default function ProtectedRoute({ children }) {
                             <div style={{ fontSize: '2rem', fontWeight: 600, marginBottom: 24 }}>
                                 Please log in to use this feature of
                             </div>
-                            
+
                             <div
                                 style={{
                                     display: 'flex',
@@ -82,8 +114,8 @@ export default function ProtectedRoute({ children }) {
                                     fontWeight: 600,
                                     marginBottom: 24,
                                 }}
-                            >                                
-                            <SitemarkIcon></SitemarkIcon>
+                            >
+                                <SitemarkIcon></SitemarkIcon>
                             </div>
 
 

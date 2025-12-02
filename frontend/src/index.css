@@ -1,7 +1,9 @@
 /* Hide scrollbars for all elements */
 * {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
 }
 
 /* Hide scrollbars for webkit browsers */
@@ -49,4 +51,32 @@ body::-webkit-scrollbar {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+
+
+
+/* SCROLLBAR FOR PROFILE DATA */
+.profile-data-scroll {
+  scrollbar-width: thin !important;
+  -ms-overflow-style: auto !important;
+}
+
+.profile-data-scroll::-webkit-scrollbar {
+  display: block !important;
+  width: 12px !important;
+}
+
+.profile-data-scroll::-webkit-scrollbar-track {
+  background: rgba(241, 241, 241, 0.2) !important;
+  border-radius: 4px !important;
+}
+
+.profile-data-scroll::-webkit-scrollbar-thumb {
+  background: rgba(136, 136, 136, 0.2) !important;
+  border-radius: 4px !important;
+}
+
+.profile-data-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(85, 85, 85, 0.2) !important;
 }

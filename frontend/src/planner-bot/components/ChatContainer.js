@@ -8,6 +8,7 @@ import ChatArea from './ChatArea';
 export default function ChatContainer({
   animationTriggered,
   profileData,
+  lastChatbotResponse,
   safeMessages,
   input,
   setInput,
@@ -37,6 +38,7 @@ export default function ChatContainer({
               <Sidebar
                 animationTriggered={animationTriggered}
                 profileData={profileData}
+                lastChatbotResponse={lastChatbotResponse}  
               />
             </Box>
           </Slide>

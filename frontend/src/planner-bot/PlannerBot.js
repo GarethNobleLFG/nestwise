@@ -8,6 +8,7 @@ import AppTheme from '../shared-theme/AppTheme';
 import AppBar from '../app-bar/AppBar';
 import ChatContainer from './components/ChatContainer';
 import { useRef } from 'react';
+import { validateToken } from '../validateToken';
 
 export default function PlannerBot() {
   const [messages, setMessages] = useState([]);
@@ -35,13 +36,31 @@ export default function PlannerBot() {
 
 
   const startChatSession = React.useCallback(async () => {
+    const tokenCheck = await validateToken();
+
+    if (!tokenCheck.valid) {
+        alert("Your session has expired. Please log in again.");
+        localStorage.removeItem("token");
+        return;
+    }
     await addBotMessage('Hello! I am NestWiseAI. How can I help you today?')
+    const token = localStorage.getItem('token'); 
 
     try {
       const res = await fetch('http://localhost:8000/chatbot/start', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          "Authorization": `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
       });
+
+      if (res.status === 401) {
+            alert("Your session has expired. Please log in again.");
+            localStorage.removeItem("token");
+            return;
+        }
+
       if (!res.ok) throw new Error('Failed to start session');
       const data = await res.json();
       setSessionId(data.session_id);
@@ -147,6 +166,14 @@ export default function PlannerBot() {
 
 
   const handleSend = async () => {
+    const tokenCheck = await validateToken();
+
+    if (!tokenCheck.valid) {
+        alert("Your session has expired. Please log in again.");
+        localStorage.removeItem("token");
+        window.location.href = "/signin";
+        return;
+    }
     if (!input.trim() || sending) return;
 
     const userInput = input.trim();
@@ -176,18 +203,29 @@ export default function PlannerBot() {
 
     // Show thinking animation
     addThinkingMessage();
+    const token = localStorage.getItem('token');
 
     try {
       if (!sessionId) throw new Error('Session not started');
 
       const res = await fetch('http://localhost:8000/chatbot/answer', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          "Authorization": `Bearer ${token}`,
+          'Content-Type': 'application/json' 
+        },
         body: JSON.stringify({
           session_id: sessionId,
           message: userInput,
         }),
       });
+
+      if (res.status === 401) {
+            removeThinkingMessage();
+            alert("Your session has expired. Please log in again.");
+            localStorage.removeItem("token");
+            return;
+        }
 
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
 
@@ -202,7 +240,7 @@ export default function PlannerBot() {
 
 
     } catch (err) {
-      
+
       console.error(err);
       removeThinkingMessage();
       await addBotMessage(`Error: ${err.message}`);
@@ -228,8 +266,13 @@ export default function PlannerBot() {
 
 
 
-
-
+  //  GET LAST CHAT RESPONSE FOR CONTEXT IN OTHER FUNCTIONS
+  const getLastChatbotResponse = () => {
+    const lastBotMessage = safeMessages
+      .filter(msg => msg.role === 'bot' && !msg.isThinking)
+      .slice(-1)[0];
+    return lastBotMessage ? lastBotMessage.content : '';
+  };
 
 
 
@@ -258,6 +301,7 @@ export default function PlannerBot() {
             <ChatContainer
               animationTriggered={animationTriggered}
               profileData={profileData}
+              lastChatbotResponse={getLastChatbotResponse()}
               safeMessages={safeMessages}
               input={input}
               setInput={setInput}

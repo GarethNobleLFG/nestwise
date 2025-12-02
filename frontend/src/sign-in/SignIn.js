@@ -128,12 +128,13 @@ export default function SignIn(props) {
 
     const formData = new FormData(event.currentTarget);
     const userData = {
+      name: ('NestWise User'), // Placeholder name
       email: formData.get('email'),
       password: formData.get('password'),
     };
 
     try {
-      const response = await fetch('http://localhost:8000/userauth/signin', {
+      const response = await fetch('http://localhost:7001/userauth/signin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -147,7 +148,7 @@ export default function SignIn(props) {
       }
 
       const data = await response.json();
-      localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem('token', data.access_token);
       console.log('Sign-in successful:', data);
 
 

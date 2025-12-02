@@ -7,15 +7,24 @@ from dotenv import load_dotenv
 load_dotenv()
 
 #   FUNCTION TO FORMAT USER RESPONSES BASED ON CONTEXT FOR DISPLAY IN FRONTEND
-def textizer(data: Dict[str, Any], last_chatbot_response: str = "") -> Dict[str, str]:
+def textizer(data: Dict[str, Any], last_chatbot_response: str = "", formatted_context: Dict[str, Any] = None) -> Dict[str, str]:
 
     client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+
+    # Include formatted context in the prompt
+    context_section = ""
+    if formatted_context:
+        context_section = f"""
+    PREVIOUSLY FORMATTED DATA FOR CONTEXT:
+    {json.dumps(formatted_context, indent=2)}
+    """
     
     prompt = f"""
     You are a data formatter for a retirement planning application. Format the following data appropriately based on context.
 
     CONTEXT FROM LAST CHATBOT RESPONSE:
     {last_chatbot_response if last_chatbot_response else "No previous context available"}
+    {context_section}
 
     DATA TO FORMAT:
     {json.dumps(data, indent=2)}

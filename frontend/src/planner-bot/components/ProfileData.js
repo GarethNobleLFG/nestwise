@@ -30,7 +30,8 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
         },
         body: JSON.stringify({
           profileData: profileData,
-          lastChatbotResponse: lastChatbotResponse
+          lastChatbotResponse: lastChatbotResponse,
+          formattedContext: formattedData
         })
       });
 

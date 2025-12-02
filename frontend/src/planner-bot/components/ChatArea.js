@@ -77,7 +77,7 @@ export default function ChatArea({
           sx={{
             position: 'absolute',
             bottom: '0px',  
-            left: '59.5%',
+            left: '58%',
             transform: 'translateX(-50%)', 
             right: 0,
             textAlign: 'center',
@@ -87,8 +87,8 @@ export default function ChatArea({
             backgroundColor: 'rgba(247, 247, 248, 0.95)',  // Semi-transparent background
             paddingTop: '5px',
             paddingBottom: '5px',
-            width: '80%'
-            //ml: '125px' 
+            width: '80%',
+            //ml: '60%' 
           }}
         >
           NestWise can make mistakes. Check important info.

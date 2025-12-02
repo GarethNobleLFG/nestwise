@@ -74,7 +74,7 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
         borderRadius: 2,
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
         padding: 1,
-        height: '100%',
+        height: '385px',
         width: '100%',
         display: 'flex',
         flexDirection: 'column',

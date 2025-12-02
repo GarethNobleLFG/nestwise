@@ -51,7 +51,7 @@ export default function ChatArea({
         <div style={{
           position: 'absolute',
           bottom: '30px',  // Moved up to make room for text below
-          left: '15%',
+          left: '10%',
           right: 0,
           transform: 'translateX(-50%)', // Centers the element
           width: '80%', // Control the width
@@ -76,7 +76,7 @@ export default function ChatArea({
           sx={{
             position: 'absolute',
             bottom: '0px',  
-            left: '60%',
+            left: '59.5%',
             transform: 'translateX(-50%)', 
             right: 0,
             textAlign: 'center',

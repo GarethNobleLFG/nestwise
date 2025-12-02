@@ -16,25 +16,25 @@ export default function ChatArea({
   sending
 }) {
   return (
-    <Box sx={{ 
-      width: '80%', 
-      display: 'flex', 
-      flexDirection: 'column', 
+    <Box sx={{
+      width: '80%',
+      display: 'flex',
+      flexDirection: 'column',
       position: 'relative',
       height: '100%',
-      overflow: 'hidden',  
-      ml: '0px'  
+      overflow: 'hidden',
+      ml: '0px'
     }}>
       {/* Scrollable Messages Area */}
       <Fade in={animationTriggered} timeout={1600}>
-        <Box sx={{ 
-          flex: 1, 
-          display: 'flex', 
+        <Box sx={{
+          flex: 1,
+          display: 'flex',
           flexDirection: 'column',
           overflowY: 'auto',
-          overflowX: 'hidden',  
-          ml: '100px',  
-          paddingBottom: '120px',  
+          overflowX: 'hidden',
+          ml: '100px',
+          paddingBottom: '120px',
           height: 'calc(100% - 120px)',
           '&::-webkit-scrollbar': {
             display: 'none'
@@ -51,10 +51,12 @@ export default function ChatArea({
         <div style={{
           position: 'absolute',
           bottom: '30px',  // Moved up to make room for text below
-          left: 0,
+          left: '50%',
           right: 0,
-          zIndex: 1000,  
-          backgroundColor: 'rgba(247, 247, 248, 0.95)', 
+          transform: 'translateX(-50%)', // Centers the element
+          width: '80%', // Control the width
+          zIndex: 1000,
+          backgroundColor: 'rgba(247, 247, 248, 0.95)',
           paddingTop: '10px',
         }}>
           <ChatInput
@@ -73,8 +75,9 @@ export default function ChatArea({
           variant="caption"
           sx={{
             position: 'absolute',
-            bottom: '0px',  // Positioned at the very bottom
-            left: 0,
+            bottom: '0px',  
+            left: '50%',
+            transform: 'translateX(-50%)', 
             right: 0,
             textAlign: 'center',
             color: 'text.secondary',
@@ -83,7 +86,8 @@ export default function ChatArea({
             backgroundColor: 'rgba(247, 247, 248, 0.95)',  // Semi-transparent background
             paddingTop: '5px',
             paddingBottom: '5px',
-            ml: '125px' 
+            width: '80%'
+            //ml: '125px' 
           }}
         >
           NestWise can make mistakes. Check important info.

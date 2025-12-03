@@ -127,7 +127,7 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
                   variant="body2"
                   sx={{
                     display: 'flex',
-                    color: index > 4 ? 'red' : 'text.secondary', // Red if index > 5
+                    color: index > 4 ? '#c47c1eff' : 'text.secondary', // Red if index > 5
                     fontStyle: 'italic',
                     mb: 0.5,
                     ml: '0px',
@@ -143,7 +143,7 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
                 <Typography
                   variant="body2"
                   sx={{
-                    color: index > 4 ? 'red' : '#666', // Red if index > 5               
+                    color: index > 4 ? '#c47c1eff' : '#666', // Red if index > 5               
                     fontWeight: 'bold',
                     ml: '12px',
                     mt: '4px',

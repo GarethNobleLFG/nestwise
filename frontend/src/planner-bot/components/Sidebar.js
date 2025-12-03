@@ -10,6 +10,7 @@ export default function Sidebar({ animationTriggered, profileData, lastChatbotRe
     <Box
       sx={{
         width: '85%',
+        height: '100%',
         bgcolor: 'grey.200',
         p: 1,
         borderRight: 1,
@@ -27,14 +28,15 @@ export default function Sidebar({ animationTriggered, profileData, lastChatbotRe
       <Divider sx={{ borderBottomWidth: 2, mb: 1, mt: 1.5 }} />
 
       <Grow in={animationTriggered} timeout={1800}>
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <ProfileData 
-          animationTriggered={animationTriggered} 
-          profileData={profileData} 
-          lastChatbotResponse={lastChatbotResponse}  
+        <Box sx={{ width: '100%', height: '100%' }}>
+          <ProfileData
+            animationTriggered={animationTriggered}
+            profileData={profileData}
+            lastChatbotResponse={lastChatbotResponse}
           />
         </Box>
       </Grow>
+
     </Box>
   );
 }

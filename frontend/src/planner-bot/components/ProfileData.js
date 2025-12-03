@@ -73,13 +73,11 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
         bgcolor: 'grey.50',
         borderRadius: 2,
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-        padding: 1,
+        padding: 2,
         height: '100%',
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
-        ml: '0px', // Pixel positioning control
-        mt: '0px', // Pixel positioning control
       }}
     >
       <Typography variant="h6" sx={{
@@ -89,29 +87,31 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
         ml: '9px', // Pixel positioning control
         mt: '0px', // Pixel positioning control
       }}>
+
         Data For Your Plan:
       </Typography>
+
+
       <Divider sx={{
         borderBottomWidth: 2,
         mb: 1,
         mt: 1,
         ml: '0px', // Pixel positioning control
       }} />
+
+
       <Box
         className="profile-data-scroll"
         sx={{
           overflowY: 'auto',
-          flex: 1,
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
-          px: 2,
-          ml: '0px', // Pixel positioning control
-          mt: '0px', // Pixel positioning control
-          maxHeight: '100%',
-
+          height: '290px',
+          bgcolor: 'grey.50',
+          borderRadius: 2,
+          border: '1px solid #e0e0e0',  // Light grey border
+          padding: 2,
         }}>
-
 
         {Object.keys(formattedData).length !== 0 ? (
           Object.entries(formattedData).map(([key, value], index) => (
@@ -127,7 +127,7 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
                   variant="body2"
                   sx={{
                     display: 'flex',
-                    color: 'text.secondary',
+                    color: index > 4 ? 'red' : 'text.secondary', // Red if index > 5
                     fontStyle: 'italic',
                     mb: 0.5,
                     ml: '0px',
@@ -143,9 +143,9 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
                 <Typography
                   variant="body2"
                   sx={{
-                    color: '#666',
+                    color: index > 4 ? 'red' : '#666', // Red if index > 5               
                     fontWeight: 'bold',
-                    ml: '12px', 
+                    ml: '12px',
                     mt: '4px',
                   }}
                 >
@@ -176,6 +176,7 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
         textAlign: 'center',
         ml: '0px', // Pixel positioning control
         mt: 'auto', // Pixel positioning control
+        mb: -1.5,
       }}>
         Tell chatbot if data is not accurate.
       </Typography>

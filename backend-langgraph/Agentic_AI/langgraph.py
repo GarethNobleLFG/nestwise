@@ -12,6 +12,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_core.tools import tool
 from langgraph.prebuilt import ToolNode, tools_condition, create_react_agent
+from datetime import date
 
 MAXNUMOFFIELDS = 10
 COMPLETENESSRATIO = 1
@@ -621,6 +622,10 @@ def call_planner(state: PlannerState):
   Use ONLY the retrieved context below. Each fact must cite the source (filename and page).
   If unknown, write "unknown". Follow this schema strictly in JSON:
 
+  Today's Date: {date.today().isoformat()}
+
+  Your output must use the current year when generating projections, retirement timelines, contribution limits, and all forward-looking estimates.
+
 
   {json.dumps(structured_json_schema)}
 
@@ -910,7 +915,8 @@ Use the following guidelines:
 1. Structure the report with clear sections and headings.
 2. Use bullet points and numbered lists for clarity.
 3. Highlight key recommendations and action items.
-4. Ensure the report is easy to read and understand for a non-technical audience.
+4. Mention that plan has been genrated using RAG (Retrieval Augmented Generation) techniques.
+5. Ensure the report is easy to read and understand for a non-technical audience.
 """)
 def call_formatter(raw_json_str: str):
    

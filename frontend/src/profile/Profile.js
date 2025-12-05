@@ -87,6 +87,8 @@ export default function Profile() {
 
 
     useEffect(() => {
+        document.title = "NestWise - Profile";
+
         const interval = setInterval(() => {
 
             const token = localStorage.getItem('token');

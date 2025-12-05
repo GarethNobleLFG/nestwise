@@ -9,13 +9,22 @@ import LogoCollection from './components/LogoCollection';
 import Features from './components/Features';
 import FAQ from './components/FAQ';
 import Footer from './components/Footer';
+import { useEffect } from 'react';
 
 export default function MarketingPage(props) {
+
+
+  useEffect(() => {
+    document.title = "NestWise - Welcome";
+  }, []);
+
+
+
   return (
     <AppTheme>
       <CssBaseline enableColorScheme />
-      <Box 
-        sx={{ 
+      <Box
+        sx={{
           overflowX: 'hidden',
           width: '100%',
           minHeight: '100vh',
@@ -31,7 +40,7 @@ export default function MarketingPage(props) {
           <FAQ />
           <Divider />
           <Footer />
-          <LogoCollection/>
+          <LogoCollection />
         </Box>
       </Box>
     </AppTheme>

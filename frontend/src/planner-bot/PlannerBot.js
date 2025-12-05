@@ -27,6 +27,8 @@ export default function PlannerBot() {
 
 
   React.useEffect(() => {
+    document.title = "NestWise - Planner Bot";
+
     const timer = setTimeout(() => {
       setAnimationTriggered(true);
     }, 50);

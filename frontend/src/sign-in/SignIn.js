@@ -83,6 +83,8 @@ export default function SignIn(props) {
 
   // Trigger animations when component mounts
   React.useEffect(() => {
+    document.title = "NestWise - Signin";
+
     setChecked(true);
   }, []);
 

@@ -3,11 +3,13 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import Fade from '@mui/material/Fade';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function ProfileData({ animationTriggered, profileData, lastChatbotResponse }) {
   const [formattedData, setFormattedData] = useState({});
   const [isFormatting, setIsFormatting] = useState(false);
+  const scrollRef = useRef(null);
+
 
   // FORMAT TEXT
   const textizer = async () => {
@@ -66,6 +68,17 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
   }, [profileData, lastChatbotResponse]);
 
 
+  // Separate useEffect For Auto Scrolling When fromattedData Changes.
+  useEffect(() => {
+    if (scrollRef.current && Object.keys(formattedData).length > 0) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, [formattedData]); 
+
+
 
   return (
     <Box
@@ -102,6 +115,7 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
 
       <Box
         className="profile-data-scroll"
+        ref={scrollRef}
         sx={{
           overflowY: 'auto',
           display: 'flex',

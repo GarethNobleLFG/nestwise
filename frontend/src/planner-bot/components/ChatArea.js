@@ -88,7 +88,7 @@ export default function ChatArea({
             bottom: '0px',
             left: '0',
             right: '0',
-            paddingLeft: '100px',
+            paddingLeft: '120px',
             paddingRight: '20px',
             textAlign: 'center',
             color: 'text.secondary',

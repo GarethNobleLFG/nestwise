@@ -14,13 +14,14 @@ export default function PlannerBot() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [chatToDelete, setChatToDelete] = useState(null);
-  const [typingText, setTypingText] = useState('');
   const [sessionId, setSessionId] = useState(null);
   const [profileData, setProfileData] = useState({});
   const [animationTriggered, setAnimationTriggered] = useState(false);
   const initialized = useRef(false);
+  const [conversationTitle, setConversationTitle] = useState('');
+  const [selectedPlan, setSelectedPlan] = useState(null);
+
+
 
   const safeMessages = Array.isArray(messages) ? messages : [];
 
@@ -41,27 +42,37 @@ export default function PlannerBot() {
     const tokenCheck = await validateToken();
 
     if (!tokenCheck.valid) {
-        alert("Your session has expired. Please log in again.");
-        localStorage.removeItem("token");
-        return;
+      alert("Your session has expired. Please log in again.");
+      localStorage.removeItem("token");
+      return;
     }
+
+    // Check To See If There Is An Existing Chat State.
+    const savedState = loadFromSessionStorage();
+    if (savedState && savedState.sessionId) {
+      console.log('Using existing session from storage');
+      return; // Don't start a new session if we have one
+    }
+
+
+
     await addBotMessage('Hello! I am NestWiseAI. How can I help you today?')
-    const token = localStorage.getItem('token'); 
+    const token = localStorage.getItem('token');
 
     try {
       const res = await fetch('http://localhost:8000/chatbot/start', {
         method: 'POST',
-        headers: { 
+        headers: {
           "Authorization": `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
       });
 
       if (res.status === 401) {
-            alert("Your session has expired. Please log in again.");
-            localStorage.removeItem("token");
-            return;
-        }
+        alert("Your session has expired. Please log in again.");
+        localStorage.removeItem("token");
+        return;
+      }
 
       if (!res.ok) throw new Error('Failed to start session');
       const data = await res.json();
@@ -171,10 +182,10 @@ export default function PlannerBot() {
     const tokenCheck = await validateToken();
 
     if (!tokenCheck.valid) {
-        alert("Your session has expired. Please log in again.");
-        localStorage.removeItem("token");
-        window.location.href = "/signin";
-        return;
+      alert("Your session has expired. Please log in again.");
+      localStorage.removeItem("token");
+      window.location.href = "/signin";
+      return;
     }
     if (!input.trim() || sending) return;
 
@@ -212,9 +223,9 @@ export default function PlannerBot() {
 
       const res = await fetch('http://localhost:8000/chatbot/answer', {
         method: 'POST',
-        headers: { 
+        headers: {
           "Authorization": `Bearer ${token}`,
-          'Content-Type': 'application/json' 
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           session_id: sessionId,
@@ -223,13 +234,15 @@ export default function PlannerBot() {
       });
 
       if (res.status === 401) {
-            removeThinkingMessage();
-            alert("Your session has expired. Please log in again.");
-            localStorage.removeItem("token");
-            return;
-        }
+        removeThinkingMessage();
+        alert("Your session has expired. Please log in again.");
+        localStorage.removeItem("token");
+        return;
+      }
 
-      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      if (!res.ok) {
+        throw new Error(`Server error: ${res.status}`);
+      }
 
       const data = await res.json();
 
@@ -237,18 +250,26 @@ export default function PlannerBot() {
         setProfileData(data.real_profile);
       }
 
+      // Getting The Conversation Title Saved To A State To Be Used.
+      if (data.conversation_title) {
+        console.log("Convo Title: ", data.conversation_title);
+        setConversationTitle(data.conversation_title);
+      }
+
       removeThinkingMessage();
       await addBotMessage(data.response);
 
 
-    } catch (err) {
+    }
+    catch (err) {
 
       console.error(err);
       removeThinkingMessage();
       await addBotMessage(`Error: ${err.message}`);
 
 
-    } finally {
+    }
+    finally {
       setSending(false);
     }
   };
@@ -281,6 +302,82 @@ export default function PlannerBot() {
 
 
 
+  // -----------------Implentation For Saving Chat State-----------------
+  const saveToSessionStorage = (messages, sessionId, profileData, conversationTitle) => {
+    const chatState = {
+      messages,
+      sessionId,
+      profileData,
+      conversationTitle,
+      timestamp: Date.now()
+    };
+    sessionStorage.setItem('plannerBotState', JSON.stringify(chatState));
+  };
+
+
+  const loadFromSessionStorage = () => {
+    const saved = sessionStorage.getItem('plannerBotState');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (error) {
+        console.error('Error parsing saved chat state:', error);
+        return null;
+      }
+    }
+    return null;
+  };
+
+  
+
+  React.useEffect(() => {
+    if (!initialized.current) {
+      const savedState = loadFromSessionStorage();
+      if (savedState) {
+        setMessages(savedState.messages || []);
+        setSessionId(savedState.sessionId || null);
+        setProfileData(savedState.profileData || {});
+        setConversationTitle(savedState.conversationTitle || '');
+        console.log('Restored chat state from session storage');
+      }
+    }
+  }, []);
+
+
+
+  // Add this useEffect to save state whenever it changes
+  React.useEffect(() => {
+    if (initialized.current && (messages.length > 0 || sessionId)) {
+      saveToSessionStorage(messages, sessionId, profileData, conversationTitle);
+    }
+  }, [messages, sessionId, profileData, conversationTitle]);
+
+
+
+  const clearChat = () => {
+    setMessages([]);
+    setInput('');
+    setSending(false);
+    setSessionId(null);
+    setProfileData({});
+    setConversationTitle('');
+
+    sessionStorage.removeItem('plannerBotState');
+
+    initialized.current = false;
+
+    setTimeout(() => {
+      initialized.current = true;
+      startChatSession();
+    }, 100);
+  };
+  // ---------------------------------------------------------------------
+
+
+  // Check To See If There Are Chats Happening, Meaining The Plan Should Be Saved.
+  const isChatActive = safeMessages.length > 1 || sending;
+
+
   return (
     <AppTheme>
       <CssBaseline />
@@ -310,6 +407,11 @@ export default function PlannerBot() {
               handleSend={handleSend}
               handleFileUpload={handleFileUpload}
               sending={sending}
+              conversationTitle={conversationTitle}
+              clearChat={clearChat}
+              isChatActive={isChatActive}
+              selectedPlan={selectedPlan}        
+              setSelectedPlan={setSelectedPlan}  
             />
           </Box>
         </Slide>

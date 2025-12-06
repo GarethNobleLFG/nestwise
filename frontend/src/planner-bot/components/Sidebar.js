@@ -5,7 +5,16 @@ import Grow from '@mui/material/Grow';
 import PlanSelector from './PlanSelector';
 import ProfileData from './ProfileData';
 
-export default function Sidebar({ animationTriggered, profileData, lastChatbotResponse }) {
+export default function Sidebar({
+  animationTriggered,
+  profileData,
+  lastChatbotResponse,
+  conversationTitle,
+  clearChat,
+  isChatActive,
+  selectedPlan,
+  setSelectedPlan
+}) {
   return (
     <Box
       sx={{
@@ -20,15 +29,22 @@ export default function Sidebar({ animationTriggered, profileData, lastChatbotRe
       }}
     >
       <Grow in={animationTriggered} timeout={1400}>
-        <Box sx={{ width: '100%' }}>
-          <PlanSelector animationTriggered={animationTriggered} />
+        <Box sx={{ width: '100%', flexShrink: 0 }}>
+          <PlanSelector
+            animationTriggered={animationTriggered}
+            conversationTitle={conversationTitle}
+            clearChat={clearChat}
+            isChatActive={isChatActive}
+            selectedPlan={selectedPlan}        
+            setSelectedPlan={setSelectedPlan}  
+          />
         </Box>
       </Grow>
 
-      <Divider sx={{ borderBottomWidth: 2, mb: 1, mt: 1.5 }} />
+      <Divider sx={{ borderBottomWidth: 2, mb: 1, mt: 1.5, flexShrink: 0 }} />
 
       <Grow in={animationTriggered} timeout={1800}>
-        <Box sx={{ width: '100%', height: '100%' }}>
+        <Box sx={{ width: '100%', flex: 1, minHeight: 0 }}>
           <ProfileData
             animationTriggered={animationTriggered}
             profileData={profileData}

@@ -76,7 +76,7 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
         behavior: 'smooth'
       });
     }
-  }, [formattedData]); 
+  }, [formattedData]);
 
 
 
@@ -101,7 +101,7 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
         mt: '0px', // Pixel positioning control
       }}>
 
-        Data For Your Plan:
+        Data For Your Plan
       </Typography>
 
 
@@ -120,11 +120,10 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
           overflowY: 'auto',
           display: 'flex',
           flexDirection: 'column',
-          height: '290px',
-          bgcolor: 'grey.50',
-          borderRadius: 2,
-          border: '1px solid #e0e0e0',  // Light grey border
+          flex: 1,
+          minHeight: 0, // Enusring No Growth Of Box.         
           padding: 2,
+          flexShrink: 0, // Prevents Shrinking.
         }}>
 
         {Object.keys(formattedData).length !== 0 ? (
@@ -175,7 +174,12 @@ export default function ProfileData({ animationTriggered, profileData, lastChatb
         ) : (
 
 
-          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 2 }}>
+          <Typography variant="body2" sx={{
+            color: 'text.secondary',
+            mt: 2,
+            textAlign: 'center',
+            width: '100%'
+          }}>
             No data available yet.
           </Typography>
 

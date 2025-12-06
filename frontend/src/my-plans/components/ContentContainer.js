@@ -42,14 +42,14 @@ export default function ChatContainer({
           </Slide>
 
           <Slide direction="left" in={animationTriggered} timeout={1200}>
-            <Box sx={{ 
-              flex: 1, 
+            <Box sx={{
+              flex: 1,
               display: 'flex',
-              padding: '16px',                    
-              marginLeft: '-40px',                
-              marginTop: '10px',                
-              width: '100%',         
-              height: '100%',        
+              padding: '16px',
+              marginLeft: '-40px',
+              marginTop: '10px',
+              width: '100%',
+              height: '100%',
             }}>
               <ContentViewer
                 animationTriggered={true}
@@ -61,18 +61,17 @@ export default function ChatContainer({
                 // THIS WILL NEED CHANGED IN THE FUTURE.
                 pdfUrl="path/to/your/document.pdf"
                 leftData={{
-                  "Total Plans": "3",
-                  "Active Users": "1,247",
-                  "Monthly Growth": "12.5%",
-                  "Revenue": "$45,000"
+                  "Portfolio Value": "$347,500",
+                  "Annual Contribution": "$22,000",
+                  "Years to Retirement": "23",
+                  "Target Retirement": "$1.2M"
                 }}
                 rightData={{
-                  "Success Rate": "94%",
-                  "Avg Response": "2.3s",
-                  "Satisfaction": "4.8/5",
-                  "Uptime": "99.9%"
+                  "Asset Allocation": "60/30/10",
+                  "Annual Growth": "7.2%",
+                  "Risk Level": "Moderate",
+                  "On Track": "Yes"
                 }}
-
 
 
 

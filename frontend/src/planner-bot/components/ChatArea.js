@@ -25,6 +25,8 @@ export default function ChatArea({
       overflow: 'hidden',
       ml: '1%'
     }}>
+
+
       {/* Scrollable Messages Area */}
       <Fade in={animationTriggered} timeout={1600}>
         <Box sx={{
@@ -43,22 +45,29 @@ export default function ChatArea({
           '-ms-overflow-style': 'none',  // IE and Edge
           'scrollbar-width': 'none',     // Firefox
         }}>
+
+
           <MessageList safeMessages={safeMessages} />
+
+
         </Box>
       </Fade>
+
 
       {/* Sticky Chat Input */}
       <Slide direction="up" in={animationTriggered} timeout={2000}>
         <div style={{
           position: 'absolute',
-          bottom: '30px',  // Moved up to make room for text below
-          left: '8%',
-          right: 0,
-          transform: 'translateX(-50%)', // Centers the element
-          width: '80%', // Control the width
+          bottom: '30px',
+          left: '0',
+          right: '0',
+          paddingLeft: '120px',
+          paddingRight: '20px',
           zIndex: 1000,
           backgroundColor: 'rgba(247, 247, 248, 0.95)',
           paddingTop: '10px',
+          display: 'flex', 
+          justifyContent: 'center',
         }}>
           <ChatInput
             input={input}
@@ -75,19 +84,19 @@ export default function ChatArea({
         <Typography
           variant="caption"
           sx={{
-            bottom: '0px',  
-            //left: '80%',
-            transform: 'translateX(-50%)', 
-            right: 0,
+            position: 'absolute',
+            bottom: '0px',
+            left: '0',
+            right: '0',
+            paddingLeft: '100px',
+            paddingRight: '20px',
             textAlign: 'center',
             color: 'text.secondary',
             fontSize: '0.75rem',
-            zIndex: 1000,  // High z-index to ensure it's above content
-            backgroundColor: 'rgba(247, 247, 248, 0.95)',  // Semi-transparent background
+            zIndex: 1000,
+            backgroundColor: 'rgba(247, 247, 248, 0.95)',
             paddingTop: '5px',
             paddingBottom: '5px',
-            width: '80%',
-            ml: '58%' 
           }}
         >
           NestWise can make mistakes. Check important info.

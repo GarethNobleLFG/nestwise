@@ -9,6 +9,12 @@ import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import { useEffect } from 'react';
 
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+
 export default function PlanSelector({
   animationTriggered,
   selectedPlan,
@@ -21,6 +27,8 @@ export default function PlanSelector({
 
 
   const [plans, setPlans] = React.useState(['Plan 1']);
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [planToDelete, setPlanToDelete] = React.useState(null);
 
   useEffect(() => {
 
@@ -225,7 +233,8 @@ export default function PlanSelector({
                 onClick={e => {
                   e.stopPropagation();
                   // Remove this plan from the list
-                  setPlans(prev => prev.filter((_, i) => i !== index));
+                  setPlanToDelete({ plan, index });
+                  setDeleteDialogOpen(true);
                 }}
                 sx={{
                   minWidth: 'auto',
@@ -251,6 +260,49 @@ export default function PlanSelector({
           </Box>
         ))}
       </Box>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
+      >
+        <DialogTitle id="delete-dialog-title">
+          Delete {planToDelete?.plan}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="delete-dialog-description">
+            Are you sure you want to delete {planToDelete?.plan}?<br /><br /> All progress will be lost and this action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
+            Cancel
+          </Button>
+          <Button
+
+            onClick={() => {
+              if (planToDelete) {
+                setPlans(prev => prev.filter((_, i) => i !== planToDelete.index));
+              }
+
+              setDeleteDialogOpen(false);
+              setPlanToDelete(null);
+
+              // Add Deleting Of Plan API Call Implementation Here.
+            }}
+            color="error"
+            variant="contained"
+
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+
+
     </Box>
   );
 }

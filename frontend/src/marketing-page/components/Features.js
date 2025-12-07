@@ -171,7 +171,7 @@ export default function Features() {
           gutterBottom
           sx={{ color: 'text.primary' }}
         >
-          How it works.
+          How It Works.
         </Typography>
 
 

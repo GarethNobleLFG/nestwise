@@ -230,9 +230,9 @@ export default function MessageList({ safeMessages }) {
 
             <Box
               sx={{
-                alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                alignSelf: msg.role === 'user' ? 'flex-end' : 'stretch',
                 mb: 1,
-                maxWidth: '75%',
+                maxWidth: msg.role === 'user' ? '75%' : '100%', 
               }}
             >
 

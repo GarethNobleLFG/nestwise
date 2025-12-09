@@ -27,7 +27,7 @@ export default function ChatArea({
       height: '100%',
       overflow: 'hidden',
       alignItems: 'center',
-      //paddingRight: '5%', 
+      paddingRight: '5%', 
     }}>
 
       {/* Scrollable Messages Area */}

@@ -27,7 +27,7 @@ export default function ChatArea({
       height: '100%',
       overflow: 'hidden',
       alignItems: 'center',
-      paddingRight: '5%', // Center all content
+      //paddingRight: '5%', 
     }}>
 
       {/* Scrollable Messages Area */}
@@ -59,7 +59,7 @@ export default function ChatArea({
         <Box sx={{
           position: 'absolute',
           bottom: 30,
-          left: '50%',
+          //left: '50%',
           transform: 'translateX(-50%)',
           width: '100%',
           maxWidth: '900px',
@@ -67,8 +67,7 @@ export default function ChatArea({
           zIndex: 1000,
           backgroundColor: 'rgba(247, 247, 248, 0.95)',
           paddingTop: '10px',
-          paddingRight: '5%', // Center all content
-
+          // paddingRight: '5%',
         }}>
           <ChatInput
             input={input}

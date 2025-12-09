@@ -23,7 +23,7 @@ export default function ChatArea({
       position: 'relative',
       height: '100%',
       overflow: 'hidden',
-      ml: '1%'
+      ml: '5%'
     }}>
 
 

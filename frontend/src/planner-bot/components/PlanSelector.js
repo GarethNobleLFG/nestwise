@@ -160,6 +160,7 @@ export default function PlanSelector({
                     }}
                   />
                 }
+                title={plan} 
                 sx={{
                   display: 'flex',
                   alignItems: 'center',

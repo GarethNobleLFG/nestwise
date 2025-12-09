@@ -4,6 +4,75 @@ import Typography from '@mui/material/Typography';
 import Grow from '@mui/material/Grow';
 import Divider from '@mui/material/Divider';
 import ReactMarkdown from 'react-markdown';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
+import PersonIcon from '@mui/icons-material/Person';
+
+
+// BotHeader Component.
+const BotHeader = () => (
+  <Box
+    sx={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 1,
+      mb: 1,
+      color: '#666',
+    }}
+  >
+    <SmartToyIcon
+      sx={{
+        fontSize: '1rem',
+        color: '#c47c1eff'
+      }}
+    />
+    <Typography
+      variant="caption"
+      sx={{
+        fontSize: '0.75rem',
+        fontWeight: 500,
+        color: '#666'
+      }}
+    >
+      <strong>NestWise Bot</strong>
+    </Typography>
+  </Box>
+);
+
+
+// UserHeader Component.
+const UserHeader = () => (
+  <Box
+    sx={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      gap: 1,
+      mb: 1,
+      color: '#666',
+    }}
+  >
+    <PersonIcon
+      sx={{
+        fontSize: '1rem',
+        color: 'primary.main'
+      }}
+    />
+
+    <Typography
+      variant="caption"
+      sx={{
+        fontSize: '0.75rem',
+        fontWeight: 500,
+        color: '#666'
+      }}
+    >
+      Me
+    </Typography>
+  </Box>
+);
+
+
+
 
 // ThinkingAnimation component
 const ThinkingAnimation = () => (
@@ -62,7 +131,7 @@ export default function MessageList({ safeMessages }) {
 
   // Scroll to bottom when new messages are added
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ 
+    messagesEndRef.current?.scrollIntoView({
       behavior: 'smooth',
       block: 'end'
     });
@@ -93,7 +162,7 @@ export default function MessageList({ safeMessages }) {
   React.useEffect(() => {
     if (safeMessages.length > 0) {
       const lastMessage = safeMessages[safeMessages.length - 1];
-      
+
       // If it's a user message, scroll immediately
       if (lastMessage.role === 'user') {
         scrollToLatestUserMessage();
@@ -111,12 +180,12 @@ export default function MessageList({ safeMessages }) {
   // Helper function to determine if we should show a divider
   const shouldShowDivider = (currentMsg, index) => {
     if (index === 0) return false; // No divider before first message
-    
+
     const previousMsg = safeMessages[index - 1];
-    
+
     // Show divider when transitioning from user message to bot message (or thinking)
-    return previousMsg.role === 'user' && 
-           (currentMsg.role === 'bot' || currentMsg.isThinking);
+    return previousMsg.role === 'user' &&
+      (currentMsg.role === 'bot' || currentMsg.isThinking);
   };
 
 
@@ -147,144 +216,168 @@ export default function MessageList({ safeMessages }) {
           {/* Add divider with padding when transitioning from user to bot */}
           {shouldShowDivider(msg, index) && (
             <Box sx={{ py: 4 }}>
-              <Divider 
-                sx={{ 
+              <Divider
+                sx={{
                   opacity: 0.6,
                   borderColor: 'rgba(149, 149, 149, 0.2)',
                   borderWidth: '1px'
-                }} 
+                }}
               />
             </Box>
           )}
-          
+
           <Grow in={true} timeout={500}>
+
             <Box
               sx={{
                 alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
                 mb: 1,
-                ...(msg.role === 'user' ? {
-                  bgcolor: 'primary.main',
-                  color: 'white',
-                  px: 2,
-                  py: 1,
-                  borderRadius: 2,
-                } : {
-                  bgcolor: 'transparent',
-                  color: 'text.primary',
-                  px: 0,
-                  py: 0,
-                }),
                 maxWidth: '75%',
               }}
             >
-              {msg.isThinking ? (
-                <ThinkingAnimation />
-              ) : msg.role === 'user' ? (
-                <Typography variant="body1">{msg.content}</Typography>
-              ) : (
-                <ReactMarkdown
-                  components={{
-                    h1: ({ children }) => (
-                      <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 2, mb: 1, color: 'text.primary' }}>
-                        {children}
-                      </Typography>
-                    ),
-                    h2: ({ children }) => (
-                      <Typography variant="h5" sx={{ fontWeight: 'bold', mt: 1.5, mb: 0.5, color: 'text.primary' }}>
-                        {children}
-                      </Typography>
-                    ),
-                    h3: ({ children }) => (
-                      <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1, mb: 0.5, color: 'text.primary' }}>
-                        {children}
-                      </Typography>
-                    ),
-                    p: ({ children }) => (
-                      <Typography variant="body1" sx={{ mb: 1, color: 'text.primary', lineHeight: 1.6 }}>
-                        {children}
-                      </Typography>
-                    ),
-                    li: ({ children }) => (
-                      <Typography component="li" variant="body1" sx={{ ml: 2, mb: 0.5, color: 'text.primary' }}>
-                        {children}
-                      </Typography>
-                    ),
-                    ul: ({ children }) => (
-                      <Box component="ul" sx={{ pl: 2, mb: 1 }}>
-                        {children}
-                      </Box>
-                    ),
-                    ol: ({ children }) => (
-                      <Box component="ol" sx={{ pl: 2, mb: 1 }}>
-                        {children}
-                      </Box>
-                    ),
-                    strong: ({ children }) => (
-                      <Box component="span" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
-                        {children}
-                      </Box>
-                    ),
-                    em: ({ children }) => (
-                      <Box component="span" sx={{ fontStyle: 'italic', color: 'text.primary' }}>
-                        {children}
-                      </Box>
-                    ),
-                    code: ({ children }) => (
-                      <Box 
-                        component="code"
-                        sx={{ 
-                          backgroundColor: '#f5f5f5', 
-                          padding: '2px 4px', 
-                          borderRadius: '3px',
-                          fontFamily: 'monospace',
-                          fontSize: '0.875em',
-                          color: 'text.primary'
-                        }}
-                      >
-                        {children}
-                      </Box>
-                    ),
-                    pre: ({ children }) => (
-                      <Box
-                        component="pre"
-                        sx={{
-                          backgroundColor: '#f5f5f5',
-                          padding: '12px',
-                          borderRadius: '6px',
-                          overflow: 'auto',
-                          marginBottom: '8px',
-                          fontFamily: 'monospace',
-                          color: 'text.primary'
-                        }}
-                      >
-                        {children}
-                      </Box>
-                    ),
-                    blockquote: ({ children }) => (
-                      <Box
-                        component="blockquote"
-                        sx={{
-                          borderLeft: '4px solid #ddd',
-                          pl: 2,
-                          ml: 0,
-                          mb: 1,
-                          fontStyle: 'italic',
-                          color: 'text.secondary'
-                        }}
-                      >
-                        {children}
-                      </Box>
-                    ),
-                  }}
-                >
-                  {msg.content}
-                </ReactMarkdown>
+
+              {/* User Header - outside the bubble */}
+              {msg.role === 'user' && (
+                <UserHeader />
               )}
+
+              {/* Bot Header - outside the bubble */}
+              {msg.role === 'bot' && !msg.isThinking && (
+                <BotHeader />
+              )}
+
+
+
+              <Box
+                sx={{
+                  ...(msg.role === 'user' ? {
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                    px: 2,
+                    py: 1,
+                    borderRadius: 2,
+                  } : {
+                    bgcolor: 'transparent',
+                    color: 'text.primary',
+                    px: 0,
+                    py: 0,
+                  }),
+                }}
+              >
+
+                {msg.isThinking ? (
+                  <ThinkingAnimation />
+                ) : msg.role === 'user' ? (
+                  <Typography variant="body1">{msg.content}</Typography>
+                ) : (
+                  <ReactMarkdown
+                    components={{
+                      h1: ({ children }) => (
+                        <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 2, mb: 1, color: 'text.primary' }}>
+                          {children}
+                        </Typography>
+                      ),
+                      h2: ({ children }) => (
+                        <Typography variant="h5" sx={{ fontWeight: 'bold', mt: 1.5, mb: 0.5, color: 'text.primary' }}>
+                          {children}
+                        </Typography>
+                      ),
+                      h3: ({ children }) => (
+                        <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1, mb: 0.5, color: 'text.primary' }}>
+                          {children}
+                        </Typography>
+                      ),
+                      p: ({ children }) => (
+                        <Typography variant="body1" sx={{ mb: 1, color: 'text.primary', lineHeight: 1.6 }}>
+                          {children}
+                        </Typography>
+                      ),
+                      li: ({ children }) => (
+                        <Typography component="li" variant="body1" sx={{ ml: 2, mb: 0.5, color: 'text.primary' }}>
+                          {children}
+                        </Typography>
+                      ),
+                      ul: ({ children }) => (
+                        <Box component="ul" sx={{ pl: 2, mb: 1 }}>
+                          {children}
+                        </Box>
+                      ),
+                      ol: ({ children }) => (
+                        <Box component="ol" sx={{ pl: 2, mb: 1 }}>
+                          {children}
+                        </Box>
+                      ),
+                      strong: ({ children }) => (
+                        <Box component="span" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
+                          {children}
+                        </Box>
+                      ),
+                      em: ({ children }) => (
+                        <Box component="span" sx={{ fontStyle: 'italic', color: 'text.primary' }}>
+                          {children}
+                        </Box>
+                      ),
+                      code: ({ children }) => (
+                        <Box
+                          component="code"
+                          sx={{
+                            backgroundColor: '#f5f5f5',
+                            padding: '2px 4px',
+                            borderRadius: '3px',
+                            fontFamily: 'monospace',
+                            fontSize: '0.875em',
+                            color: 'text.primary'
+                          }}
+                        >
+                          {children}
+                        </Box>
+                      ),
+                      pre: ({ children }) => (
+                        <Box
+                          component="pre"
+                          sx={{
+                            backgroundColor: '#f5f5f5',
+                            padding: '12px',
+                            borderRadius: '6px',
+                            overflow: 'auto',
+                            marginBottom: '8px',
+                            fontFamily: 'monospace',
+                            color: 'text.primary'
+                          }}
+                        >
+                          {children}
+                        </Box>
+                      ),
+                      blockquote: ({ children }) => (
+                        <Box
+                          component="blockquote"
+                          sx={{
+                            borderLeft: '4px solid #ddd',
+                            pl: 2,
+                            ml: 0,
+                            mb: 1,
+                            fontStyle: 'italic',
+                            color: 'text.secondary'
+                          }}
+                        >
+                          {children}
+                        </Box>
+                      ),
+                    }}
+                  >
+
+
+                    {msg.content}
+
+
+                  </ReactMarkdown>
+                )}
+              </Box>
             </Box>
           </Grow>
         </React.Fragment>
       ))}
-      
+
       {/* Invisible element to scroll to */}
       <div ref={messagesEndRef} style={{ height: '20px' }} />
     </Box>

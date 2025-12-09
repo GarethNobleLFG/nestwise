@@ -14,7 +14,12 @@ export default function ChatContainer({
   setInput,
   handleSend,
   handleFileUpload,
-  sending
+  sending,
+  conversationTitle,
+  clearChat,
+  isChatActive,
+  selectedPlan,
+  setSelectedPlan
 }) {
   return (
     <Box sx={{ width: '100%', height: '100%' }}> {/* Removed maxWidth and px constraints */}
@@ -38,7 +43,12 @@ export default function ChatContainer({
               <Sidebar
                 animationTriggered={animationTriggered}
                 profileData={profileData}
-                lastChatbotResponse={lastChatbotResponse}  
+                lastChatbotResponse={lastChatbotResponse}
+                conversationTitle={conversationTitle}
+                clearChat={clearChat}
+                isChatActive={isChatActive}
+                selectedPlan={selectedPlan}       
+                setSelectedPlan={setSelectedPlan}  
               />
             </Box>
           </Slide>

@@ -17,48 +17,58 @@ export default function ChatArea({
 }) {
   return (
     <Box sx={{
-      width: '80%',
+      width: '100%',
+      maxWidth: 'none',
+      margin: '0 auto',
+      px: 2, // Increased padding for better spacing
       display: 'flex',
       flexDirection: 'column',
       position: 'relative',
       height: '100%',
       overflow: 'hidden',
-      ml: '1%'
+      alignItems: 'center',
+      paddingRight: '5%', // Center all content
     }}>
+
       {/* Scrollable Messages Area */}
       <Fade in={animationTriggered} timeout={1600}>
         <Box sx={{
           flex: 1,
-          //left: '40%',
           display: 'flex',
           flexDirection: 'column',
           overflowY: 'auto',
           overflowX: 'hidden',
-          ml: '100px',
+          width: '100%',
+          maxWidth: '900px', // Slightly increased max width
           paddingBottom: '120px',
           height: 'calc(100% - 120px)',
           '&::-webkit-scrollbar': {
             display: 'none'
           },
-          '-ms-overflow-style': 'none',  // IE and Edge
-          'scrollbar-width': 'none',     // Firefox
+          '-ms-overflow-style': 'none',
+          'scrollbar-width': 'none',
         }}>
+
           <MessageList safeMessages={safeMessages} />
+
         </Box>
       </Fade>
 
       {/* Sticky Chat Input */}
       <Slide direction="up" in={animationTriggered} timeout={2000}>
-        <div style={{
+        <Box sx={{
           position: 'absolute',
-          bottom: '30px',  // Moved up to make room for text below
-          left: '8%',
-          right: 0,
-          transform: 'translateX(-50%)', // Centers the element
-          width: '80%', // Control the width
+          bottom: 30,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '100%',
+          maxWidth: '900px',
+          px: 2,
           zIndex: 1000,
           backgroundColor: 'rgba(247, 247, 248, 0.95)',
           paddingTop: '10px',
+          paddingRight: '5%', // Center all content
+
         }}>
           <ChatInput
             input={input}
@@ -67,7 +77,7 @@ export default function ChatArea({
             handleFileUpload={handleFileUpload}
             sending={sending}
           />
-        </div>
+        </Box>
       </Slide>
 
       {/* Text under chat bar */}
@@ -75,19 +85,22 @@ export default function ChatArea({
         <Typography
           variant="caption"
           sx={{
-            bottom: '0px',  
-            //left: '80%',
-            transform: 'translateX(-50%)', 
-            right: 0,
+            position: 'absolute',
+            bottom: 0,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '100%',
+            maxWidth: '900px',
+            px: 2,
             textAlign: 'center',
             color: 'text.secondary',
             fontSize: '0.75rem',
-            zIndex: 1000,  // High z-index to ensure it's above content
-            backgroundColor: 'rgba(247, 247, 248, 0.95)',  // Semi-transparent background
+            zIndex: 1000,
+            backgroundColor: 'rgba(247, 247, 248, 0.95)',
             paddingTop: '5px',
             paddingBottom: '5px',
-            width: '80%',
-            ml: '58%' 
+            paddingRight: '5%', // Center all content
+
           }}
         >
           NestWise can make mistakes. Check important info.

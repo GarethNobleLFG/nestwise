@@ -33,7 +33,7 @@ const BotHeader = () => (
         color: '#666'
       }}
     >
-      <strong>NestWise Bot</strong>
+      <strong>NestWise Agent</strong>
     </Typography>
   </Box>
 );

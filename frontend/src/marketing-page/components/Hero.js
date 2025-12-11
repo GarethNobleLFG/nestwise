@@ -252,7 +252,7 @@ export default function Hero() {
                     color="primary"
                     size="small"
                     sx={{ minWidth: '20%' }}
-                    onClick={() => navigate('/signin')}
+                    onClick={() => navigate('/signup')}
                   >
                     sign up today!
                   </Button>

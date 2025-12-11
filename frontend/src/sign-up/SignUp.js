@@ -347,9 +347,10 @@ export default function SignUp(props) {
                 <Typography sx={{ textAlign: 'center', mt: 1 }}>
                   Already have an account?{' '}
                   <Link
-                    href="/material-ui/getting-started/templates/sign-in/"
+                    component="button"
                     variant="body2"
                     sx={{ alignSelf: 'center' }}
+                    onClick={() => navigate('/signin')}
                   >
                     Sign in
                   </Link>

@@ -27,10 +27,10 @@ export default function PlanSelector({ animationTriggered, onPlanClick }) {
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
         padding: 2,
         width: '100%',
-        height: '629px',
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        minHeight: 'calc(100vh - 64px - 32px)',
+        minHeight: '100%',
       }}
     >
       {/* My Plans Header with animation */}

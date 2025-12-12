@@ -9,6 +9,7 @@ export default function Sidebar({ animationTriggered, profileData }) {
     <Box
       sx={{
         width: '85%',
+        height: '100%',
         bgcolor: 'grey.200',
         p: 1,
         borderRight: 1,
@@ -17,13 +18,13 @@ export default function Sidebar({ animationTriggered, profileData }) {
         flexDirection: 'column',
       }}
     >
-      <Grow in={animationTriggered} timeout={1400}>
-        <Box sx={{ width: '100%' }}>
+      <Grow in={animationTriggered} timeout={1400} style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
           <DisplayedPlans animationTriggered={animationTriggered} />
         </Box>
       </Grow>
 
-      
+
     </Box>
   );
 }

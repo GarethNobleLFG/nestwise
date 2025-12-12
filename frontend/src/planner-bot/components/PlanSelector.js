@@ -26,7 +26,7 @@ export default function PlanSelector({
 }) {
 
 
-  const [plans, setPlans] = React.useState(['Plan 1']);
+  const [plans, setPlans] = React.useState(['Plan 1', 'Plan 2', 'Plan 3']);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [planToDelete, setPlanToDelete] = React.useState(null);
 
@@ -39,7 +39,7 @@ export default function PlanSelector({
 
     }
     else {
-      setPlans(prev => prev.length === 1 ? ['Plan 1'] : prev);
+      setPlans(prev => prev.length === 1 ? [`Plan ${prev.length}`] : prev);
     }
 
   }, [conversationTitle]);
@@ -119,147 +119,156 @@ export default function PlanSelector({
       <Divider sx={{ borderBottomWidth: 2, mb: 1, mt: 1 }} />
 
       {/* Plan Buttons */}
-      <Box sx={{ overflowY: 'auto', maxHeight: '100%', mb: 1 }}>
-        {plans.map((plan, index) => (
-          <Box
-            key={index}
-            onClick={() => {
-              setSelectedPlan(plan);
-              onPlanClick && onPlanClick(plan);
-            }}
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '95%',
-              marginBottom: 0.8,
-              padding: '8px 8px',
-              color: '#555',
-              backgroundColor: selectedPlan === plan ? '#fff3e0' : 'transparent',
-              border: selectedPlan === plan ? '2px solid #c47c1eff' : '1px solid #ddd',
-              borderRadius: 1,
-              flexShrink: 0,
-              cursor: 'pointer',
-              opacity: animationTriggered ? 1 : 0,
-              transform: animationTriggered ? 'translateY(0)' : 'translateY(10px)',
-              transition: `all 0.3s ease-in-out ${index * 100}ms`,
-              '&:hover': {
-                backgroundColor: selectedPlan === plan ? '#ffe0b3' : '#e8e8e8',
-                borderColor: selectedPlan === plan ? '#c47c1eff' : '#bbb',
-                transform: 'translateX(4px)',
-              },
-            }}
-          >
-            {/* Plan title row */}
-            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-              <Button
-                startIcon={
-                  <FolderIcon
-                    sx={{
-                      fontSize: '1rem',
-                      color: selectedPlan === plan ? '#c47c1eff' : '#666'
-                    }}
-                  />
-                }
-                title={plan} 
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                  flex: 1,
-                  padding: 0,
-                  color: selectedPlan === plan ? '#c47c1eff' : 'inherit',
-                  backgroundColor: 'transparent',
-                  border: 'none',
-                  borderRadius: 0,
-                  textTransform: 'none',
-                  fontSize: '0.875rem',
-                  fontWeight: selectedPlan === plan ? 600 : 500,
-                  minHeight: 'auto',
-                  boxShadow: 'none',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  '&:hover': {
-                    backgroundColor: 'transparent',
-                    boxShadow: 'none',
-                    '& .MuiSvgIcon-root': {
-                      color: '#c47c1eff',
-                    },
-                  },
-                  '& .MuiButton-startIcon': {
-                    marginRight: 0.8,
-                    marginLeft: 0,
-                    flexShrink: 0,
-                  },
-                }}
-              >
-                {plan}
-              </Button>
-            </Box>
-
-            {/* Action buttons row */}
-            <Box
+      <Box
+        className="profile-data-scroll"
+        sx={{
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          minHeight: 0, // Ensuring No Growth Of Box.         
+          flexShrink: 0, // Prevents Shrinking.
+        }}
+      >        {plans.map((plan, index) => (
+        <Box
+          key={index}
+          onClick={() => {
+            setSelectedPlan(plan);
+            onPlanClick && onPlanClick(plan);
+          }}
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            width: '95%',
+            marginBottom: 0.8,
+            padding: '8px 8px',
+            color: '#555',
+            backgroundColor: selectedPlan === plan ? '#fff3e0' : 'transparent',
+            border: selectedPlan === plan ? '2px solid #c47c1eff' : '1px solid #ddd',
+            borderRadius: 1,
+            flexShrink: 0,
+            cursor: 'pointer',
+            opacity: animationTriggered ? 1 : 0,
+            transform: animationTriggered ? 'translateY(0)' : 'translateY(10px)',
+            transition: `all 0.3s ease-in-out ${index * 100}ms`,
+            '&:hover': {
+              backgroundColor: selectedPlan === plan ? '#ffe0b3' : '#e8e8e8',
+              borderColor: selectedPlan === plan ? '#c47c1eff' : '#bbb',
+              transform: 'translateX(4px)',
+            },
+          }}
+        >
+          {/* Plan title row */}
+          <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+            <Button
+              startIcon={
+                <FolderIcon
+                  sx={{
+                    fontSize: '1rem',
+                    color: selectedPlan === plan ? '#c47c1eff' : '#666'
+                  }}
+                />
+              }
+              title={plan}
               sx={{
                 display: 'flex',
-                gap: 0.5,
-                mt: 0.5,
-                ml: '8px',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                flex: 1,
+                padding: 0,
+                color: selectedPlan === plan ? '#c47c1eff' : 'inherit',
+                backgroundColor: 'transparent',
+                border: 'none',
+                borderRadius: 0,
+                textTransform: 'none',
+                fontSize: '0.875rem',
+                fontWeight: selectedPlan === plan ? 600 : 500,
+                minHeight: 'auto',
+                boxShadow: 'none',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                '&:hover': {
+                  backgroundColor: 'transparent',
+                  boxShadow: 'none',
+                  '& .MuiSvgIcon-root': {
+                    color: '#c47c1eff',
+                  },
+                },
+                '& .MuiButton-startIcon': {
+                  marginRight: 0.8,
+                  marginLeft: 0,
+                  flexShrink: 0,
+                },
               }}
             >
-              <Button
-                onClick={e => {
-                  e.stopPropagation();
-                  console.log(`Save to plan: ${plan}`);
-                }}
-                sx={{
-                  minWidth: 'auto',
-                  padding: '3px 8px',
-                  fontSize: '0.6rem',
-                  backgroundColor: (isChatActive && selectedPlan === plan) ? '#c47c1eff' : '#ddd',
-                  color: (isChatActive && selectedPlan === plan) ? 'white' : '#999',
-                  border: 'none',
-                  borderRadius: 1,
-                  textTransform: 'none',
-                  cursor: (isChatActive && selectedPlan === plan) ? 'pointer' : 'not-allowed',
-                  '&:hover': {
-                    backgroundColor: (isChatActive && selectedPlan === plan) ? '#b8691eff' : '#ddd',
-                  },
-                }}
-                disabled={!isChatActive || selectedPlan !== plan}
-              >
-                Save
-              </Button>
-
-              <Button
-                onClick={e => {
-                  e.stopPropagation();
-                  // Remove this plan from the list
-                  setPlanToDelete({ plan, index });
-                  setDeleteDialogOpen(true);
-                }}
-                sx={{
-                  minWidth: 'auto',
-                  padding: '3px 8px',
-                  fontSize: '0.6rem',
-                  backgroundColor: selectedPlan === plan ? '#d32f2f' : '#ddd',
-                  color: selectedPlan === plan ? 'white' : '#999',
-                  border: 'none',
-                  borderRadius: 1,
-                  textTransform: 'none',
-                  cursor: selectedPlan === plan ? 'pointer' : 'not-allowed',
-                  '&:hover': {
-                    backgroundColor: selectedPlan === plan ? '#b71c1c' : '#ddd',
-                  },
-                }}
-                disabled={selectedPlan !== plan}
-              >
-                Delete
-              </Button>
-
-
-            </Box>
+              {plan}
+            </Button>
           </Box>
-        ))}
+
+          {/* Action buttons row */}
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 0.5,
+              mt: 0.5,
+              ml: '8px',
+            }}
+          >
+            <Button
+              onClick={e => {
+                e.stopPropagation();
+                console.log(`Save to plan: ${plan}`);
+              }}
+              sx={{
+                minWidth: 'auto',
+                padding: '3px 8px',
+                fontSize: '0.6rem',
+                backgroundColor: (isChatActive && selectedPlan === plan) ? '#c47c1eff' : '#ddd',
+                color: (isChatActive && selectedPlan === plan) ? 'white' : '#999',
+                border: 'none',
+                borderRadius: 1,
+                textTransform: 'none',
+                cursor: (isChatActive && selectedPlan === plan) ? 'pointer' : 'not-allowed',
+                '&:hover': {
+                  backgroundColor: (isChatActive && selectedPlan === plan) ? '#b8691eff' : '#ddd',
+                },
+              }}
+              disabled={!isChatActive || selectedPlan !== plan}
+            >
+              Save
+            </Button>
+
+            <Button
+              onClick={e => {
+                e.stopPropagation();
+                // Remove this plan from the list
+                setPlanToDelete({ plan, index });
+                setDeleteDialogOpen(true);
+              }}
+              sx={{
+                minWidth: 'auto',
+                padding: '3px 8px',
+                fontSize: '0.6rem',
+                backgroundColor: selectedPlan === plan ? '#d32f2f' : '#ddd',
+                color: selectedPlan === plan ? 'white' : '#999',
+                border: 'none',
+                borderRadius: 1,
+                textTransform: 'none',
+                cursor: selectedPlan === plan ? 'pointer' : 'not-allowed',
+                '&:hover': {
+                  backgroundColor: selectedPlan === plan ? '#b71c1c' : '#ddd',
+                },
+              }}
+              disabled={selectedPlan !== plan}
+            >
+              Delete
+            </Button>
+
+
+          </Box>
+        </Box>
+      ))}
       </Box>
 
       {/* Delete Confirmation Dialog */}

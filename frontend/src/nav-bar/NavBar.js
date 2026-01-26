@@ -81,22 +81,45 @@ export default function NavBar() {
                             <>
                                 <button
                                     onClick={() => navigate('/profile')}
-                                    className="!flex !items-center !space-x-2 !px-5 !py-3 !text-base !font-medium !transition-colors !rounded-full hover:!bg-yellow-50 !border-none !cursor-pointer"
-                                    style={{ color: '#c47c1eff' }}
+                                    className="!flex !items-center !space-x-2 !px-5 !py-3 !text-base !font-medium !transition-colors !rounded-full !border-2 !cursor-pointer hover:!scale-105 hover:!shadow-lg"
+                                    style={{
+                                        color: 'white',
+                                        backgroundColor: '#c47c1eff',
+                                        borderColor: 'hsl(var(--brand-400))'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.target.style.backgroundColor = 'hsl(var(--brand-500))';
+                                        e.target.style.borderColor = 'hsl(var(--brand-500))';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.backgroundColor = '#c47c1eff';
+                                        e.target.style.borderColor = 'hsl(var(--brand-400))';
+                                    }}
                                 >
-                                    <PersonIcon className="!w-5 !h-5" style={{ color: '#c47c1eff' }} />
+                                    <PersonIcon className="!w-5 !h-5" style={{ color: 'white' }} />
                                     <span>{userName || 'Profile'}</span>
                                 </button>
                             </>
                         ) : (
                             <button
                                 onClick={() => navigate('/signin')}
-                                className="!px-5 !py-3 !text-base !font-medium !text-gray-700 hover:!text-gray-900 !transition-colors !rounded-full hover:!bg-yellow-50 !border-none !cursor-pointer !flex !items-center"
+                                className="!flex !items-center !space-x-2 !px-5 !py-3 !text-base !font-medium !transition-colors !rounded-full !border-2 !cursor-pointer hover:!scale-105 hover:!shadow-lg"
+                                style={{
+                                    color: 'white',
+                                    backgroundColor: '#c47c1eff',
+                                    borderColor: 'hsl(var(--brand-400))'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.target.style.backgroundColor = 'hsl(var(--brand-500))';
+                                    e.target.style.borderColor = 'hsl(var(--brand-500))';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.backgroundColor = '#c47c1eff';
+                                    e.target.style.borderColor = 'hsl(var(--brand-400))';
+                                }}
                             >
-                                <svg className="!w-5 !h-5 !mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                                </svg>
-                                Sign In
+                                <PersonIcon className="!w-5 !h-5" style={{ color: 'white' }} />
+                                <span>Sign in</span>
                             </button>
                         )}
                     </div>

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
 import AppTheme from '../shared-theme/AppTheme';
 import NavBar from '../nav-bar/NavBar';
+import { Button } from '../../shadcn/components/ui/button';
 
 export default function MarketingPage() {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ export default function MarketingPage() {
     <AppTheme>
       <CssBaseline enableColorScheme />
       <div className="!min-h-screen !bg-gradient-to-br !from-slate-50 !to-gray-100 !flex !flex-col">
-        
+
         {/* Use the new NavBar component */}
         <NavBar />
 
@@ -44,16 +45,16 @@ export default function MarketingPage() {
 
           <div className="!container !mx-auto !px-4 !py-8 !relative !z-10 !max-w-4xl !h-full !flex !items-center">
             <div className="!grid !grid-cols-1 lg:!grid-cols-2 !gap-6 !items-center !w-full">
-              
+
               {/* Left Side - Content */}
-              <motion.div 
+              <motion.div
                 className="!space-y-8 !text-center"
                 initial={{ opacity: 0, x: -50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8 }}
               >
                 {/* Brand Title - using Hero.js color scheme */}
-                <motion.h1 
+                <motion.h1
                   className="!text-5xl md:!text-7xl !font-bold !tracking-tight"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -62,9 +63,9 @@ export default function MarketingPage() {
                   <span style={{ color: '#FFD700' }}>Nest</span>
                   <span style={{ color: '#c47c1eff' }}>Wise</span>
                 </motion.h1>
-                
+
                 {/* Main Message */}
-                <motion.p 
+                <motion.p
                   className="!text-2xl md:!text-4xl !font-semibold !text-gray-900 !leading-tight"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -72,18 +73,18 @@ export default function MarketingPage() {
                 >
                   Plan Your Financial Future.
                 </motion.p>
-                
+
                 {/* Subtitle */}
-                <motion.p 
+                <motion.p
                   className="!text-lg md:!text-xl !text-gray-600 !max-w-lg !leading-relaxed !mx-auto"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.6 }}
                 >
-                  AI-powered retirement planning made simple. Get personalized advice, 
+                  AI-powered retirement planning made simple. Get personalized advice,
                   track your progress, and build your nest egg with confidence.
                 </motion.p>
-                
+
                 {/* CTA Button - using primary color from theme */}
                 <motion.div
                   className="!flex !justify-center"
@@ -95,24 +96,21 @@ export default function MarketingPage() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <button 
+                    <Button
                       className="!text-lg !px-8 !py-4 !text-white !font-semibold !shadow-xl !rounded-lg !transition-all !border-none !cursor-pointer"
-                      style={{ 
+                      style={{
                         background: 'linear-gradient(45deg, #FFD700, #c47c1eff)',
-                        '&:hover': {
-                          background: 'linear-gradient(45deg, #FFC000, #b86f1a)'
-                        }
                       }}
                       onClick={() => navigate(isLoggedIn ? "/planner-bot" : "/signup")}
                     >
                       Start Planning Today
-                    </button>
+                    </Button>
                   </motion.div>
                 </motion.div>
               </motion.div>
 
               {/* Right Side - Animation */}
-              <motion.div 
+              <motion.div
                 className="!flex !items-center !justify-center"
                 initial={{ opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -125,11 +123,11 @@ export default function MarketingPage() {
                     style={{
                       background: 'radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, rgba(196, 124, 30, 0.3) 100%)'
                     }}
-                    animate={{ 
+                    animate={{
                       rotate: 360,
                       scale: [1, 1.05, 1]
                     }}
-                    transition={{ 
+                    transition={{
                       rotate: { duration: 20, repeat: Infinity, ease: "linear" },
                       scale: { duration: 4, repeat: Infinity, ease: "easeInOut" }
                     }}
@@ -140,16 +138,16 @@ export default function MarketingPage() {
                       style={{
                         background: 'radial-gradient(circle, rgba(196, 124, 30, 0.4) 0%, rgba(255, 215, 0, 0.4) 100%)'
                       }}
-                      animate={{ 
+                      animate={{
                         rotate: -360,
                       }}
-                      transition={{ 
+                      transition={{
                         rotate: { duration: 15, repeat: Infinity, ease: "linear" }
                       }}
                       onClick={() => navigate(isLoggedIn ? "/planner-bot" : "/signup")}
                     >
                       {/* Core */}
-                      <div 
+                      <div
                         className="!w-32 !h-32 !rounded-full !flex !items-center !justify-center !text-white !text-lg !font-bold !shadow-2xl hover:!shadow-3xl !transition-shadow"
                         style={{
                           background: 'linear-gradient(45deg, #FFD700, #c47c1eff)'
@@ -162,16 +160,16 @@ export default function MarketingPage() {
                       </div>
                     </motion.div>
                   </motion.div>
-                  
+
                   {/* Floating Elements - using theme colors */}
                   <motion.div
                     className="!absolute !-top-6 !-right-6 !w-12 !h-12 !rounded-lg !shadow-lg !flex !items-center !justify-center !text-white !text-lg"
                     style={{ backgroundColor: '#c47c1eff' }}
-                    animate={{ 
+                    animate={{
                       y: [-10, 10, -10],
                       rotate: [0, 180, 360]
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 6,
                       repeat: Infinity,
                       ease: "easeInOut"
@@ -179,15 +177,15 @@ export default function MarketingPage() {
                   >
                     📊
                   </motion.div>
-                  
+
                   <motion.div
                     className="!absolute !-bottom-6 !-left-6 !w-10 !h-10 !rounded-full !shadow-lg !flex !items-center !justify-center !text-white !text-sm"
                     style={{ backgroundColor: '#FFD700' }}
-                    animate={{ 
+                    animate={{
                       y: [10, -10, 10],
                       x: [5, -5, 5]
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 4,
                       repeat: Infinity,
                       ease: "easeInOut"
@@ -195,14 +193,14 @@ export default function MarketingPage() {
                   >
                     🎯
                   </motion.div>
-                  
+
                   <motion.div
                     className="!absolute !top-1/2 !-left-8 !w-8 !h-8 !bg-green-400 !rounded-lg !shadow-lg !flex !items-center !justify-center !text-white !text-xs"
-                    animate={{ 
+                    animate={{
                       x: [-5, 5, -5],
                       rotate: [0, 360, 0]
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 5,
                       repeat: Infinity,
                       ease: "easeInOut"
@@ -210,15 +208,15 @@ export default function MarketingPage() {
                   >
                     💼
                   </motion.div>
-                  
+
                   <motion.div
                     className="!absolute !top-1/4 !-right-12 !w-6 !h-6 !rounded-full !shadow-lg !flex !items-center !justify-center !text-white !text-xs"
                     style={{ backgroundColor: '#b86f1a' }}
-                    animate={{ 
+                    animate={{
                       y: [-8, 8, -8],
                       rotate: [0, -360, 0]
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 7,
                       repeat: Infinity,
                       ease: "easeInOut"

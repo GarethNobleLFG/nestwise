@@ -2,7 +2,9 @@ import * as React from 'react';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import TwitterIcon from '@mui/icons-material/X';
-import SitemarkIcon from '../../app-bar/SitemarkIcon';
+import { Input } from '../../shadcn/components/ui/input';
+import { Button } from '../../shadcn/components/ui/button';
+import { Card } from '../../shadcn/components/ui/card';
 
 function Copyright() {
   return (
@@ -38,8 +40,8 @@ export default function Footer() {
                 Your intelligent financial planning companion. Build wealth, plan retirement, and secure your financial future with AI-powered insights.
               </p>
 
-              {/* Newsletter Signup - More compact */}
-              <div>
+              {/* Newsletter Signup - Using shadcn components */}
+              <Card className="p-4 bg-white/50 backdrop-blur-sm border-gray-200">
                 <h3 className="text-lg font-semibold mb-2" style={{ color: '#c47c1eff' }}>
                   Join Our Newsletter
                 </h3>
@@ -47,21 +49,21 @@ export default function Footer() {
                   Get weekly financial tips and insights. No spam, ever!
                 </p>
                 <div className="flex flex-col gap-2">
-                  <input
+                  <Input
                     type="email"
                     placeholder="Enter your email"
-                    className="w-full px-3 py-2 text-sm bg-white/70 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent backdrop-blur-sm"
+                    className="text-sm bg-white/70 border-gray-300 focus:ring-amber-500 focus:border-amber-500"
                   />
-                  <button 
-                    className="w-full px-4 py-2 text-white text-sm font-medium rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  <Button 
+                    className="w-full text-sm font-medium hover:scale-105 transition-transform duration-200"
                     style={{
                       background: 'linear-gradient(45deg, #FFD700, #c47c1eff)'
                     }}
                   >
                     Subscribe
-                  </button>
+                  </Button>
                 </div>
-              </div>
+              </Card>
             </div>
 
             {/* Quick Links */}
@@ -191,33 +193,51 @@ export default function Footer() {
 
               {/* Social Media Icons */}
               <div className="flex items-center space-x-4">
-                <a
-                  href="https://github.com/GarethNobleLFG/NestWise"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Button
+                  variant="ghost"
+                  size="icon"
                   className="p-2 bg-white/70 hover:bg-amber-100 rounded-full transition-all duration-200 transform hover:scale-110 backdrop-blur-sm"
-                  aria-label="GitHub"
+                  asChild
                 >
-                  <GitHubIcon className="w-5 h-5 text-gray-600 hover:text-amber-700" />
-                </a>
-                <a
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  <a
+                    href="https://github.com/GarethNobleLFG/NestWise"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="GitHub"
+                  >
+                    <GitHubIcon className="w-5 h-5 text-gray-600 hover:text-amber-700" />
+                  </a>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
                   className="p-2 bg-white/70 hover:bg-amber-100 rounded-full transition-all duration-200 transform hover:scale-110 backdrop-blur-sm"
-                  aria-label="Twitter"
+                  asChild
                 >
-                  <TwitterIcon className="w-5 h-5 text-gray-600 hover:text-amber-700" />
-                </a>
-                <a
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  <a
+                    href="#"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Twitter"
+                  >
+                    <TwitterIcon className="w-5 h-5 text-gray-600 hover:text-amber-700" />
+                  </a>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
                   className="p-2 bg-white/70 hover:bg-amber-100 rounded-full transition-all duration-200 transform hover:scale-110 backdrop-blur-sm"
-                  aria-label="LinkedIn"
+                  asChild
                 >
-                  <LinkedInIcon className="w-5 h-5 text-gray-600 hover:text-amber-700" />
-                </a>
+                  <a
+                    href="#"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="LinkedIn"
+                  >
+                    <LinkedInIcon className="w-5 h-5 text-gray-600 hover:text-amber-700" />
+                  </a>
+                </Button>
               </div>
             </div>
           </div>

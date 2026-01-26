@@ -4,6 +4,7 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
     "./public/index.html"
   ],
+  important: true, // This makes all Tailwind utilities !important
   theme: {
     container: {
       center: true,
@@ -71,6 +72,6 @@ module.exports = {
   },
   plugins: [],
   corePlugins: {
-    preflight: false, // Keep this to avoid conflicts with Material-UI
+    preflight: true, // Enable Tailwind's base styles to override MUI
   },
 }

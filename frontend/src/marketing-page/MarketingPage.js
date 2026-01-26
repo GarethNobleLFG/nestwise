@@ -34,7 +34,7 @@ export default function MarketingPage() {
     <AppTheme>
       <CssBaseline enableColorScheme />
       <div className="!min-h-screen !bg-gradient-to-br !from-slate-50 !to-gray-100 !flex !flex-col">
-        
+
         {/* Use the new NavBar component */}
         <NavBar />
 
@@ -47,17 +47,17 @@ export default function MarketingPage() {
           </div>
 
           <div className="!container !mx-auto !px-4 !py-16 !relative !z-10 !max-w-6xl !w-full">
-            <div className="!flex !flex-col !items-center !justify-center !text-center !space-y-16">
-              
+            <div className="!flex !flex-col !items-center !justify-center !text-center !space-y-8">
+
               {/* Content Section - Centered */}
-              <motion.div 
+              <motion.div
                 className="!space-y-6 !text-center !max-w-6xl !w-full"
                 initial={{ opacity: 0, y: -30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
               >
                 {/* Main Title - All on one line */}
-                <motion.h1 
+                <motion.h1
                   className="!text-5xl md:!text-7xl lg:!text-8xl !font-bold !tracking-tight !leading-none !whitespace-nowrap"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -68,18 +68,18 @@ export default function MarketingPage() {
                   <span style={{ color: '#c47c1eff' }}>Wise</span>
                   <span className="!text-gray-900">!</span>
                 </motion.h1>
-                
+
                 {/* Subtitle - Smaller */}
-                <motion.p 
+                <motion.p
                   className="!text-lg md:!text-xl !text-gray-600 !max-w-2xl !leading-relaxed !mx-auto !mt-6"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.4 }}
                 >
-                  AI-powered retirement planning made simple. Get personalized advice, 
+                  AI-powered retirement planning made simple. Get personalized advice,
                   track your progress, and build your nest egg with confidence.
                 </motion.p>
-                
+
                 {/* CTA Button - Smaller */}
                 <motion.div
                   className="!flex !justify-center !pt-8"
@@ -91,9 +91,9 @@ export default function MarketingPage() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <button 
+                    <button
                       className="!text-lg !px-8 !py-4 !text-white !font-semibold !shadow-xl !rounded-lg !transition-all !border-none !cursor-pointer"
-                      style={{ 
+                      style={{
                         background: 'linear-gradient(45deg, #FFD700, #c47c1eff)',
                       }}
                       onClick={() => navigate(isLoggedIn ? "/planner-bot" : "/signup")}
@@ -105,7 +105,7 @@ export default function MarketingPage() {
               </motion.div>
 
               {/* Writing Animation Component */}
-              <motion.div 
+              <motion.div
                 className="!w-full"
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -121,7 +121,7 @@ export default function MarketingPage() {
         <div className="!w-full !border-t !border-gray-200"></div>
 
         {/* How It Works Section */}
-        <motion.section 
+        <motion.section
           className="!bg-white"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -135,7 +135,7 @@ export default function MarketingPage() {
         <div className="!w-full !border-t !border-gray-200"></div>
 
         {/* FAQ Section */}
-        <motion.section 
+        <motion.section
           className="!bg-gray-50"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}

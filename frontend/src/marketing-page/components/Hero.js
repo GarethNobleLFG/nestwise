@@ -1,286 +1,257 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Container from '@mui/material/Container';
-import InputLabel from '@mui/material/InputLabel';
-import Link from '@mui/material/Link';
-import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import Fade from '@mui/material/Fade';
-import Slide from '@mui/material/Slide';
-import Zoom from '@mui/material/Zoom';
-import visuallyHidden from '@mui/utils/visuallyHidden';
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import CssBaseline from '@mui/material/CssBaseline';
+import AppTheme from '../shared-theme/AppTheme';
+import NavBar from '../nav-bar/NavBar';
 
-
-
-export default function Hero() {
-  const [checked, setChecked] = React.useState(false);
-  const [isTokenValid, setIsTokenValid] = React.useState(true);
+export default function MarketingPage() {
   const navigate = useNavigate();
 
-
-  // Trigger animations when component mounts
-  React.useEffect(() => {
-    setChecked(true);
+  useEffect(() => {
+    document.title = "NestWise - Welcome";
   }, []);
 
-
-
-
-
-
-  // --------------TOKEN CHECKING--------------
-  function checkTokenValidity(token) {
-    if (!token) {
-      return false;
-    }
-
+  // Check if user is logged in
+  const checkTokenValidity = (token) => {
+    if (!token) return false;
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       return payload.exp * 1000 > Date.now();
-    }
-    catch {
+    } catch (error) {
       return false;
     }
-  }
+  };
 
-
-
-  // --------------GET USER INFO WITH TOKEN--------------
-  function getUserFromToken(token) {
-    if (!token) {
-      return;
-    }
-    try {
-
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return { email: payload.sub, name: payload.name || payload.sub };
-    }
-    catch {
-      return null;
-    }
-  }
-
-
-
-
-
-  // --------------USEEFFECT FOR PAGE RE-RENDERS IF TOKEN IS BAD--------------
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem('token');
-
-      setIsTokenValid(checkTokenValidity(token));
-    };
-    // Check if token is vaild once.
-    checkAuth();
-    const interval = setInterval(checkAuth, 2000); // Repeat check.
-    return () => clearInterval(interval);
-  }, []);
-
-
-
-
-  // --------------STATE FOR USER DATA--------------
   const token = localStorage.getItem('token');
-  const [profile, setProfile] = useState(getUserFromToken(token));
-
-
+  const isLoggedIn = checkTokenValidity(token);
 
   return (
-    <Box
-      id="hero"
-      sx={(theme) => ({
-        width: '100%',
-        backgroundRepeat: 'no-repeat',
-        backgroundImage:
-          'radial-gradient(ellipse 80% 50% at 50% -20%, hsl(210, 100%, 90%), transparent)',
-        ...theme.applyStyles('dark', {
-          backgroundImage:
-            'radial-gradient(ellipse 80% 50% at 50% -20%, hsl(210, 100%, 16%), transparent)',
-        }),
-      })}
-    >
-      <Container
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          pt: { xs: 14, sm: 20 },
-          pb: { xs: 8, sm: 12 },
-        }}
-      >
-        <Stack
-          spacing={2}
-          useFlexGap
-          sx={{ alignItems: 'center', width: { xs: '100%', sm: '70%' } }}
-        >
+    <AppTheme>
+      <CssBaseline enableColorScheme />
+      <div className="!min-h-screen !bg-gradient-to-br !from-slate-50 !to-gray-100 !flex !flex-col">
+        
+        {/* Use the new NavBar component */}
+        <NavBar />
 
+        {/* Welcome Banner Content */}
+        <section className="!flex-grow !relative !overflow-hidden !pt-24 !pb-4">
+          {/* Background Elements - using gold and light brown */}
+          <div className="!absolute !inset-0">
+            <div className="!absolute !top-1/4 !right-1/4 !w-96 !h-96 !bg-gradient-to-r !from-yellow-400/20 !to-amber-600/20 !rounded-full !blur-3xl !animate-pulse"></div>
+            <div className="!absolute !bottom-1/4 !left-1/4 !w-64 !h-64 !bg-gradient-to-r !from-amber-700/20 !to-yellow-500/20 !rounded-full !blur-3xl !animate-pulse"></div>
+          </div>
 
-          {isTokenValid ? (
-
-            <React.Fragment>
-              {/* Large heading with slide animation */}
-              <Slide direction="down" in={checked} timeout={1000}>
-
-
-                <Typography
-                  variant="h1"
-                  sx={{
-                    fontSize: 'clamp(3rem, 10vw, 3.5rem)',
-                    textAlign: 'center',
-                    lineHeight: 1.2,
-                  }}
+          <div className="!container !mx-auto !px-4 !py-8 !relative !z-10 !max-w-4xl !h-full !flex !items-center">
+            <div className="!grid !grid-cols-1 lg:!grid-cols-2 !gap-6 !items-center !w-full">
+              
+              {/* Left Side - Content */}
+              <motion.div 
+                className="!space-y-8 !text-center"
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+              >
+                {/* Brand Title - using Hero.js color scheme */}
+                <motion.h1 
+                  className="!text-5xl md:!text-7xl !font-bold !tracking-tight"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
                 >
-                  Welcome back, {' '}
-                  <Typography
-                    variant="h0.5"
-                    component="span"
-                    sx={{
-                      color: '#c47c1eff', // Light Brown for "Wise"
+                  <span style={{ color: '#FFD700' }}>Nest</span>
+                  <span style={{ color: '#c47c1eff' }}>Wise</span>
+                </motion.h1>
+                
+                {/* Main Message */}
+                <motion.p 
+                  className="!text-2xl md:!text-4xl !font-semibold !text-gray-900 !leading-tight"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                >
+                  Plan Your Financial Future.
+                </motion.p>
+                
+                {/* Subtitle */}
+                <motion.p 
+                  className="!text-lg md:!text-xl !text-gray-600 !max-w-lg !leading-relaxed !mx-auto"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.6 }}
+                >
+                  AI-powered retirement planning made simple. Get personalized advice, 
+                  track your progress, and build your nest egg with confidence.
+                </motion.p>
+                
+                {/* CTA Button - using primary color from theme */}
+                <motion.div
+                  className="!flex !justify-center"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.8 }}
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <button 
+                      className="!text-lg !px-8 !py-4 !text-white !font-semibold !shadow-xl !rounded-lg !transition-all !border-none !cursor-pointer"
+                      style={{ 
+                        background: 'linear-gradient(45deg, #FFD700, #c47c1eff)',
+                        '&:hover': {
+                          background: 'linear-gradient(45deg, #FFC000, #b86f1a)'
+                        }
+                      }}
+                      onClick={() => navigate(isLoggedIn ? "/planner-bot" : "/signup")}
+                    >
+                      Start Planning Today
+                    </button>
+                  </motion.div>
+                </motion.div>
+              </motion.div>
+
+              {/* Right Side - Animation */}
+              <motion.div 
+                className="!flex !items-center !justify-center"
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 1, delay: 0.4 }}
+              >
+                <div className="!relative">
+                  {/* Main Circle - using gold and light brown */}
+                  <motion.div
+                    className="!w-72 !h-72 !rounded-full !flex !items-center !justify-center"
+                    style={{
+                      background: 'radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, rgba(196, 124, 30, 0.3) 100%)'
+                    }}
+                    animate={{ 
+                      rotate: 360,
+                      scale: [1, 1.05, 1]
+                    }}
+                    transition={{ 
+                      rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+                      scale: { duration: 4, repeat: Infinity, ease: "easeInOut" }
                     }}
                   >
-                    {profile?.name || 'User'}!
-                  </Typography>
-                </Typography>
-              </Slide>
-
-
-              <Zoom in={checked} timeout={1500}>
-                <Typography
-                  sx={{
-                    textAlign: 'center',
-                    color: 'text.secondary',
-                    width: { sm: '100%', md: '80%' },
-                  }}
-                >
-                  <strong>Let's continue building your personalized retirement plans!</strong>
-                </Typography>
-              </Zoom>
-
-
-
-              {/* Email input + button with zoom animation */}
-              <Zoom in={checked} timeout={2000}>
-                <Stack
-                  direction={{ xs: 'column', sm: 'row' }}
-                  spacing={1}
-                  useFlexGap
-                  sx={{ pt: 1, width: { xs: '100%', sm: '350px' }, alignItems: 'center', justifyContent: 'center' }}
-                >
-
-
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    sx={{ minWidth: '20%' }}
-                    onClick={() => navigate('/myplans')}
-                  >
-                    go to my plans
-                  </Button>
-                </Stack>
-              </Zoom>
-
-
-            </React.Fragment>
-
-          ) : (
-
-            <React.Fragment>
-              {/* Large heading with slide animation */}
-              <Slide direction="down" in={checked} timeout={1000}>
-                <Typography
-                  variant="h1"
-                  sx={{
-                    fontSize: 'clamp(3rem, 10vw, 3.5rem)',
-                    textAlign: 'center',
-                    lineHeight: 1.2,
-                  }}
-                >
-                  Welcome to {' '}
-                  <Typography
-                    variant="h0.5"
-                    component="span"
-                    sx={{
-                      color: '#FFD700', // Gold for "Nest"
+                    {/* Inner Circle */}
+                    <motion.div
+                      className="!w-52 !h-52 !rounded-full !flex !items-center !justify-center !cursor-pointer hover:!scale-105 !transition-transform"
+                      style={{
+                        background: 'radial-gradient(circle, rgba(196, 124, 30, 0.4) 0%, rgba(255, 215, 0, 0.4) 100%)'
+                      }}
+                      animate={{ 
+                        rotate: -360,
+                      }}
+                      transition={{ 
+                        rotate: { duration: 15, repeat: Infinity, ease: "linear" }
+                      }}
+                      onClick={() => navigate(isLoggedIn ? "/planner-bot" : "/signup")}
+                    >
+                      {/* Core */}
+                      <div 
+                        className="!w-32 !h-32 !rounded-full !flex !items-center !justify-center !text-white !text-lg !font-bold !shadow-2xl hover:!shadow-3xl !transition-shadow"
+                        style={{
+                          background: 'linear-gradient(45deg, #FFD700, #c47c1eff)'
+                        }}
+                      >
+                        <div className="!text-center">
+                          <div className="!text-3xl !mb-1">💰</div>
+                          <div className="!text-sm">Planning</div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                  
+                  {/* Floating Elements - using theme colors */}
+                  <motion.div
+                    className="!absolute !-top-6 !-right-6 !w-12 !h-12 !rounded-lg !shadow-lg !flex !items-center !justify-center !text-white !text-lg"
+                    style={{ backgroundColor: '#c47c1eff' }}
+                    animate={{ 
+                      y: [-10, 10, -10],
+                      rotate: [0, 180, 360]
+                    }}
+                    transition={{ 
+                      duration: 6,
+                      repeat: Infinity,
+                      ease: "easeInOut"
                     }}
                   >
-                    Nest
-                  </Typography>
-                  <Typography
-                    variant="h0.5"
-                    component="span"
-                    sx={{
-                      color: '#c47c1eff', // Light Brown for "Wise"
+                    📊
+                  </motion.div>
+                  
+                  <motion.div
+                    className="!absolute !-bottom-6 !-left-6 !w-10 !h-10 !rounded-full !shadow-lg !flex !items-center !justify-center !text-white !text-sm"
+                    style={{ backgroundColor: '#FFD700' }}
+                    animate={{ 
+                      y: [10, -10, 10],
+                      x: [5, -5, 5]
+                    }}
+                    transition={{ 
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: "easeInOut"
                     }}
                   >
-                    Wise
-                  </Typography>
-                </Typography>
-              </Slide>
-
-              <Zoom in={checked} timeout={1500}>
-                <Typography
-                  sx={{
-                    textAlign: 'center',
-                    color: 'text.secondary',
-                    width: { sm: '100%', md: '80%' },
-                  }}
-                >
-                  <strong>Plan your retirement with confidence, building a secure future tailored to your goals. Get a personalized plan sent straight to your email!</strong>
-                </Typography>
-              </Zoom>
-
-
-
-              {/* Email input + button with zoom animation */}
-              <Zoom in={checked} timeout={2000}>
-                <Stack
-                  direction={{ xs: 'column', sm: 'row' }}
-                  spacing={1}
-                  useFlexGap
-                  sx={{ pt: 1, width: { xs: '100%', sm: '350px' }, alignItems: 'center', justifyContent: 'center' }}
-                >
-
-
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    sx={{ minWidth: '20%' }}
-                    onClick={() => navigate('/signup')}
+                    🎯
+                  </motion.div>
+                  
+                  <motion.div
+                    className="!absolute !top-1/2 !-left-8 !w-8 !h-8 !bg-green-400 !rounded-lg !shadow-lg !flex !items-center !justify-center !text-white !text-xs"
+                    animate={{ 
+                      x: [-5, 5, -5],
+                      rotate: [0, 360, 0]
+                    }}
+                    transition={{ 
+                      duration: 5,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
                   >
-                    sign up today!
-                  </Button>
-                </Stack>
-              </Zoom>
-            </React.Fragment>
+                    💼
+                  </motion.div>
+                  
+                  <motion.div
+                    className="!absolute !top-1/4 !-right-12 !w-6 !h-6 !rounded-full !shadow-lg !flex !items-center !justify-center !text-white !text-xs"
+                    style={{ backgroundColor: '#b86f1a' }}
+                    animate={{ 
+                      y: [-8, 8, -8],
+                      rotate: [0, -360, 0]
+                    }}
+                    transition={{ 
+                      duration: 7,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    📈
+                  </motion.div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
 
-          )}
+        {/* Divider */}
+        <div className="!w-full !border-t !border-gray-200"></div>
 
-
-
-
-          {/* Terms and conditions with slide from bottom */}
-          <Slide direction="up" in={checked} timeout={2500}>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ textAlign: 'center' }}
-            >
-              Please read our&nbsp;
-              <Link href="#" color="primary">
-                Terms & Conditions
-              </Link>
-              .
-            </Typography>
-          </Slide>
-        </Stack>
-      </Container>
-    </Box>
+        {/* Minimal Footer */}
+        <div className="!pb-8">
+          <div className="!max-w-2xl !mx-auto !px-4">
+            <div className="!border-t !w-1/2 !mx-auto !mb-6" style={{ borderColor: '#c47c1eff' }}></div>
+            <div className="!flex !flex-col sm:!flex-row !justify-between !items-center !space-y-4 sm:!space-y-0">
+              <div className="!flex !flex-wrap !items-center !gap-6 !text-xs !text-gray-500">
+                <a href="#" className="hover:!text-gray-700 !transition-colors !no-underline">Features</a>
+                <a href="#" className="hover:!text-gray-700 !transition-colors !no-underline">Pricing</a>
+                <a href="#" className="hover:!text-gray-700 !transition-colors !no-underline">Help</a>
+                <a href="#" className="hover:!text-gray-700 !transition-colors !no-underline">Terms</a>
+                <a href="#" className="hover:!text-gray-700 !transition-colors !no-underline">Privacy</a>
+                <a href="#" className="hover:!text-gray-700 !transition-colors !no-underline">Security</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </AppTheme>
   );
 }

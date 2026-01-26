@@ -20,7 +20,11 @@ export default function FAQ() {
   return (
     <Container
       id="faq"
+      maxWidth={false}
       sx={{
+        maxWidth: '1280px', // equivalent to max-w-7xl
+        mx: 'auto',
+        px: { xs: 3, sm: 6 }, // equivalent to px-6
         pt: { xs: 4, sm: 12 },
         pb: { xs: 8, sm: 16 },
         position: 'relative',

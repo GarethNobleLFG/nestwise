@@ -8,6 +8,8 @@ import WritingAnimation from './components/WritingAnimation';
 import HowItWorks from './components/HowItWorks';
 import FAQ from './components/FAQ';
 import Footer from './components/Footer';
+import { Button } from '../shadcn/components/ui/button';
+
 
 export default function MarketingPage() {
   const navigate = useNavigate();
@@ -91,15 +93,15 @@ export default function MarketingPage() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <button
-                      className="!text-lg !px-8 !py-4 !text-white !font-semibold !shadow-xl !rounded-lg !transition-all !border-none !cursor-pointer"
+                    <Button
+                      className="!text-xl !px-10 !py-6 !text-white !font-semibold !shadow-xl !rounded-lg !transition-all !border-none !cursor-pointer"
                       style={{
                         background: 'linear-gradient(45deg, #FFD700, #c47c1eff)',
                       }}
                       onClick={() => navigate(isLoggedIn ? "/planner-bot" : "/signup")}
                     >
                       Start Planning Today
-                    </button>
+                    </Button>
                   </motion.div>
                 </motion.div>
               </motion.div>

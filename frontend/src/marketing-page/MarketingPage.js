@@ -8,6 +8,7 @@ import WritingAnimation from './components/WritingAnimation';
 import HowItWorks from './components/HowItWorks';
 import FAQ from './components/FAQ';
 import Footer from './components/Footer';
+import LogoCollection from './components/LogoCollection';
 import { Button } from '../shadcn/components/ui/button';
 
 
@@ -149,6 +150,17 @@ export default function MarketingPage() {
 
         {/* Footer Component */}
         <Footer />
+
+        {/* How It Works Section */}
+        <motion.section
+          className="!bg-white"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <LogoCollection />
+        </motion.section>
       </div>
     </AppTheme>
   );

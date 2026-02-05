@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { Button } from '../../shadcn/components/ui/button';
+import EditIcon from '@mui/icons-material/Edit';
 import ClearIcon from '@mui/icons-material/Clear';
 import SelectPlanModal from './SelectPlanModal';
 
@@ -12,12 +13,8 @@ export default function Header({
 }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const getPlanDisplayName = (planId) => {
-        return 'Select plan to edit';
-    };
-
     let headerTitle;
-    if (conversationTitle ==='None') {
+    if (conversationTitle === 'None') {
         headerTitle = 'NestWise Agent';
     }
     else {
@@ -27,20 +24,20 @@ export default function Header({
     return (
         <>
             <div className="px-8 py-6">
-                <div className="max-w-4xl mx-auto flex flex-col items-center space-y-4">
-                    <div className="flex items-center space-x-6">
-                        <div>
-                            <h2 className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-amber-600 bg-clip-text text-transparent">
-                                {headerTitle}
-                            </h2>
+                <div className="max-w-4xl mx-auto flex flex-col items-start space-y-4">
+                    <div className="flex items-center space-x-8">
+                        <div className="flex items-center space-x-2">
+                            <div className="text-base font-semibold text-gray-800 flex items-center">
+                                Current Plan:
+                            </div>
+                            <Button
+                                variant="outline"
+                                onClick={() => setIsModalOpen(true)}
+                                className="bg-white/40 backdrop-blur-sm rounded-2xl shadow-lg border-0 px-4 py-3 text-base font-semibold text-gray-800 hover:bg-white/60 transition-all duration-300"
+                            >
+                                {headerTitle} <EditIcon className="h-4 w-4 ml-2" />
+                            </Button>
                         </div>
-                        <Button
-                            variant="outline"
-                            onClick={() => setIsModalOpen(true)}
-                            className="bg-white/40 backdrop-blur-sm rounded-2xl shadow-lg border-0 px-4 py-3 text-sm font-medium hover:bg-white/60 transition-all duration-300"
-                        >
-                            {getPlanDisplayName(selectedPlan)}
-                        </Button>
 
                         <Button
                             variant="ghost"

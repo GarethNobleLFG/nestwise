@@ -3,10 +3,23 @@ import { motion } from 'framer-motion';
 import { cn } from '../../shadcn/lib/utils';
 import PersonIcon from '@mui/icons-material/Person';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
+import ReactMarkdown from 'react-markdown';
+import { markdownHandler } from '../../utils/markdownHandler';
 
 export default function MessagesArea({ safeMessages }) {
+    const messagesEndRef = React.useRef(null);
+    const scrollAreaRef = React.useRef(null);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    React.useEffect(() => {
+        scrollToBottom();
+    }, [safeMessages]);
+
     return (
-        <div className="flex-1 overflow-y-auto px-8 py-4 min-h-0" style={{ height: 'calc(100vh - 200px)' }}>
+        <div ref={scrollAreaRef} className="flex-1 overflow-y-auto px-8 py-4 min-h-0" style={{ height: 'calc(100vh - 200px)' }}>
             <div className="max-w-4xl mx-auto space-y-4 min-h-full">
                 {safeMessages.map((message, index) => {
                     const prevMessage = safeMessages[index - 1];
@@ -27,7 +40,7 @@ export default function MessagesArea({ safeMessages }) {
                                 )}
                                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                                transition={{ duration: 0.4, delay: index * 0.1 }}
+                                transition={{ duration: 0.4 }}
                             >
                                 {message.role === 'bot' && (
                                     <div className="w-8 h-8 bg-[#c47c1eff] rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
@@ -37,10 +50,10 @@ export default function MessagesArea({ safeMessages }) {
 
                                 <div
                                     className={cn(
-                                        "max-w-lg transition-all duration-300",
+                                        "transition-all duration-300",
                                         message.role === 'user'
-                                            ? "p-3 rounded-2xl shadow-lg backdrop-blur-xl border bg-gradient-to-br from-yellow-400/90 to-amber-500/90 text-white border-yellow-300/30 hover:shadow-xl hover:scale-[1.01]"
-                                            : "text-gray-800"
+                                            ? "max-w-lg p-3 rounded-2xl shadow-lg backdrop-blur-xl border bg-gradient-to-br from-yellow-400/90 to-amber-500/90 text-white border-yellow-300/30 hover:shadow-xl hover:scale-[1.01]"
+                                            : "max-w-3xl text-gray-800"
                                     )}
                                 >
                                     {message.isThinking ? (
@@ -50,10 +63,14 @@ export default function MessagesArea({ safeMessages }) {
                                                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75"></div>
                                                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150"></div>
                                             </div>
-                                            <span className="text-gray-500 text-sm">AI is thinking...</span>
+                                            <span className="text-gray-500 text-sm">NestWise Agent is thinking...</span>
                                         </div>
                                     ) : (
-                                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                                        <div className="text-sm leading-relaxed prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-800 prose-strong:text-gray-900 prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded prose-pre:bg-gray-100 prose-pre:p-3 prose-pre:rounded-lg">
+                                            <ReactMarkdown components={message.role === 'bot' ? markdownHandler : {}}>
+                                                {message.content}
+                                            </ReactMarkdown>
+                                        </div>
                                     )}
                                 </div>
 
@@ -64,6 +81,8 @@ export default function MessagesArea({ safeMessages }) {
                         </React.Fragment>
                     );
                 })}
+                {/* Invisible div at the end for scrolling reference */}
+                <div ref={messagesEndRef} />
             </div>
         </div>
     );

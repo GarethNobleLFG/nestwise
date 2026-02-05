@@ -16,6 +16,14 @@ export default function Header({
         return 'Select plan to edit';
     };
 
+    let headerTitle;
+    if (conversationTitle ==='None') {
+        headerTitle = 'NestWise Agent';
+    }
+    else {
+        headerTitle = conversationTitle || 'NestWise Agent';
+    }
+
     return (
         <>
             <div className="px-8 py-6">
@@ -23,7 +31,7 @@ export default function Header({
                     <div className="flex items-center space-x-6">
                         <div>
                             <h2 className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-amber-600 bg-clip-text text-transparent">
-                                {conversationTitle || 'NestWise Agent'}
+                                {headerTitle}
                             </h2>
                         </div>
                         <Button

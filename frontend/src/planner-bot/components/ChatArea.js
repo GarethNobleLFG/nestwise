@@ -27,7 +27,6 @@ export default function ChatArea({
       height: '100%',
       overflow: 'hidden',
       alignItems: 'center',
-      // Removed: paddingRight: '5%', - This was causing asymmetrical padding
     }}>
 
       {/* Scrollable Messages Area */}
@@ -59,15 +58,15 @@ export default function ChatArea({
         <Box sx={{
           position: 'absolute',
           bottom: 30,
-          left: '50%', // Added this back
-          transform: 'translateX(-50%)', // Now this will work properly
-          width: '100%',
-          maxWidth: '900px',
+          left: 0,        // Changed from '50%' to 0
+          right: 0,       // Added right: 0 to span full width
+          width: 'auto',  // Changed from '100%' to 'auto'
+          maxWidth: 'none', // Removed maxWidth constraint
           px: 2,
           zIndex: 1000,
           backgroundColor: 'rgba(247, 247, 248, 0.95)',
           paddingTop: '10px',
-          // Removed: paddingRight: '5%', - This was causing offset
+          // Removed transform since we're not centering anymore
         }}>
           <ChatInput
             input={input}
@@ -86,10 +85,10 @@ export default function ChatArea({
           sx={{
             position: 'absolute',
             bottom: 0,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '100%',
-            maxWidth: '900px',
+            left: 0,        // Changed from '50%' to 0
+            right: 0,       // Added right: 0
+            width: 'auto',  // Changed from '100%' to 'auto'
+            maxWidth: 'none', // Removed maxWidth constraint
             px: 2,
             textAlign: 'center',
             color: 'text.secondary',
@@ -98,7 +97,7 @@ export default function ChatArea({
             backgroundColor: 'rgba(247, 247, 248, 0.95)',
             paddingTop: '5px',
             paddingBottom: '5px',
-            // Removed: paddingRight: '5%', - This was causing offset
+            // Removed transform since we're not centering anymore
           }}
         >
           NestWise can make mistakes. Check important info.

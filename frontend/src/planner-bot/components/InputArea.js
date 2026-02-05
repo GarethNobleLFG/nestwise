@@ -57,7 +57,7 @@ export default function InputArea({
         </div>
         
         <p className="text-xs text-gray-600 text-center mt-2 font-medium">
-          💡 NestWise AI can make mistakes. Always verify important financial information.
+          NestWise Agent can make mistakes. Always verify important financial information.
         </p>
       </div>
     </div>

@@ -13,7 +13,7 @@ export default function Header({
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const getPlanDisplayName = (planId) => {
-        return '🎯 Select plan to edit';
+        return 'Select plan to edit';
     };
 
     return (

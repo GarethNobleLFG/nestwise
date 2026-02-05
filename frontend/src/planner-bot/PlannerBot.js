@@ -395,8 +395,7 @@ export default function PlannerBot() {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="relative z-10 min-h-screen pt-12 flex flex-col">
-
+      <div className="relative z-10 h-screen flex flex-col overflow-hidden pt-6">
         {/* Header */}
         <Header
           conversationTitle={conversationTitle}

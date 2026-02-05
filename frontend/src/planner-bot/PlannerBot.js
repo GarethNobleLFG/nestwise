@@ -418,7 +418,7 @@ export default function PlannerBot() {
         />
 
         {/* Profile Data Area */}
-        <div className="absolute bottom-4 left-4 z-20">
+        <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-20">
           <ProfileDataArea
             profileData={profileData}
             animationTriggered={animationTriggered}

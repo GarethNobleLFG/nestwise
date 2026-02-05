@@ -14,6 +14,7 @@ import SmartToyIcon from '@mui/icons-material/SmartToy';
 import InputArea from './components/InputArea';
 import MessagesArea from './components/MessagesArea';
 import Header from './components/Header';
+import ProfileDataArea from './components/ProfileDataArea';
 
 
 export default function PlannerBot() {
@@ -415,6 +416,15 @@ export default function PlannerBot() {
           handleFileUpload={handleFileUpload}
           sending={sending}
         />
+
+        {/* Profile Data Area */}
+        <div className="absolute bottom-4 left-4 z-20">
+          <ProfileDataArea
+            profileData={profileData}
+            animationTriggered={animationTriggered}
+            lastChatbotResponse={getLastChatbotResponse()}
+          />
+        </div>
       </div>
     </div>
   );

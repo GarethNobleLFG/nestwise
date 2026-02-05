@@ -9,6 +9,7 @@ import AppBar from '../app-bar/AppBar';
 import ChatContainer from './components/ChatContainer';
 import { useRef } from 'react';
 import { validateToken } from '../validateToken';
+import NavBar from '../nav-bar/NavBar';
 
 export default function PlannerBot() {
   const [messages, setMessages] = useState([]);
@@ -381,7 +382,7 @@ export default function PlannerBot() {
   return (
     <AppTheme>
       <CssBaseline />
-      <AppBar />
+      <NavBar page='planner-bot' />
 
       <Box
         sx={{

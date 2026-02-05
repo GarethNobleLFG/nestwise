@@ -38,6 +38,7 @@ export default function ChatContainer({
             boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
           }}
         >
+          {/*
           <Slide direction="right" in={animationTriggered} timeout={1200}>
             <Box sx={{ width: '20%', display: 'flex' }}>
               <Sidebar
@@ -52,6 +53,7 @@ export default function ChatContainer({
               />
             </Box>
           </Slide>
+          */}
 
           <Slide direction="left" in={animationTriggered} timeout={1200}>
             <Box sx={{ flex: 1, display: 'flex' }}>

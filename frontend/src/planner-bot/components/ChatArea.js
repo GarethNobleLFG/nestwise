@@ -20,14 +20,14 @@ export default function ChatArea({
       width: '100%',
       maxWidth: 'none',
       margin: '0 auto',
-      px: 2, // Increased padding for better spacing
+      px: 2,
       display: 'flex',
       flexDirection: 'column',
       position: 'relative',
       height: '100%',
       overflow: 'hidden',
       alignItems: 'center',
-      paddingRight: '5%', 
+      // Removed: paddingRight: '5%', - This was causing asymmetrical padding
     }}>
 
       {/* Scrollable Messages Area */}
@@ -39,7 +39,7 @@ export default function ChatArea({
           overflowY: 'auto',
           overflowX: 'hidden',
           width: '100%',
-          maxWidth: '900px', // Slightly increased max width
+          maxWidth: '900px',
           paddingBottom: '120px',
           height: 'calc(100% - 120px)',
           '&::-webkit-scrollbar': {
@@ -59,15 +59,15 @@ export default function ChatArea({
         <Box sx={{
           position: 'absolute',
           bottom: 30,
-          //left: '50%',
-          transform: 'translateX(-50%)',
+          left: '50%', // Added this back
+          transform: 'translateX(-50%)', // Now this will work properly
           width: '100%',
           maxWidth: '900px',
           px: 2,
           zIndex: 1000,
           backgroundColor: 'rgba(247, 247, 248, 0.95)',
           paddingTop: '10px',
-          // paddingRight: '5%',
+          // Removed: paddingRight: '5%', - This was causing offset
         }}>
           <ChatInput
             input={input}
@@ -98,8 +98,7 @@ export default function ChatArea({
             backgroundColor: 'rgba(247, 247, 248, 0.95)',
             paddingTop: '5px',
             paddingBottom: '5px',
-            paddingRight: '5%', // Center all content
-
+            // Removed: paddingRight: '5%', - This was causing offset
           }}
         >
           NestWise can make mistakes. Check important info.

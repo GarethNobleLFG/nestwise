@@ -38,7 +38,7 @@ export default function WelcomeBanner({ navigate, isLoggedIn }) {
           >
             {/* Main Title - Changes based on login status */}
             <motion.h1
-              className="!text-5xl md:!text-7xl lg:!text-8xl !font-bold !tracking-tight !leading-none !whitespace-nowrap"
+              className="!text-5xl md:!text-7xl lg:!text-8xl !font-bold !tracking-tight !leading-none " //!whitespace-nowrap
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}

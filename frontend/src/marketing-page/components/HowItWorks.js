@@ -40,9 +40,6 @@ const items = [
   },
 ];
 
-
-
-
 const Chip = styled(MuiChip)(({ theme }) => ({
   variants: [
     {
@@ -63,17 +60,10 @@ const Chip = styled(MuiChip)(({ theme }) => ({
   ],
 }));
 
-
-
-
 function MobileLayout({ selectedItemIndex, handleItemClick, selectedFeature }) {
   if (!items[selectedItemIndex]) {
     return null;
   }
-
-
-
-
 
   return (
     <Box
@@ -131,8 +121,6 @@ function MobileLayout({ selectedItemIndex, handleItemClick, selectedFeature }) {
   );
 }
 
-
-
 MobileLayout.propTypes = {
   handleItemClick: PropTypes.func.isRequired,
   selectedFeature: PropTypes.shape({
@@ -145,13 +133,7 @@ MobileLayout.propTypes = {
   selectedItemIndex: PropTypes.number.isRequired,
 };
 
-
-
-export { MobileLayout };
-
-
-
-export default function Features() {
+export default function HowItWorks() {
   const [selectedItemIndex, setSelectedItemIndex] = React.useState(0);
 
   const handleItemClick = (index) => {
@@ -161,20 +143,25 @@ export default function Features() {
   const selectedFeature = items[selectedItemIndex];
 
   return (
-    <Container id="features" sx={{ py: { xs: 8, sm: 16 } }}>
+    <Container 
+      id="how-it-works" 
+      maxWidth={false}
+      sx={{ 
+        maxWidth: '1280px', // equivalent to max-w-7xl
+        mx: 'auto',
+        px: { xs: 3, sm: 6 }, // equivalent to px-6
+        py: { xs: 8, sm: 16 } 
+      }}
+    >
       <Box sx={{ width: { sm: '100%', md: '80%' } }}>
-
-
         <Typography
           component="h2"
           variant="h4"
           gutterBottom
           sx={{ color: 'text.primary' }}
         >
-          How It Works.
+          How It Works
         </Typography>
-
-
 
         <Typography
           variant="body1"
@@ -187,12 +174,10 @@ export default function Features() {
             lineHeight: 1.6
           }}
         >
-          <strong>Retirement planning made simple!</strong> Read below to understand how NestWise achieves this:
+          <strong>Retirement planning made simple!</strong> Discover how NestWise transforms complex financial planning into an intuitive, personalized experience:
         </Typography>
-
-
-
       </Box>
+
       <Box
         sx={{
           display: 'flex',
@@ -219,6 +204,7 @@ export default function Features() {
                     p: 2,
                     height: '100%',
                     width: '500px',
+                    borderRadius: 2,
                     '&:hover': {
                       backgroundColor: (theme.vars || theme).palette.action.hover,
                     },
@@ -246,7 +232,6 @@ export default function Features() {
                   ]}
                 >
                   {icon}
-
                   <Typography variant="h6">{title}</Typography>
                   <Typography variant="body2">{description}</Typography>
                 </Box>
@@ -259,6 +244,7 @@ export default function Features() {
             selectedFeature={selectedFeature}
           />
         </div>
+
         <Box
           sx={{
             display: { xs: 'none', sm: 'flex' },
@@ -273,6 +259,7 @@ export default function Features() {
               width: '100%',
               display: { xs: 'none', sm: 'flex' },
               pointerEvents: 'none',
+              borderRadius: 2,
             }}
           >
             <Box
@@ -280,7 +267,7 @@ export default function Features() {
                 m: 'auto',
                 width: 600,
                 height: 600,
-                backgroundSize: 'contain', // Fills the box, crops if needed
+                backgroundSize: 'contain',
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'center',
                 backgroundImage: 'var(--items-imageLight)',

@@ -1,16 +1,7 @@
 import * as React from 'react';
 import { useEffect, useState, useRef } from 'react';
-import { motion } from 'framer-motion';
 import { validateToken } from '../validateToken';
 import NavBar from '../nav-bar/NavBar';
-import { Button } from '../shadcn/components/ui/button';
-import { Card, CardContent } from '../shadcn/components/ui/card';
-import { cn } from '../shadcn/lib/utils';
-import SendIcon from '@mui/icons-material/Send';
-import AddIcon from '@mui/icons-material/Add';
-import ClearIcon from '@mui/icons-material/Clear';
-import PersonIcon from '@mui/icons-material/Person';
-import SmartToyIcon from '@mui/icons-material/SmartToy';
 import InputArea from './components/InputArea';
 import MessagesArea from './components/MessagesArea';
 import Header from './components/Header';

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect, useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { validateToken } from '../validateToken';
 import NavBar from '../nav-bar/NavBar';
 import InputArea from './components/InputArea';

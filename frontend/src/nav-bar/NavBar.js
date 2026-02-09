@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import DescriptionIcon from '@mui/icons-material/Description';
 import PersonIcon from '@mui/icons-material/Person';
 
-
-export default function NavBar() {
+export default function NavBar({ page }) {
     const navigate = useNavigate();
 
     // Check if user is logged in
@@ -34,76 +34,101 @@ export default function NavBar() {
 
     const userName = getUserName(token);
 
+    // Conditional styling based on page
+    const isPlannerBot = page === 'planner-bot';
+    const navHeight = isPlannerBot ? '!h-12' : '!h-20'; // Thinner for planner-bot
+    const navBackground = isPlannerBot ? '!bg-transparent' : '!bg-white/10'; // More transparent for planner-bot
+    const backdropBlur = isPlannerBot ? '!backdrop-blur-none' : '!backdrop-blur-sm'; // Remove blur for full transparency
+
     return (
-        <nav className="!fixed !top-0 !left-0 !right-0 !w-full !bg-transparent !z-50 !backdrop-blur-sm">
+        <motion.nav
+            className={`!fixed !top-0 !left-0 !right-0 !w-full !z-50 ${navBackground} ${backdropBlur}`}
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+        >
             <div className="!w-full !px-8">
-                <div className="!flex !justify-between !items-center !h-20">
+                <div className={`!flex !justify-between !items-center ${navHeight}`}>
                     {/* Logo - matching Hero.js colors */}
-                    <button
+                    <motion.button
                         onClick={() => navigate('/')}
                         className="!flex !items-center !space-x-3 group !no-underline !bg-transparent !border-none !cursor-pointer"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: 0.2 }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                     >
-                        <span className="!text-3xl !font-bold !text-gray-900 !tracking-wide">
-                            <span style={{ color: '#FFD700' }}>Nest</span>
-                            <span style={{ color: '#c47c1eff' }}>Wise</span>
+                        <span className={`!font-bold !text-gray-900 !tracking-wide ${isPlannerBot ? '!text-2xl' : '!text-3xl'}`}>
+                            <motion.span
+                                style={{ color: '#FFD700' }}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.4, delay: 0.4 }}
+                            >
+                                Nest
+                            </motion.span>
+                            <motion.span
+                                style={{ color: '#c47c1eff' }}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.4, delay: 0.3 }}
+                            >
+                                Wise
+                            </motion.span>
                         </span>
-                    </button>
+                    </motion.button>
 
                     {/* Action Buttons */}
-                    <div className="!flex !items-center !space-x-5">
-
-
-
+                    <motion.div
+                        className="!flex !items-center !space-x-5"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.4, delay: 0.3 }}
+                    >
                         {/* Planner Bot Button */}
-                        <button
-                            onClick={() => navigate('/myplans')}
-                            className="!flex !items-center !space-x-2 !px-5 !py-3 !text-base !font-medium !text-gray-700 hover:!text-gray-900 !transition-colors !rounded-full hover:!bg-yellow-50 !border-none !cursor-pointer"
+                        <motion.button
+                            onClick={() => navigate('/plannerbot')}
+                            className={`!flex !items-center !space-x-2 !font-medium !text-gray-700 hover:!text-gray-900 !transition-colors !rounded-full hover:!bg-yellow-50 !border-none !cursor-pointer ${isPlannerBot ? '!px-3 !py-2 !text-sm' : '!px-5 !py-3 !text-base'}`}
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.4, delay: 0.5 }}
+                            whileHover={{ scale: 1.05, y: -2 }}
+                            whileTap={{ scale: 0.95 }}
                         >
-                            <SmartToyIcon className="!w-5 !h-5" />
+                            <motion.div
+                                whileHover={{ rotate: 360 }}
+                                transition={{ duration: 0.5 }}
+                            >
+                                <SmartToyIcon className={isPlannerBot ? "!w-4 !h-4" : "!w-5 !h-5"} />
+                            </motion.div>
                             <span>Planner Bot</span>
-                        </button>
-
-
+                        </motion.button>
 
                         {/* Plans Button */}
-                        <button
+                        <motion.button
                             onClick={() => navigate('/myplans')}
-                            className="!flex !items-center !space-x-2 !px-5 !py-3 !text-base !font-medium !text-gray-700 hover:!text-gray-900 !transition-colors !rounded-full hover:!bg-yellow-50 !border-none !cursor-pointer"
+                            className={`!flex !items-center !space-x-2 !font-medium !text-gray-700 hover:!text-gray-900 !transition-colors !rounded-full hover:!bg-yellow-50 !border-none !cursor-pointer ${isPlannerBot ? '!px-3 !py-2 !text-sm' : '!px-5 !py-3 !text-base'}`}
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.4, delay: 0.3 }}
+                            whileHover={{ scale: 1.05, y: -2 }}
+                            whileTap={{ scale: 0.95 }}
                         >
-                            <DescriptionIcon className="!w-5 !h-5" />
+                            <motion.div
+                                whileHover={{ scale: 1.1 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <DescriptionIcon className={isPlannerBot ? "!w-4 !h-4" : "!w-5 !h-5"} />
+                            </motion.div>
                             <span>My Plans</span>
-                        </button>
-
-
+                        </motion.button>
 
                         {/* User Authentication */}
                         {isLoggedIn ? (
-                            <>
-                                <button
-                                    onClick={() => navigate('/profile')}
-                                    className="!flex !items-center !space-x-2 !px-5 !py-3 !text-base !font-medium !transition-colors !rounded-full !border-2 !cursor-pointer hover:!scale-105 hover:!shadow-lg"
-                                    style={{
-                                        color: 'white',
-                                        backgroundColor: '#c47c1eff',
-                                        borderColor: 'hsl(var(--brand-400))'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.target.style.backgroundColor = 'hsl(var(--brand-500))';
-                                        e.target.style.borderColor = 'hsl(var(--brand-500))';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.target.style.backgroundColor = '#c47c1eff';
-                                        e.target.style.borderColor = 'hsl(var(--brand-400))';
-                                    }}
-                                >
-                                    <PersonIcon className="!w-5 !h-5" style={{ color: 'white' }} />
-                                    <span>{userName || 'Profile'}</span>
-                                </button>
-                            </>
-                        ) : (
-                            <button
-                                onClick={() => navigate('/signin')}
-                                className="!flex !items-center !space-x-2 !px-5 !py-3 !text-base !font-medium !transition-colors !rounded-full !border-2 !cursor-pointer hover:!scale-105 hover:!shadow-lg"
+                            <motion.button
+                                onClick={() => navigate('/profile')}
+                                className={`!flex !items-center !space-x-2 !font-medium !transition-colors !rounded-full !border-2 !cursor-pointer hover:!scale-105 hover:!shadow-lg ${isPlannerBot ? '!px-3 !py-2 !text-sm' : '!px-5 !py-3 !text-base'}`}
                                 style={{
                                     color: 'white',
                                     backgroundColor: '#c47c1eff',
@@ -117,14 +142,56 @@ export default function NavBar() {
                                     e.target.style.backgroundColor = '#c47c1eff';
                                     e.target.style.borderColor = 'hsl(var(--brand-400))';
                                 }}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.4, delay: 0.3, type: "spring", bounce: 0.3 }}
+                                whileHover={{ scale: 1.1, y: -2 }}
+                                whileTap={{ scale: 0.9 }}
                             >
-                                <PersonIcon className="!w-5 !h-5" style={{ color: 'white' }} />
+                                <motion.div
+                                    initial={{ rotate: 0 }}
+                                    whileHover={{ rotate: [0, -10, 10, 0] }}
+                                    transition={{ duration: 0.5 }}
+                                >
+                                    <PersonIcon className={isPlannerBot ? "!w-4 !h-4" : "!w-5 !h-5"} style={{ color: 'white' }} />
+                                </motion.div>
+                                <span>{userName || 'Profile'}</span>
+                            </motion.button>
+                        ) : (
+                            <motion.button
+                                onClick={() => navigate('/signin')}
+                                className={`!flex !items-center !space-x-2 !font-medium !transition-colors !rounded-full !border-2 !cursor-pointer hover:!scale-105 hover:!shadow-lg ${isPlannerBot ? '!px-3 !py-2 !text-sm' : '!px-5 !py-3 !text-base'}`}
+                                style={{
+                                    color: 'white',
+                                    backgroundColor: '#c47c1eff',
+                                    borderColor: 'hsl(var(--brand-400))'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.target.style.backgroundColor = 'hsl(var(--brand-500))';
+                                    e.target.style.borderColor = 'hsl(var(--brand-500))';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.backgroundColor = '#c47c1eff';
+                                    e.target.style.borderColor = 'hsl(var(--brand-400))';
+                                }}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.4, delay: 0.3, type: "spring", bounce: 0.3 }}
+                                whileHover={{ scale: 1.1, y: -2 }}
+                                whileTap={{ scale: 0.9 }}
+                            >
+                                <motion.div
+                                    whileHover={{ rotate: [0, -5, 5, 0] }}
+                                    transition={{ duration: 0.4 }}
+                                >
+                                    <PersonIcon className={isPlannerBot ? "!w-4 !h-4" : "!w-5 !h-5"} style={{ color: 'white' }} />
+                                </motion.div>
                                 <span>Sign in</span>
-                            </button>
+                            </motion.button>
                         )}
-                    </div>
+                    </motion.div>
                 </div>
             </div>
-        </nav>
+        </motion.nav>
     );
 }

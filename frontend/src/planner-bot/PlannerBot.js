@@ -1,14 +1,12 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
-import CssBaseline from '@mui/material/CssBaseline';
-import Toolbar from '@mui/material/Toolbar';
-import Slide from '@mui/material/Slide';
-import Box from '@mui/material/Box';
-import AppTheme from '../shared-theme/AppTheme';
-import AppBar from '../app-bar/AppBar';
-import ChatContainer from './components/ChatContainer';
-import { useRef } from 'react';
+import { useState, useRef } from 'react';
 import { validateToken } from '../validateToken';
+import NavBar from '../nav-bar/NavBar';
+import InputArea from './components/InputArea';
+import MessagesArea from './components/MessagesArea';
+import Header from './components/Header';
+import ProfileDataArea from './components/ProfileDataArea';
+
 
 export default function PlannerBot() {
   const [messages, setMessages] = useState([]);
@@ -328,7 +326,7 @@ export default function PlannerBot() {
     return null;
   };
 
-  
+
 
   React.useEffect(() => {
     if (!initialized.current) {
@@ -379,46 +377,46 @@ export default function PlannerBot() {
 
 
   return (
-    <AppTheme>
-      <CssBaseline />
-      <AppBar />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 relative overflow-hidden">
+      <NavBar page='planner-bot' />
 
-      <Box
-        sx={{
-          position: 'fixed',
-          top: 48, // Dense AppBar is typically 48px instead of 64px
-          left: 0,
-          right: 0,
-          bottom: 0,
-          width: '100vw',
-          height: 'calc(100vh - 48px)', // Adjusted for dense AppBar
-          overflow: 'hidden'
-        }}
-      >
-        <Slide direction="up" in={animationTriggered} timeout={800}>
-          <Box sx={{ width: '100%', height: '100%', display: 'flex' }}>
-            <ChatContainer
-              animationTriggered={animationTriggered}
-              profileData={profileData}
-              lastChatbotResponse={getLastChatbotResponse()}
-              safeMessages={safeMessages}
-              input={input}
-              setInput={setInput}
-              handleSend={handleSend}
-              handleFileUpload={handleFileUpload}
-              sending={sending}
-              conversationTitle={conversationTitle}
-              clearChat={clearChat}
-              isChatActive={isChatActive}
-              selectedPlan={selectedPlan}        
-              setSelectedPlan={setSelectedPlan}  
-            />
-          </Box>
-        </Slide>
-      </Box>
+      {/* Background decoration */}
+      <div className="absolute inset-0">
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-yellow-400/20 to-amber-600/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-amber-700/20 to-yellow-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-full blur-3xl"></div>
+      </div>
 
-    </AppTheme>
+      <div className="relative z-10 h-screen flex flex-col overflow-hidden pt-6">
+        {/* Header */}
+        <Header
+          conversationTitle={conversationTitle}
+          selectedPlan={selectedPlan}
+          setSelectedPlan={setSelectedPlan}
+          clearChat={clearChat}
+        />
+
+        {/* Messages Area */}
+        <MessagesArea safeMessages={safeMessages} />
+
+        {/* Input Area */}
+        <InputArea
+          input={input}
+          setInput={setInput}
+          handleSend={handleSend}
+          handleFileUpload={handleFileUpload}
+          sending={sending}
+        />
+
+        {/* Profile Data Area */}
+        <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-20">
+          <ProfileDataArea
+            profileData={profileData}
+            animationTriggered={animationTriggered}
+            lastChatbotResponse={getLastChatbotResponse()}
+          />
+        </div>
+      </div>
+    </div>
   );
-
-
 }

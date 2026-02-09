@@ -986,15 +986,17 @@ def chat_step(user_message: str, session_id: str):
     
     if assistant_message == prev_assistant_message:
         planner_message = state['planner']['messages'][-1]
-        raw_json = planner_message.content
+        response_text= planner_message.content
+        from_planner = True
 
         # Call the formatter agent
-        response_text = call_formatter(raw_json)
+       # response_text = call_formatter(raw_json)
         
 
     else:
         response_text = assistant_message.content
         prev_assistant_message = assistant_message
+        from_planner = False
 
     
     ## Pass to the frontend.
@@ -1010,5 +1012,6 @@ def chat_step(user_message: str, session_id: str):
     return {
         "response": response_text,
         "real_profile": profile_data,
-        "conversation_title": conversation_title
+        "conversation_title": conversation_title,
+        "from_planner": from_planner
     } 

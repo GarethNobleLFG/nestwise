@@ -22,10 +22,12 @@ DB_NAME = os.getenv("MONGO_DB_AUTH", "nestwise_auth")
 client = MongoClient(MONGO_URL)
 db = client[DB_NAME]
 users_collection = db["users"]
+plans_collection = db["plans"]
 
-# Inject users_collection into controllers so they can use it
+# Inject collections into controllers so they can use it
 import controllers.userAuth as userAuthController
 userAuthController.users_collection = users_collection
+userAuthController.plans_collection = plans_collection
 
 @app.get("/")
 def root():

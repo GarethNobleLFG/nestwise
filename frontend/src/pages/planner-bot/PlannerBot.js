@@ -5,6 +5,7 @@ import InputArea from './components/InputArea';
 import MessagesArea from './components/MessagesArea';
 import Header from './components/Header';
 import ProfileDataArea from './components/ProfileDataArea';
+import NavIndex from '../../components/shared/nav-index/NavIndex';
 
 
 export default function PlannerBot() {
@@ -385,11 +386,15 @@ export default function PlannerBot() {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="relative z-10 h-screen grid grid-cols-2 overflow-hidden pt-6">
-        {/* Left side */}
-        <div className="flex flex-col px-8 h-full">
-          <div className="w-full flex flex-col h-full min-h-0">
-            {/* Header */}
+      <div className="relative z-10 h-screen flex overflow-hidden pt-6">
+        {/* Navigation Index */}
+        <NavIndex />
+
+        <div className="flex-1 grid grid-cols-5">
+          {/* Left side - takes 3 columns */}
+          <div className="col-span-3 flex flex-col px-8 h-full ml-32">
+            <div className="w-full flex flex-col h-full min-h-0">
+              {/* Header */}
               <Header
                 conversationTitle={conversationTitle}
                 selectedPlan={selectedPlan}
@@ -397,37 +402,37 @@ export default function PlannerBot() {
                 clearChat={clearChat}
               />
 
-            {/* Messages Area */}
-            <div className="flex-1 min-h-0">
-              <MessagesArea safeMessages={safeMessages} />
-            </div>
+              {/* Messages Area */}
+              <div className="flex-1 min-h-0">
+                <MessagesArea safeMessages={safeMessages} />
+              </div>
 
-            {/* Input Area */}
-            <InputArea
-              input={input}
-              setInput={setInput}
-              handleSend={handleSend}
-              handleFileUpload={handleFileUpload}
-              sending={sending}
-            />
+              {/* Input Area */}
+              <InputArea
+                input={input}
+                setInput={setInput}
+                handleSend={handleSend}
+                handleFileUpload={handleFileUpload}
+                sending={sending}
+              />
+            </div>
+          </div>
+
+          {/* Right side - takes 2 columns */}
+          <div className="col-span-2 flex items-center justify-center">
+
           </div>
         </div>
 
-        {/* Right side */}
-        <div className="flex items-center justify-center">
-          {/* Your big content goes here */}
-        </div>
-
-
-        {/* Profile Data Area 
-        <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-20">
-          <ProfileDataArea
-            profileData={profileData}
-            animationTriggered={animationTriggered}
-            lastChatbotResponse={getLastChatbotResponse()}
-          />
-        </div>
-        */}
+        {/* Profile Data Area NOT SURE IF I SHOULD REMOVE THIS YET
+                <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-20">
+                  <ProfileDataArea
+                    profileData={profileData}
+                    animationTriggered={animationTriggered}
+                    lastChatbotResponse={getLastChatbotResponse()}
+                  />
+                </div>
+                */}
       </div>
     </div>
   );

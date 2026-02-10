@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { motion } from 'framer-motion';
-import { cn } from '../../shadcn/lib/utils';
+import { cn } from '../../../components/shared/shadcn/lib/utils';
+import { markdownHandler } from '../../../utils/markdownHandler';
 import PersonIcon from '@mui/icons-material/Person';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import ReactMarkdown from 'react-markdown';
-import { markdownHandler } from '../../utils/markdownHandler';
 
 export default function MessagesArea({ safeMessages }) {
     const messagesEndRef = React.useRef(null);

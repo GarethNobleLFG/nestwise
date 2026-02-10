@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { Button } from '../../shadcn/components/ui/button';
+import { Button } from '../../../components/shared/shadcn/components/ui/button';
 import EditIcon from '@mui/icons-material/Edit';
 import ClearIcon from '@mui/icons-material/Clear';
 import SelectPlanModal from './SelectPlanModal';

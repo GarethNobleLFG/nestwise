@@ -4,8 +4,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
 import Slide from '@mui/material/Slide';
 import Box from '@mui/material/Box';
-import AppTheme from '../shared-theme/AppTheme';
-import AppBar from '../app-bar/AppBar';
+import AppTheme from '../../layouts/AppTheme';
+import AppBar from '../../components/shared/app-bar/AppBar';
 import ContentContainer from './components/ContentContainer';
 import { useRef } from 'react';
 

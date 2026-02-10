@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Button } from '../../shadcn/components/ui/button';
+import { Button } from '../../../components/shared/shadcn/components/ui/button';
 import WritingAnimation from './WritingAnimation';
 
 export default function WelcomeBanner({ navigate, isLoggedIn }) {

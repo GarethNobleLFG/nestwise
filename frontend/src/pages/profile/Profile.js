@@ -14,7 +14,7 @@ import Chip from '@mui/material/Chip';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import CardMembershipIcon from '@mui/icons-material/CardMembership';
 import Footer from '../marketing-page/components/Footer';
-import AppTheme from '../../shared-theme/AppTheme';
+import AppTheme from '../../layouts/AppTheme';
 import CssBaseline from '@mui/material/CssBaseline';
 import Card from '@mui/material/Card';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';

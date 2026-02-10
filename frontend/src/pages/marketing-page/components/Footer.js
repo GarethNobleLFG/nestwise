@@ -2,9 +2,9 @@ import * as React from 'react';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import TwitterIcon from '@mui/icons-material/X';
-import { Input } from '../../shadcn/components/ui/input';
-import { Button } from '../../shadcn/components/ui/button';
-import { Card } from '../../shadcn/components/ui/card';
+import { Input } from '../../../components/shared/shadcn/components/ui/input';
+import { Button } from '../../../components/shared/shadcn/components/ui/button';
+import { Card } from '../../../components/shared/shadcn/components/ui/card';
 
 function Copyright() {
   return (

@@ -387,28 +387,43 @@ export default function PlannerBot() {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="relative z-10 h-screen flex flex-col overflow-hidden pt-6">
-        {/* Header */}
-        <Header
-          conversationTitle={conversationTitle}
-          selectedPlan={selectedPlan}
-          setSelectedPlan={setSelectedPlan}
-          clearChat={clearChat}
-        />
+      <div className="relative z-10 h-screen grid grid-cols-2 overflow-hidden pt-6">
+        {/* Left side */}
+        <div className="flex flex-col px-8 h-full">
+          <div className="w-full flex flex-col h-full min-h-0">
+            {/* Header */}
+            <div className="pt-5">
+              <Header
+                conversationTitle={conversationTitle}
+                selectedPlan={selectedPlan}
+                setSelectedPlan={setSelectedPlan}
+                clearChat={clearChat}
+              />
+            </div>
 
-        {/* Messages Area */}
-        <MessagesArea safeMessages={safeMessages} />
+            {/* Messages Area */}
+            <div className="flex-1 min-h-0">
+              <MessagesArea safeMessages={safeMessages} />
+            </div>
 
-        {/* Input Area */}
-        <InputArea
-          input={input}
-          setInput={setInput}
-          handleSend={handleSend}
-          handleFileUpload={handleFileUpload}
-          sending={sending}
-        />
+            {/* Input Area */}
+            <InputArea
+              input={input}
+              setInput={setInput}
+              handleSend={handleSend}
+              handleFileUpload={handleFileUpload}
+              sending={sending}
+            />
+          </div>
+        </div>
 
-        {/* Profile Data Area */}
+        {/* Right side */}
+        <div className="flex items-center justify-center">
+          {/* Your big content goes here */}
+        </div>
+
+
+        {/* Profile Data Area 
         <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-20">
           <ProfileDataArea
             profileData={profileData}
@@ -416,6 +431,7 @@ export default function PlannerBot() {
             lastChatbotResponse={getLastChatbotResponse()}
           />
         </div>
+        */}
       </div>
     </div>
   );

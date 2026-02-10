@@ -432,16 +432,6 @@ export default function PlannerBot() {
             </p>
           </div>
         </div>
-
-        {/* Profile Data Area NOT SURE IF I SHOULD REMOVE THIS YET
-                <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-20">
-                  <ProfileDataArea
-                    profileData={profileData}
-                    animationTriggered={animationTriggered}
-                    lastChatbotResponse={getLastChatbotResponse()}
-                  />
-                </div>
-                */}
       </div>
     </div>
   );

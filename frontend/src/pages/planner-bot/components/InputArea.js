@@ -55,10 +55,6 @@ export default function InputArea({
             </Button>
           </div>
         </div>
-        
-        <p className="text-xs text-gray-600 text-center mt-2 font-medium">
-          NestWise Agent can make mistakes. Always verify important financial information.
-        </p>
       </div>
     </div>
   );

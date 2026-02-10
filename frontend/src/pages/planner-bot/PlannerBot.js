@@ -408,19 +408,28 @@ export default function PlannerBot() {
               </div>
 
               {/* Input Area */}
-              <InputArea
-                input={input}
-                setInput={setInput}
-                handleSend={handleSend}
-                handleFileUpload={handleFileUpload}
-                sending={sending}
-              />
+              <div className="mb-3">
+                <InputArea
+                  input={input}
+                  setInput={setInput}
+                  handleSend={handleSend}
+                  handleFileUpload={handleFileUpload}
+                  sending={sending}
+                />
+              </div>
             </div>
           </div>
 
           {/* Right side - takes 2 columns */}
           <div className="col-span-2 flex items-center justify-center">
 
+          </div>
+
+          {/* Disclaimer */}
+          <div className="absolute bottom-1 left-40 right-0 flex justify-center pt-1">
+            <p className="text-xs text-gray-600 text-center font-medium">
+              NestWise Agent can make mistakes. Always verify important financial information.
+            </p>
           </div>
         </div>
 

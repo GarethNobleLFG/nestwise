@@ -6,6 +6,7 @@ import MessagesArea from './components/MessagesArea';
 import Header from './components/Header';
 import ProfileDataArea from './components/ProfileDataArea';
 import NavIndex from '../../components/shared/nav-index/NavIndex';
+import PlannerArea from './components/PlannerArea';
 
 
 export default function PlannerBot() {
@@ -422,7 +423,7 @@ export default function PlannerBot() {
 
           {/* Right side - takes 2 columns */}
           <div className="col-span-2 flex items-center justify-center">
-
+            <PlannerArea />
           </div>
 
           {/* Disclaimer */}

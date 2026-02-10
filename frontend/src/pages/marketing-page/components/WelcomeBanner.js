@@ -46,7 +46,17 @@ export default function WelcomeBanner({ navigate, isLoggedIn }) {
               {isLoggedIn && userName ? (
                 <>
                   <span className="!text-gray-900">Welcome back, </span>
-                  <span style={{ color: '#c47c1eff' }}>{userName}</span>
+                  <span
+                    style={{
+                      background: 'linear-gradient(45deg, #FFD700, #c47c1eff)',
+                      WebkitBackgroundClip: 'text',
+                      backgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      color: 'transparent'
+                    }}
+                  >
+                    {userName}
+                  </span>
                   <span className="!text-gray-900">!</span>
                 </>
               ) : (

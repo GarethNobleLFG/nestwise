@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useState, useRef } from 'react';
 import { validateToken } from '../../hooks/validateToken';
-import NavBar from '../../components/shared/nav-bar/NavBar';
 import InputArea from './components/InputArea';
 import MessagesArea from './components/MessagesArea';
 import Header from './components/Header';
@@ -378,7 +377,6 @@ export default function PlannerBot() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 relative overflow-hidden">
-      <NavBar page='planner-bot' />
 
       {/* Background decoration */}
       <div className="absolute inset-0">
@@ -392,14 +390,12 @@ export default function PlannerBot() {
         <div className="flex flex-col px-8 h-full">
           <div className="w-full flex flex-col h-full min-h-0">
             {/* Header */}
-            <div className="pt-5">
               <Header
                 conversationTitle={conversationTitle}
                 selectedPlan={selectedPlan}
                 setSelectedPlan={setSelectedPlan}
                 clearChat={clearChat}
               />
-            </div>
 
             {/* Messages Area */}
             <div className="flex-1 min-h-0">

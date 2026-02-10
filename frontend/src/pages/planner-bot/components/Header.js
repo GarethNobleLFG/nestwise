@@ -23,7 +23,7 @@ export default function Header({
 
     return (
         <>
-            <div className="px-8 py-6">
+            <div className="px-8"> 
                 <div className="max-w-4xl mx-auto flex flex-col items-start space-y-4">
                     <div className="flex items-center space-x-8">
                         <div className="flex items-center space-x-2">

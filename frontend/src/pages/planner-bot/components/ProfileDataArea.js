@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
-import { Card, CardContent } from '../../shadcn/components/ui/card';
+import { Card, CardContent } from '../../../components/shared/shadcn/components/ui/card';
 
 export default function ProfileDataArea({ animationTriggered, profileData, lastChatbotResponse }) {
     const [formattedData, setFormattedData] = useState({});

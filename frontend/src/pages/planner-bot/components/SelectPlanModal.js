@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '../../shadcn/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../../shadcn/components/ui/card';
+import { Button } from '../../../components/shared/shadcn/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/shared/shadcn/components/ui/card';
 import CloseIcon from '@mui/icons-material/Close';
 import HomeIcon from '@mui/icons-material/Home';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';

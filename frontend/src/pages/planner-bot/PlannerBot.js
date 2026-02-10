@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState, useRef } from 'react';
-import { validateToken } from '../validateToken';
-import NavBar from '../nav-bar/NavBar';
+import { validateToken } from '../../hooks/validateToken';
+import NavBar from '../../components/shared/nav-bar/NavBar';
 import InputArea from './components/InputArea';
 import MessagesArea from './components/MessagesArea';
 import Header from './components/Header';

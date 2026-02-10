@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button } from '../../shadcn/components/ui/button';
+import { Button } from '../../../components/shared/shadcn/components/ui/button';
 import SendIcon from '@mui/icons-material/Send';
 import AddIcon from '@mui/icons-material/Add';
 

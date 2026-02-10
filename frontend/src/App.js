@@ -1,13 +1,13 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import AppBar from './app-bar/AppBar'; // make sure this matches your filename
-import MarketingPage from './marketing-page/MarketingPage';
-import SignIn from './sign-in/SignIn';
-import SignUp from './sign-up/SignUp';
-import PlannerBot from './planner-bot/PlannerBot'; // PlannerBot page
-import MyPlans from './my-plans/MyPlans'; // <-- import MyPlans page
-import ProtectedRoute from './protected-route/ProtectedRoute';
-import Profile from './profile/Profile';
+import AppBar from './components/shared/app-bar/AppBar';
+import MarketingPage from './pages/marketing-page/MarketingPage';
+import SignIn from './pages/sign-in/SignIn';
+import SignUp from './pages/sign-up/SignUp';
+import PlannerBot from './pages/planner-bot/PlannerBot';
+import MyPlans from './pages/my-plans/MyPlans';
+import ProtectedRoute from './components/shared/protected-route/ProtectedRoute';
+import Profile from './pages/profile/Profile';
 
 function App() {
   return (

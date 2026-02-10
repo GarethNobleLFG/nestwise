@@ -422,8 +422,12 @@ export default function PlannerBot() {
           </div>
 
           {/* Right side - takes 2 columns */}
-          <div className="col-span-2 flex items-center justify-center">
-            <PlannerArea />
+          <div className="col-span-2 flex items-center justify-center mb-6">
+            <PlannerArea
+              animationTriggered={animationTriggered}
+              profileData={profileData}
+              lastChatbotResponse={getLastChatbotResponse}
+            />
           </div>
 
           {/* Disclaimer */}

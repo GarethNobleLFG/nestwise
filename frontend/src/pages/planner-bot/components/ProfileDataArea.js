@@ -83,7 +83,7 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
-            className="w-58 h-80"
+            className="w-full h-full"
         >
             <Card className="h-full bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <CardContent className="p-4 h-full flex flex-col">

@@ -2,5 +2,158 @@ import * as React from 'react';
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '../../../components/shared/shadcn/components/ui/card';
+import ReactMarkdown from 'react-markdown';
+import { markdownHandler } from '../../../utils/markdownHandler';
+import ProfileDataArea from './ProfileDataArea';
 
-export default function PlannerArea({ animationTriggered, profileData, lastChatbotResponse }) {}
+export default function PlannerArea({ animationTriggered, profileData, lastChatbotResponse }) {
+    const [plan, setPlanContent] = useState('# Financial Planning\n\nYour personalized financial plan will appear here once generated...');
+    const [isGenerating, setIsGenerating] = useState(false);
+    const markdownRef = useRef(null);
+
+    // Generate or update planner content based on profile data changes
+    useEffect(() => {
+        if (Object.keys(profileData).length > 0 && lastChatbotResponse) {
+            updatePlanContent();
+        }
+    }, [profileData, lastChatbotResponse]);
+
+    const updatePlanContent = async () => {
+        setIsGenerating(true);
+
+        try {
+            const samplePlan = `
+# 📋 Your Financial Planning Summary
+
+## 📊 Current Profile Overview
+Based on your recent conversation, here's what we know about your financial situation.
+
+## 🎯 Recommended Actions
+- Review your current financial goals
+- Assess risk tolerance
+- Optimize investment portfolio
+- Plan for retirement milestones
+
+## 📈 Investment Strategy
+Your personalized investment recommendations will be generated based on your profile data and recent discussions.
+
+## 🛡️ Risk Management
+Evaluate insurance coverage and emergency fund requirements.
+
+## 📅 Timeline & Milestones
+- **Short-term (1-2 years)**: Emergency fund establishment
+- **Medium-term (3-10 years)**: Investment growth phase
+- **Long-term (10+ years)**: Retirement preparation
+
+---
+*This plan will update automatically as you provide more information through our chat interface.*
+            `;
+
+            setPlanContent(samplePlan.trim());
+        }
+        catch (error) {
+            console.error('Error generating planner content:', error);
+            setPlanContent('# Error\n\nUnable to generate financial plan. Please try again.');
+        }
+        finally {
+            setIsGenerating(false);
+        }
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="w-full h-full"
+        >
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
+                className="w-full h-full"
+            >
+                <Card className="h-full bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300">
+                    <CardContent className="p-6 h-full flex flex-col space-y-6">
+
+                        {/* Profile Data Area - Now occupies space directly */}
+                        <motion.div
+                            initial={{ opacity: 0, y: -30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 0.2 }}
+                            className="flex-shrink-0 h-64"
+                        >
+                            <ProfileDataArea
+                                animationTriggered={animationTriggered}
+                                profileData={profileData}
+                                lastChatbotResponse={lastChatbotResponse}
+                            />
+                        </motion.div>
+
+                        {/* Thin Divider */}
+                        <motion.div
+                            initial={{ opacity: 0, scaleX: 0 }}
+                            animate={{ opacity: 1, scaleX: 1 }}
+                            transition={{ duration: 0.5, delay: 0.3 }}
+                            className="flex-shrink-0 flex items-center justify-center"
+                        >
+                            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+                            <div className="px-4 text-sm font-medium text-gray-500">Financial Plan</div>
+                            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+                        </motion.div>
+
+                        {/* Financial Plan Section */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 0.4 }}
+                            className="flex-1 min-h-0 flex flex-col"
+                        >
+                            <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 h-full border border-gray-200 flex flex-col">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-xl font-semibold text-gray-800 flex items-center">
+                                        <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                                        Your Financial Plan
+                                    </h3>
+                                    {isGenerating && (
+                                        <motion.div
+                                            animate={{ rotate: 360 }}
+                                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                            className="w-5 h-5 border-2 border-yellow-400 border-t-transparent rounded-full"
+                                        />
+                                    )}
+                                </div>
+                                
+                                <div
+                                    ref={markdownRef}
+                                    className="flex-1 overflow-y-auto"
+                                    style={{
+                                        scrollbarWidth: 'thin',
+                                        scrollbarColor: '#d4a574 transparent'
+                                    }}
+                                >
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.6, delay: 0.5 }}
+                                    >
+                                        <ReactMarkdown components={markdownHandler}>
+                                            {plan}
+                                        </ReactMarkdown>
+                                    </motion.div>
+                                </div>
+                                
+                                <div className="pt-4 border-t border-gray-200 mt-4 flex-shrink-0">
+                                    <p className="text-xs text-gray-500 text-center">
+                                        This plan updates automatically as you provide more information through the chat.
+                                    </p>
+                                </div>
+                            </div>
+                        </motion.div>
+
+                    </CardContent>
+                </Card>
+            </motion.div>
+        </motion.div>
+    );
+}

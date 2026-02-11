@@ -18,6 +18,7 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
         }
     }, [profileData, lastChatbotResponse]);
 
+    // Update plan and reflect in UI.
     const updatePlanContent = async () => {
         setIsGenerating(true);
 

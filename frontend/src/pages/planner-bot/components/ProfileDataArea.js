@@ -2,67 +2,18 @@ import * as React from 'react';
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '../../../components/shared/shadcn/components/ui/card';
+import { textizer } from '../../../hooks/textizer';
 
 export default function ProfileDataArea({ animationTriggered, profileData, lastChatbotResponse }) {
     const [formattedData, setFormattedData] = useState({});
     const [isFormatting, setIsFormatting] = useState(false);
     const scrollRef = useRef(null);
 
-
-    // FORMAT TEXT - keeping your original logic exactly the same
-    const textizer = async () => {
-        if (Object.keys(profileData).length === 0) {
-            return;
-        }
-
-        if (isFormatting) {
-            return;
-        }
-
-        setIsFormatting(true);
-
-        try {
-            const response = await fetch('http://localhost:8000/textizer/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    profileData: profileData,
-                    lastChatbotResponse: lastChatbotResponse,
-                    formattedContext: formattedData
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Textizer API call failed.');
-            }
-
-            const textizerReturn = await response.json();
-            setFormattedData(textizerReturn);
-        }
-        catch (error) {
-            // FALL BACK FORMATTING IF THIS BREAKS
-            console.error('Textizer API error:', error);
-            const fallback = {};
-            Object.entries(profileData).forEach(([key, value]) => {
-                fallback[key] = value === false || value === null ? "" : String(value);
-            });
-            setFormattedData(fallback);
-        }
-        finally {
-            setIsFormatting(false);
-        }
-    };
-
-
-
     // FORMAT ON RE-RENDER - keeping your original logic
     useEffect(() => {
-        textizer();
+        if (isFormatting) return;
+        textizer(profileData, lastChatbotResponse, formattedData, setFormattedData, setIsFormatting);
     }, [profileData, lastChatbotResponse]);
-
-
 
     // Separate useEffect For Auto Scrolling When formattedData Changes - keeping your original logic
     useEffect(() => {
@@ -73,10 +24,6 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
             });
         }
     }, [formattedData]);
-
-
-
-
 
     return (
         <motion.div

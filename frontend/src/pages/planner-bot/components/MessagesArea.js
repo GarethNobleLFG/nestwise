@@ -19,7 +19,7 @@ export default function MessagesArea({ safeMessages }) {
     }, [safeMessages]);
 
     return (
-        <div ref={scrollAreaRef} className="flex-1 overflow-y-auto px-8 py-4 min-h-0" style={{ height: 'calc(100vh - 200px)' }}>
+        <div ref={scrollAreaRef} className="flex-1 overflow-y-auto px-8 py-4 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" style={{ height: 'calc(100vh - 200px)' }}>
             <div className="max-w-4xl mx-auto space-y-4 min-h-full">
                 {safeMessages.map((message, index) => {
                     const prevMessage = safeMessages[index - 1];

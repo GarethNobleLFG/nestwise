@@ -2,67 +2,18 @@ import * as React from 'react';
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '../../../components/shared/shadcn/components/ui/card';
+import { textizer } from '../../../hooks/textizer';
 
 export default function ProfileDataArea({ animationTriggered, profileData, lastChatbotResponse }) {
     const [formattedData, setFormattedData] = useState({});
     const [isFormatting, setIsFormatting] = useState(false);
     const scrollRef = useRef(null);
 
-
-    // FORMAT TEXT - keeping your original logic exactly the same
-    const textizer = async () => {
-        if (Object.keys(profileData).length === 0) {
-            return;
-        }
-
-        if (isFormatting) {
-            return;
-        }
-
-        setIsFormatting(true);
-
-        try {
-            const response = await fetch('http://localhost:8000/textizer/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    profileData: profileData,
-                    lastChatbotResponse: lastChatbotResponse,
-                    formattedContext: formattedData
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Textizer API call failed.');
-            }
-
-            const textizerReturn = await response.json();
-            setFormattedData(textizerReturn);
-        }
-        catch (error) {
-            // FALL BACK FORMATTING IF THIS BREAKS
-            console.error('Textizer API error:', error);
-            const fallback = {};
-            Object.entries(profileData).forEach(([key, value]) => {
-                fallback[key] = value === false || value === null ? "" : String(value);
-            });
-            setFormattedData(fallback);
-        }
-        finally {
-            setIsFormatting(false);
-        }
-    };
-
-
-
     // FORMAT ON RE-RENDER - keeping your original logic
     useEffect(() => {
-        textizer();
-    }, [profileData, lastChatbotResponse]);
-
-
+        if (isFormatting) return;
+        textizer(profileData, lastChatbotResponse, formattedData, setFormattedData, setIsFormatting);
+    }, [profileData, lastChatbotResponse, formattedData, isFormatting]);
 
     // Separate useEffect For Auto Scrolling When formattedData Changes - keeping your original logic
     useEffect(() => {
@@ -74,23 +25,19 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
         }
     }, [formattedData]);
 
-
-
-
-
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
-            className="w-58 h-80"
+            className="w-full h-full"
         >
-            <Card className="h-full bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <Card className="h-full bg-white/90 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <CardContent className="p-4 h-full flex flex-col">
                     {/* Header */}
                     <div className="mb-3">
                         <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                            Your Tracked Info
+                            Your Info
                         </h3>
                         <div className="w-full h-0.5 bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full"></div>
                     </div>
@@ -98,11 +45,7 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
                     {/* Scrollable Content Area */}
                     <div
                         ref={scrollRef}
-                        className="flex-1 overflow-y-auto py-2 px-1 space-y-3 min-h-0"
-                        style={{
-                            scrollbarWidth: 'thin',
-                            scrollbarColor: '#d4a574 transparent'
-                        }}
+                        className="flex-1 overflow-y-auto py-2 px-1 space-y-3 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                     >
                         {Object.keys(formattedData).length !== 0 ? (
                             Object.entries(formattedData).map(([key, value], index) => (
@@ -115,7 +58,7 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
                                         delay: index * 0.1,
                                         ease: "easeOut"
                                     }}
-                                    className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg p-3 border-l-4 border-yellow-400 hover:shadow-md transition-shadow duration-200"
+                                    className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg p-2 border-l-4 border-yellow-400 hover:shadow-md transition-shadow duration-200 overflow-hidden"
                                 >
                                     <div className="flex items-start space-x-2">
                                         <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
@@ -149,13 +92,6 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
                                 </p>
                             </motion.div>
                         )}
-                    </div>
-
-                    {/* Footer */}
-                    <div className="mt-3 pt-2 border-t border-gray-200">
-                        <p className="text-xs text-gray-500 text-center">
-                            Tell chatbot if data is not accurate.
-                        </p>
                     </div>
                 </CardContent>
             </Card>

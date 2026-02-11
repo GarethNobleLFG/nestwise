@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { useState, useRef } from 'react';
 import { validateToken } from '../../hooks/validateToken';
-import NavBar from '../../components/shared/nav-bar/NavBar';
 import InputArea from './components/InputArea';
 import MessagesArea from './components/MessagesArea';
 import Header from './components/Header';
-import ProfileDataArea from './components/ProfileDataArea';
+import NavIndex from '../../components/shared/nav-index/NavIndex';
+import PlannerArea from './components/PlannerArea';
 
 
 export default function PlannerBot() {
@@ -373,12 +373,11 @@ export default function PlannerBot() {
 
 
   // Check To See If There Are Chats Happening, Meaining The Plan Should Be Saved.
-  const isChatActive = safeMessages.length > 1 || sending;
+  //const isChatActive = safeMessages.length > 1 || sending;
 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 relative overflow-hidden">
-      <NavBar page='planner-bot' />
 
       {/* Background decoration */}
       <div className="absolute inset-0">
@@ -387,34 +386,58 @@ export default function PlannerBot() {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="relative z-10 h-screen flex flex-col overflow-hidden pt-6">
-        {/* Header */}
-        <Header
-          conversationTitle={conversationTitle}
-          selectedPlan={selectedPlan}
-          setSelectedPlan={setSelectedPlan}
-          clearChat={clearChat}
-        />
+      <div className="relative z-10 h-screen flex overflow-hidden pt-6">
+        {/* Navigation Index */}
+        <NavIndex />
 
-        {/* Messages Area */}
-        <MessagesArea safeMessages={safeMessages} />
+        <div className="flex-1 grid grid-cols-6">
+          {/* Left side - takes 3 columns */}
+          <div className="col-span-3 flex flex-col px-8 h-full -mr-20 ml-32">
+            <div className="w-full flex flex-col h-full min-h-0">
+              {/* Header */}
+              <Header
+                conversationTitle={conversationTitle}
+                selectedPlan={selectedPlan}
+                setSelectedPlan={setSelectedPlan}
+                clearChat={clearChat}
+              />
 
-        {/* Input Area */}
-        <InputArea
-          input={input}
-          setInput={setInput}
-          handleSend={handleSend}
-          handleFileUpload={handleFileUpload}
-          sending={sending}
-        />
+              {/* Messages Area */}
+              <div className="flex-1 min-h-0">
+                <MessagesArea safeMessages={safeMessages} />
+              </div>
 
-        {/* Profile Data Area */}
-        <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-20">
-          <ProfileDataArea
-            profileData={profileData}
-            animationTriggered={animationTriggered}
-            lastChatbotResponse={getLastChatbotResponse()}
-          />
+              {/* Input Area */}
+              <div className="mb-3">
+                <InputArea
+                  input={input}
+                  setInput={setInput}
+                  handleSend={handleSend}
+                  handleFileUpload={handleFileUpload}
+                  sending={sending}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Right side - takes 3 columns */}
+          <div className="col-span-3 flex flex-col px-8 h-full">
+            <div className="w-full flex flex-col h-full min-h-0">
+              <PlannerArea
+                animationTriggered={animationTriggered}
+                profileData={profileData}
+                lastChatbotResponse={getLastChatbotResponse}
+                conversationTitle={conversationTitle}
+              />
+            </div>
+          </div>
+
+          {/* Disclaimer */}
+          <div className="absolute bottom-1 left-40 right-0 flex justify-center pt-1">
+            <p className="text-xs text-gray-600 text-center font-medium">
+              NestWise Agent can make mistakes. Always verify important financial information.
+            </p>
+          </div>
         </div>
       </div>
     </div>

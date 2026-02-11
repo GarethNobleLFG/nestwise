@@ -34,21 +34,15 @@ export default function NavBar({ page }) {
 
     const userName = getUserName(token);
 
-    // Conditional styling based on page
-    const isPlannerBot = page === 'planner-bot';
-    const navHeight = isPlannerBot ? '!h-12' : '!h-20'; // Thinner for planner-bot
-    const navBackground = isPlannerBot ? '!bg-transparent' : '!bg-white/10'; // More transparent for planner-bot
-    const backdropBlur = isPlannerBot ? '!backdrop-blur-none' : '!backdrop-blur-sm'; // Remove blur for full transparency
-
     return (
         <motion.nav
-            className={`!fixed !top-0 !left-0 !right-0 !w-full !z-50 ${navBackground} ${backdropBlur}`}
+            className="!fixed !top-0 !left-0 !right-0 !w-full !z-50 !bg-white/10 !backdrop-blur-sm"
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}
         >
             <div className="!w-full !px-8">
-                <div className={`!flex !justify-between !items-center ${navHeight}`}>
+                <div className="!flex !justify-between !items-center !h-20">
                     {/* Logo - matching Hero.js colors */}
                     <motion.button
                         onClick={() => navigate('/')}
@@ -59,7 +53,7 @@ export default function NavBar({ page }) {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
-                        <span className={`!font-bold !text-gray-900 !tracking-wide ${isPlannerBot ? '!text-2xl' : '!text-3xl'}`}>
+                        <span className="!font-bold !text-gray-900 !tracking-wide !text-3xl">
                             <motion.span
                                 style={{ color: '#FFD700' }}
                                 initial={{ opacity: 0 }}
@@ -89,7 +83,7 @@ export default function NavBar({ page }) {
                         {/* Planner Bot Button */}
                         <motion.button
                             onClick={() => navigate('/plannerbot')}
-                            className={`!flex !items-center !space-x-2 !font-medium !text-gray-700 hover:!text-gray-900 !transition-colors !rounded-full hover:!bg-yellow-50 !border-none !cursor-pointer ${isPlannerBot ? '!px-3 !py-2 !text-sm' : '!px-5 !py-3 !text-base'}`}
+                            className="!flex !items-center !space-x-2 !font-medium !text-gray-700 hover:!text-gray-900 !transition-colors !rounded-full hover:!bg-yellow-50 !border-none !cursor-pointer !px-5 !py-3 !text-base"
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.4, delay: 0.5 }}
@@ -100,7 +94,7 @@ export default function NavBar({ page }) {
                                 whileHover={{ rotate: 360 }}
                                 transition={{ duration: 0.5 }}
                             >
-                                <SmartToyIcon className={isPlannerBot ? "!w-4 !h-4" : "!w-5 !h-5"} />
+                                <SmartToyIcon className="!w-5 !h-5" />
                             </motion.div>
                             <span>Planner Bot</span>
                         </motion.button>
@@ -108,7 +102,7 @@ export default function NavBar({ page }) {
                         {/* Plans Button */}
                         <motion.button
                             onClick={() => navigate('/myplans')}
-                            className={`!flex !items-center !space-x-2 !font-medium !text-gray-700 hover:!text-gray-900 !transition-colors !rounded-full hover:!bg-yellow-50 !border-none !cursor-pointer ${isPlannerBot ? '!px-3 !py-2 !text-sm' : '!px-5 !py-3 !text-base'}`}
+                            className="!flex !items-center !space-x-2 !font-medium !text-gray-700 hover:!text-gray-900 !transition-colors !rounded-full hover:!bg-yellow-50 !border-none !cursor-pointer !px-5 !py-3 !text-base"
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.4, delay: 0.3 }}
@@ -119,7 +113,7 @@ export default function NavBar({ page }) {
                                 whileHover={{ scale: 1.1 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                <DescriptionIcon className={isPlannerBot ? "!w-4 !h-4" : "!w-5 !h-5"} />
+                                <DescriptionIcon className="!w-5 !h-5" />
                             </motion.div>
                             <span>My Plans</span>
                         </motion.button>
@@ -128,7 +122,7 @@ export default function NavBar({ page }) {
                         {isLoggedIn ? (
                             <motion.button
                                 onClick={() => navigate('/profile')}
-                                className={`!flex !items-center !space-x-2 !font-medium !transition-colors !rounded-full !border-2 !cursor-pointer hover:!scale-105 hover:!shadow-lg ${isPlannerBot ? '!px-3 !py-2 !text-sm' : '!px-5 !py-3 !text-base'}`}
+                                className="!flex !items-center !space-x-2 !font-medium !transition-colors !rounded-full !border-2 !cursor-pointer hover:!scale-105 hover:!shadow-lg !px-5 !py-3 !text-base"
                                 style={{
                                     color: 'white',
                                     backgroundColor: '#c47c1eff',
@@ -153,14 +147,14 @@ export default function NavBar({ page }) {
                                     whileHover={{ rotate: [0, -10, 10, 0] }}
                                     transition={{ duration: 0.5 }}
                                 >
-                                    <PersonIcon className={isPlannerBot ? "!w-4 !h-4" : "!w-5 !h-5"} style={{ color: 'white' }} />
+                                    <PersonIcon className="!w-5 !h-5" style={{ color: 'white' }} />
                                 </motion.div>
                                 <span>{userName || 'Profile'}</span>
                             </motion.button>
                         ) : (
                             <motion.button
                                 onClick={() => navigate('/signin')}
-                                className={`!flex !items-center !space-x-2 !font-medium !transition-colors !rounded-full !border-2 !cursor-pointer hover:!scale-105 hover:!shadow-lg ${isPlannerBot ? '!px-3 !py-2 !text-sm' : '!px-5 !py-3 !text-base'}`}
+                                className="!flex !items-center !space-x-2 !font-medium !transition-colors !rounded-full !border-2 !cursor-pointer hover:!scale-105 hover:!shadow-lg !px-5 !py-3 !text-base"
                                 style={{
                                     color: 'white',
                                     backgroundColor: '#c47c1eff',
@@ -184,7 +178,7 @@ export default function NavBar({ page }) {
                                     whileHover={{ rotate: [0, -5, 5, 0] }}
                                     transition={{ duration: 0.4 }}
                                 >
-                                    <PersonIcon className={isPlannerBot ? "!w-4 !h-4" : "!w-5 !h-5"} style={{ color: 'white' }} />
+                                    <PersonIcon className="!w-5 !h-5" style={{ color: 'white' }} />
                                 </motion.div>
                                 <span>Sign in</span>
                             </motion.button>

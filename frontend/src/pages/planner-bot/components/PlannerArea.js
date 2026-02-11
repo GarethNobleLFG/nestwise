@@ -84,7 +84,7 @@ Evaluate insurance coverage and emergency fund requirements.
                             initial={{ opacity: 0, x: -30 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5, delay: 0.2 }}
-                            className="flex-shrink-0 w-35 min-w-32"
+                            className="flex-shrink-0 w-35 min-w-35 max-w-35"
                         >
                             <ProfileDataArea
                                 animationTriggered={animationTriggered}

@@ -4,7 +4,6 @@ import { validateToken } from '../../hooks/validateToken';
 import InputArea from './components/InputArea';
 import MessagesArea from './components/MessagesArea';
 import Header from './components/Header';
-import ProfileDataArea from './components/ProfileDataArea';
 import NavIndex from '../../components/shared/nav-index/NavIndex';
 import PlannerArea from './components/PlannerArea';
 
@@ -374,7 +373,7 @@ export default function PlannerBot() {
 
 
   // Check To See If There Are Chats Happening, Meaining The Plan Should Be Saved.
-  const isChatActive = safeMessages.length > 1 || sending;
+  //const isChatActive = safeMessages.length > 1 || sending;
 
 
   return (

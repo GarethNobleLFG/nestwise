@@ -13,7 +13,7 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
     useEffect(() => {
         if (isFormatting) return;
         textizer(profileData, lastChatbotResponse, formattedData, setFormattedData, setIsFormatting);
-    }, [profileData, lastChatbotResponse]);
+    }, [profileData, lastChatbotResponse, formattedData, isFormatting]);
 
     // Separate useEffect For Auto Scrolling When formattedData Changes - keeping your original logic
     useEffect(() => {

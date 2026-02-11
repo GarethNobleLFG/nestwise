@@ -23,8 +23,6 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
 
         try {
             const samplePlan = `
-# 📋 Your Financial Planning Summary
-
 ## 📊 Current Profile Overview
 Based on your recent conversation, here's what we know about your financial situation.
 
@@ -65,23 +63,22 @@ Evaluate insurance coverage and emergency fund requirements.
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="w-full h-full"
+            className="w-full h-auto"
         >
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3, delay: 0.1 }}
-                className="w-full h-full"
+                className="w-full h-auto"
             >
-                <Card className="h-full bg-white/95 backdrop-blur-sm border-0 shadow-md hover:shadow-lg transition-shadow duration-300">
-                    <CardContent className="p-6 h-full flex flex-row space-x-3">
-
+                <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <CardContent className="p-6 flex flex-row space-x-3">
                         {/* Profile Data Area - Left side, full height */}
                         <motion.div
                             initial={{ opacity: 0, x: -30 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5, delay: 0.2 }}
-                            className="flex-shrink-0 w-32 h-full"
+                            className="flex-shrink-0 w-35"
                         >
                             <ProfileDataArea
                                 animationTriggered={animationTriggered}
@@ -95,13 +92,12 @@ Evaluate insurance coverage and emergency fund requirements.
                             initial={{ opacity: 0, x: 30 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5, delay: 0.4 }}
-                            className="flex-1 min-h-0 flex flex-col"
+                            className="flex-1 flex flex-col"
                         >
-                            <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 h-full border border-gray-200 flex flex-col">
+                            <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 flex flex-col">
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className="text-xl font-semibold text-gray-800 flex items-center">
-                                        <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                                        Your Financial Plan
+                                        Insert Plan Title
                                     </h3>
                                     {isGenerating && (
                                         <motion.div
@@ -114,7 +110,7 @@ Evaluate insurance coverage and emergency fund requirements.
 
                                 <div
                                     ref={markdownRef}
-                                    className="flex-1 overflow-y-auto"
+                                    className="h-80 overflow-y-auto"
                                     style={{
                                         scrollbarWidth: 'thin',
                                         scrollbarColor: '#d4a574 transparent'
@@ -129,12 +125,6 @@ Evaluate insurance coverage and emergency fund requirements.
                                             {plan}
                                         </ReactMarkdown>
                                     </motion.div>
-                                </div>
-
-                                <div className="pt-4 border-t border-gray-200 mt-4 flex-shrink-0">
-                                    <p className="text-xs text-gray-500 text-center">
-                                        This plan updates automatically as you provide more information through the chat.
-                                    </p>
                                 </div>
                             </div>
                         </motion.div>

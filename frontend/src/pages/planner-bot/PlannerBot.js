@@ -422,7 +422,7 @@ export default function PlannerBot() {
           </div>
 
           {/* Right side - takes 2 columns */}
-          <div className="col-span-3 flex items-center justify-end pr-6 mb-7">
+          <div className="col-span-3 flex items-stretch justify-end pr-6">
             <PlannerArea
               animationTriggered={animationTriggered}
               profileData={profileData}

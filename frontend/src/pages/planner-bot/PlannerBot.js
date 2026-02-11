@@ -391,9 +391,9 @@ export default function PlannerBot() {
         {/* Navigation Index */}
         <NavIndex />
 
-        <div className="flex-1 grid grid-cols-5">
+        <div className="flex-1 grid grid-cols-6">
           {/* Left side - takes 3 columns */}
-          <div className="col-span-3 flex flex-col px-8 h-full ml-32">
+          <div className="col-span-3 flex flex-col px-8 h-full -mr-10 ml-32">
             <div className="w-full flex flex-col h-full min-h-0">
               {/* Header */}
               <Header
@@ -422,7 +422,7 @@ export default function PlannerBot() {
           </div>
 
           {/* Right side - takes 2 columns */}
-          <div className="col-span-2 flex items-center justify-center mb-6">
+          <div className="col-span-3 flex items-center justify-end pr-6 mb-7">
             <PlannerArea
               animationTriggered={animationTriggered}
               profileData={profileData}

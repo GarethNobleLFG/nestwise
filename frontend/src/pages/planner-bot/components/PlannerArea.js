@@ -73,15 +73,15 @@ Evaluate insurance coverage and emergency fund requirements.
                 transition={{ duration: 0.3, delay: 0.1 }}
                 className="w-full h-full"
             >
-                <Card className="h-full bg-white/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                    <CardContent className="p-6 h-full flex flex-col space-y-6">
+                <Card className="h-full bg-white/95 backdrop-blur-sm border-0 shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <CardContent className="p-6 h-full flex flex-row space-x-3">
 
-                        {/* Profile Data Area - Now occupies space directly */}
+                        {/* Profile Data Area - Left side, full height */}
                         <motion.div
-                            initial={{ opacity: 0, y: -30 }}
-                            animate={{ opacity: 1, y: 0 }}
+                            initial={{ opacity: 0, x: -30 }}
+                            animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5, delay: 0.2 }}
-                            className="flex-shrink-0 h-64"
+                            className="flex-shrink-0 w-32 h-full"
                         >
                             <ProfileDataArea
                                 animationTriggered={animationTriggered}
@@ -90,22 +90,10 @@ Evaluate insurance coverage and emergency fund requirements.
                             />
                         </motion.div>
 
-                        {/* Thin Divider */}
+                        {/* Financial Plan Section - Right side, takes remaining space */}
                         <motion.div
-                            initial={{ opacity: 0, scaleX: 0 }}
-                            animate={{ opacity: 1, scaleX: 1 }}
-                            transition={{ duration: 0.5, delay: 0.3 }}
-                            className="flex-shrink-0 flex items-center justify-center"
-                        >
-                            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-                            <div className="px-4 text-sm font-medium text-gray-500">Financial Plan</div>
-                            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-                        </motion.div>
-
-                        {/* Financial Plan Section */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
+                            initial={{ opacity: 0, x: 30 }}
+                            animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5, delay: 0.4 }}
                             className="flex-1 min-h-0 flex flex-col"
                         >
@@ -123,7 +111,7 @@ Evaluate insurance coverage and emergency fund requirements.
                                         />
                                     )}
                                 </div>
-                                
+
                                 <div
                                     ref={markdownRef}
                                     className="flex-1 overflow-y-auto"
@@ -142,7 +130,7 @@ Evaluate insurance coverage and emergency fund requirements.
                                         </ReactMarkdown>
                                     </motion.div>
                                 </div>
-                                
+
                                 <div className="pt-4 border-t border-gray-200 mt-4 flex-shrink-0">
                                     <p className="text-xs text-gray-500 text-center">
                                         This plan updates automatically as you provide more information through the chat.

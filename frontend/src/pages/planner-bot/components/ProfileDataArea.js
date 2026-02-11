@@ -32,7 +32,7 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
             transition={{ duration: 0.3 }}
             className="w-full h-full"
         >
-            <Card className="h-full bg-white/90 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <Card className="h-full bg-white/90 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <CardContent className="p-4 h-full flex flex-col">
                     {/* Header */}
                     <div className="mb-3">
@@ -45,11 +45,7 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
                     {/* Scrollable Content Area */}
                     <div
                         ref={scrollRef}
-                        className="flex-1 overflow-y-auto py-2 px-1 space-y-3 min-h-0"
-                        style={{
-                            scrollbarWidth: 'thin',
-                            scrollbarColor: '#d4a574 transparent'
-                        }}
+                        className="flex-1 overflow-y-auto py-2 px-1 space-y-3 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                     >
                         {Object.keys(formattedData).length !== 0 ? (
                             Object.entries(formattedData).map(([key, value], index) => (
@@ -62,7 +58,7 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
                                         delay: index * 0.1,
                                         ease: "easeOut"
                                     }}
-                                    className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg p-3 border-l-4 border-yellow-400 hover:shadow-md transition-shadow duration-200"
+                                    className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg p-2 border-l-4 border-yellow-400 hover:shadow-md transition-shadow duration-200 overflow-hidden"
                                 >
                                     <div className="flex items-start space-x-2">
                                         <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>

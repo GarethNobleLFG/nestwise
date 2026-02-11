@@ -69,7 +69,8 @@ Evaluate insurance coverage and emergency fund requirements.
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="w-full h-full"
+            className="w-full"
+            style={{ height: 'calc(100vh - 53px)' }}
         >
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -77,14 +78,14 @@ Evaluate insurance coverage and emergency fund requirements.
                 transition={{ duration: 0.3, delay: 0.1 }}
                 className="w-full h-full"
             >
-                <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-md hover:shadow-lg transition-shadow duration-300">
-                    <CardContent className="p-6 flex flex-row space-x-3">
+                <Card className="h-full bg-white/95 backdrop-blur-sm border-0 shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <CardContent className="p-6 h-full flex flex-row space-x-3 min-h-0">
                         {/* Profile Data Area - Left side, full height */}
                         <motion.div
                             initial={{ opacity: 0, x: -30 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5, delay: 0.2 }}
-                            className="flex-shrink-0 w-35 min-w-35 max-w-35"
+                            className="flex-shrink-0 w-40 min-w-40 max-w-40 overflow-hidden"
                         >
                             <ProfileDataArea
                                 animationTriggered={animationTriggered}
@@ -98,9 +99,9 @@ Evaluate insurance coverage and emergency fund requirements.
                             initial={{ opacity: 0, x: 30 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5, delay: 0.4 }}
-                            className="flex-1 flex flex-col"
+                            className="flex-1 flex flex-col min-h-0"
                         >
-                            <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 flex flex-col">
+                            <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 flex flex-col h-full min-h-0">
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className="text-xl font-semibold text-gray-800 flex items-center">
                                         {headerTitle}
@@ -116,7 +117,7 @@ Evaluate insurance coverage and emergency fund requirements.
 
                                 <div
                                     ref={markdownRef}
-                                    className="h-[72vh] overflow-y-auto"
+                                    className="flex-1 overflow-y-auto h-0"
                                     style={{
                                         scrollbarWidth: 'thin',
                                         scrollbarColor: '#d4a574 transparent'

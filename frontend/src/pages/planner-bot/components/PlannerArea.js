@@ -6,8 +6,8 @@ import ReactMarkdown from 'react-markdown';
 import { markdownHandler } from '../../../utils/markdownHandler';
 import ProfileDataArea from './ProfileDataArea';
 
-export default function PlannerArea({ animationTriggered, profileData, lastChatbotResponse }) {
-    const [plan, setPlanContent] = useState('# Financial Planning\n\nYour personalized financial plan will appear here once generated...');
+export default function PlannerArea({ animationTriggered, profileData, lastChatbotResponse, conversationTitle }) {
+    const [plan, setPlanContent] = useState('Your personalized financial plan will appear here once generated...');
     const [isGenerating, setIsGenerating] = useState(false);
     const markdownRef = useRef(null);
 
@@ -42,9 +42,6 @@ Evaluate insurance coverage and emergency fund requirements.
 - **Short-term (1-2 years)**: Emergency fund establishment
 - **Medium-term (3-10 years)**: Investment growth phase
 - **Long-term (10+ years)**: Retirement preparation
-
----
-*This plan will update automatically as you provide more information through our chat interface.*
             `;
 
             setPlanContent(samplePlan.trim());
@@ -58,18 +55,26 @@ Evaluate insurance coverage and emergency fund requirements.
         }
     };
 
+    let headerTitle;
+    if (conversationTitle === 'None') {
+        headerTitle = 'NestWise Agent';
+    }
+    else {
+        headerTitle = conversationTitle || 'NestWise Agent';
+    }
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="w-full h-auto"
+            className="w-full h-full"
         >
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3, delay: 0.1 }}
-                className="w-full h-auto"
+                className="w-full h-full"
             >
                 <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-md hover:shadow-lg transition-shadow duration-300">
                     <CardContent className="p-6 flex flex-row space-x-3">
@@ -78,7 +83,7 @@ Evaluate insurance coverage and emergency fund requirements.
                             initial={{ opacity: 0, x: -30 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5, delay: 0.2 }}
-                            className="flex-shrink-0 w-35"
+                            className="flex-shrink-0 w-35 min-w-32"
                         >
                             <ProfileDataArea
                                 animationTriggered={animationTriggered}
@@ -97,7 +102,7 @@ Evaluate insurance coverage and emergency fund requirements.
                             <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 flex flex-col">
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className="text-xl font-semibold text-gray-800 flex items-center">
-                                        Insert Plan Title
+                                        {headerTitle}
                                     </h3>
                                     {isGenerating && (
                                         <motion.div
@@ -110,7 +115,7 @@ Evaluate insurance coverage and emergency fund requirements.
 
                                 <div
                                     ref={markdownRef}
-                                    className="h-80 overflow-y-auto"
+                                    className="h-[72vh] overflow-y-auto"
                                     style={{
                                         scrollbarWidth: 'thin',
                                         scrollbarColor: '#d4a574 transparent'
@@ -128,7 +133,6 @@ Evaluate insurance coverage and emergency fund requirements.
                                 </div>
                             </div>
                         </motion.div>
-
                     </CardContent>
                 </Card>
             </motion.div>

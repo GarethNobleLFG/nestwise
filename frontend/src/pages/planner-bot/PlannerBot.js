@@ -393,7 +393,7 @@ export default function PlannerBot() {
 
         <div className="flex-1 grid grid-cols-6">
           {/* Left side - takes 3 columns */}
-          <div className="col-span-3 flex flex-col px-8 h-full -mr-10 ml-32">
+          <div className="col-span-3 flex flex-col px-8 h-full -mr-20 ml-32">
             <div className="w-full flex flex-col h-full min-h-0">
               {/* Header */}
               <Header
@@ -421,13 +421,16 @@ export default function PlannerBot() {
             </div>
           </div>
 
-          {/* Right side - takes 2 columns */}
-          <div className="col-span-3 flex items-stretch justify-end pr-6">
-            <PlannerArea
-              animationTriggered={animationTriggered}
-              profileData={profileData}
-              lastChatbotResponse={getLastChatbotResponse}
-            />
+          {/* Right side - takes 3 columns */}
+          <div className="col-span-3 flex flex-col px-8 h-full">
+            <div className="w-full flex flex-col h-full min-h-0">
+              <PlannerArea
+                animationTriggered={animationTriggered}
+                profileData={profileData}
+                lastChatbotResponse={getLastChatbotResponse}
+                conversationTitle={conversationTitle}
+              />
+            </div>
           </div>
 
           {/* Disclaimer */}

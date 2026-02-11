@@ -28,7 +28,7 @@ export default function Header({
                     <div className="flex items-center space-x-8">
                         <div className="flex items-center space-x-2">
                             <div className="text-base font-semibold text-gray-800 flex items-center">
-                                Current Plan:
+                                Plan:
                             </div>
                             <Button
                                 variant="outline"

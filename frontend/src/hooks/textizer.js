@@ -1,3 +1,4 @@
+// Formats data for ProfileDataArea in planner-bot directory.
 export const textizer = async (profileData, lastChatbotResponse, formattedData, setFormattedData, setIsFormatting) => {
     if (Object.keys(profileData).length === 0) {
         return;

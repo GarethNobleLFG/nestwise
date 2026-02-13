@@ -95,45 +95,23 @@ def textizer_service(data: Dict[str, Any], last_chatbot_response: str = "", form
         return {str(key): str(value) for key, value in data.items()}
     
 # Textizer tool for formatting the plans on the frontend.
-def textizer_for_plan_service(data: str = "") -> Dict[str, str]:
+def textizer_for_plan_service(data: str = "") -> str:
     """
-    FUNCTION TO FORMAT PLAN RESPONSE FROM BACKEND
+    FUNCTION TO FORMAT PLAN RESPONSE FROM BACKEND TO MARKDOWN
     """
 
     prompt = f"""
-    You are a data formatter for a retirement planning application. Format the following data appropriately based on context.
+    You are a JSON object to markdown converter for financial planning.
 
-    CONTEXT FROM LAST CHATBOT RESPONSE:
-    {last_chatbot_response if last_chatbot_response else "No previous context available"}
-    {context_section}
+    PLAN DATA TO FORMAT:
+    {data}
 
-    DATA TO FORMAT:
-    {json.dumps(data, indent=2)}
+    Format the data into a well-structured markdown financial plan with:
+    - Clear headings and sections
+    - Proper formatting for numbers, percentages, and currency
+    - Professional layout suitable for a financial planning application
 
-    CRITICAL FORMATTING RULES - APPLY STRICTLY:
-    1. For ALL text values: EVERY WORD must start with a capital letter (Title Case)
-    2. For keys: Convert camelCase/snake_case to readable format with EVERY word capitalized
-    3. For monetary values: Format as dollar amounts with commas (e.g., "$50,000")
-    4. For ages: Format as plain numbers (e.g., "25")
-    5. For percentages: Format with % symbol (e.g., "7.5%")
-    6. For locations: Proper Title Case (e.g., "New York", "San Francisco", "Los Angeles")
-    7. For text descriptions: Title Case Every Word (e.g., "Retirement Planning Goals")
-    8. American locations are the most common, so base your checking on that.
-
-    SPELL CHECKING RULES:
-    - "retirment" → "Retirement"
-    - "savigns" → "Savings"
-    - "anual" → "Annual"
-    - "califronia" → "California"
-    - "newyork" → "New York"
-
-    CAPITALIZATION EXAMPLES:
-    - "retirement planning" → "Retirement Planning"
-    - "current savings amount" → "Current Savings Amount"
-    - "new york city" → "New York City"
-    - "monthly income target" → "Monthly Income Target"
-
-    Return ONLY a JSON object with formatted key-value pairs. No other text. All keys and values must be returned, IF there is no value, return nothing for the value.
+    Return ONLY the markdown text of the plan. No code blocks or extra formatting.
     """
 
     try:
@@ -142,34 +120,21 @@ def textizer_for_plan_service(data: str = "") -> Dict[str, str]:
             messages=[
                 {
                     "role": "system", 
-                    "content": "You are a precise data formatter. Return only valid JSON with no additional text or explanation."
+                    "content": "You are a markdown formatter. Return only clean markdown text with no additional formatting or explanations."
                 },
                 {
                     "role": "user", 
                     "content": prompt
                 }
             ],
-            temperature=0.1,  # Low temperature for consistent formatting
-            max_tokens=1000
+            temperature=0.1,
+            max_tokens=1500
         )
         
-        # Extract and parse the response
-        formatted_text = response.choices[0].message.content.strip()
+        formatted_response = response.choices[0].message.content.strip()
         
-        # Remove any markdown code blocks if present
-        if formatted_text.startswith('```json'):
-            formatted_text = formatted_text[7:]
-        if formatted_text.endswith('```'):
-            formatted_text = formatted_text[:-3]
+        return formatted_response
         
-        # Parse JSON response
-        formatted_data = json.loads(formatted_text)
-        
-        return formatted_data
-        
-    except json.JSONDecodeError as e:
-        print(f"JSON parsing error: {e}")
-        return {str(key): str(value) for key, value in data.items()}    
     except Exception as e:
-        print(f"OpenAI API error: {e}")
-        return {str(key): str(value) for key, value in data.items()}
+        print(f"Plan formatting error: {e}")
+        return f"# Financial Plan\n\nError formatting plan data: {str(e)}"

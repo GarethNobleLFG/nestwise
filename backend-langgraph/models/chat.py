@@ -5,11 +5,9 @@ from pydantic import BaseModel
 class StartResponse(BaseModel):
     session_id: str
 
-
 class AnswerRequest(BaseModel):
     session_id: str
     message: str
-
 
 class AnswerResponse(BaseModel):
     response: str

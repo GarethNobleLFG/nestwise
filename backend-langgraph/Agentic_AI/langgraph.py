@@ -684,7 +684,7 @@ def route_decision_summarize(state: MasterState) -> str:
 ## RAG Implementation
 
 # ---- Load PDFs from Google Drive folder ----
-pdf_folder = "./"
+pdf_folder = "../retirement_pdfs"
 pdf_files = glob.glob(f"{pdf_folder}/*.pdf")
 
 loaded_docs = []

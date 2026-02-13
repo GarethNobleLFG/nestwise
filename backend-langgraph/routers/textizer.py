@@ -1,20 +1,15 @@
 from fastapi import APIRouter
-from pydantic import BaseModel
-from typing import Dict, Any
-from controllers.textizer import textizer, textizer_for_plan
+from models.chat import TextizerRequest, PlanTextizerRequest
+from services.textizer import textizer_service, textizer_for_plan_service
 
 textizer_router = APIRouter()
 
-#   MAY NEED TO ADD THIS TO THE MODELS FILE AS A PYDANTIC MODEL
-class TextizerRequest(BaseModel):
-    profileData: Dict[str, Any]
-    lastChatbotResponse: str = ""
-
 @textizer_router.post("/")
 async def format_data(request: TextizerRequest):
-    formatted_data = textizer(request.profileData, request.lastChatbotResponse)
+    formatted_data = textizer_service(request.profileData, request.lastChatbotResponse, request.formattedContext)
     return formatted_data
 
-@textizer_router.post("/plan")
+@textizer_router.post("/plan")  
 async def format_plan(request: PlanTextizerRequest):
-    return textizer_for_plan(request, None)
+    formatted_markdown = textizer_for_plan_service(request.planData)
+    return formatted_markdown

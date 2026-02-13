@@ -32,7 +32,7 @@ def textizer_for_plan(req, res):
         formatted_markdown = textizer_for_plan_service(plan_data)
         
         # Return response
-        return jsonify({'markdown': formatted_markdown})
+        return formatted_markdown
         
     except Exception as e:
         print(f"Plan textizer controller error: {e}")

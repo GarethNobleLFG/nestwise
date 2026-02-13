@@ -17,3 +17,11 @@ export async function validateToken() {
         return { valid: false };
     }
 }
+
+export const getAuthToken = () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        throw new Error('No authentication token found');
+    }
+    return token;
+};

@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from models.chat import TextizerRequest, PlanTextizerRequest
+from models.textizer import TextizerRequest, PlanTextizerRequest
 from services.textizer import textizer_service, textizer_for_plan_service
 
 textizer_router = APIRouter()

@@ -1,6 +1,5 @@
 # models/chat.py
 from pydantic import BaseModel
-from typing import Dict, Any
 
 # Pydantic models
 class StartResponse(BaseModel):
@@ -18,11 +17,3 @@ class AnswerResponse(BaseModel):
 class ProfileUpdateRequest(BaseModel):
     session_id: str
     profile: dict
-
-class TextizerRequest(BaseModel):
-    profileData: Dict[str, Any]
-    lastChatbotResponse: str = ""
-    formattedContext: Dict[str, Any] = {}
-
-class PlanTextizerRequest(BaseModel):
-    planData: str

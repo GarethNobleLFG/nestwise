@@ -13,6 +13,7 @@ class AnswerResponse(BaseModel):
     response: str
     real_profile: dict | None = None
     conversation_title: str | None = None
+    from_planner: bool = False
 
 class ProfileUpdateRequest(BaseModel):
     session_id: str

@@ -54,11 +54,12 @@ async def answer_question(payload: AnswerRequest, user_email: str = Depends(veri
             return AnswerResponse(
                 response=result.get("response", ""),
                 real_profile=result.get("real_profile", {}),
-                conversation_title=result.get("conversation_title", None)
+                conversation_title=result.get("conversation_title", None),
+                from_planner=result.get("from_planner", False)
             )
         else:
             # backward compatibility fallback
-            return AnswerResponse(response=str(result), real_profile={})
+            return AnswerResponse(response=str(result), real_profile={}, from_planner=False)
 
     except Exception as exc:
         logger.exception("Error while generating chat response")

@@ -18,6 +18,8 @@ export default function PlannerBot() {
   const initialized = useRef(false);
   const [conversationTitle, setConversationTitle] = useState('');
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [generatedPlan, setGeneratedPlan] = useState(null); // Store plan from backend (formatted text)
+  const [rawPlanJSON, setRawPlanJSON] = useState(null); // Store raw JSON for database
 
 
 
@@ -244,6 +246,10 @@ export default function PlannerBot() {
 
       const data = await res.json();
 
+      // Debug: log the full response
+      console.log("Full backend response:", data);
+      console.log("from_planner flag:", data.from_planner);
+
       if (data.real_profile) {
         setProfileData(data.real_profile);
       }
@@ -254,8 +260,30 @@ export default function PlannerBot() {
         setConversationTitle(data.conversation_title);
       }
 
-      removeThinkingMessage();
-      await addBotMessage(data.response);
+      // Check if response is from planner and extract plan
+      const detectedPlan = detectAndExtractPlan(data.response, data.from_planner);
+      if (detectedPlan) {
+        setGeneratedPlan(detectedPlan);
+        
+        // Also try to parse and store the raw JSON for database
+        try {
+          const parsedJSON = JSON.parse(detectedPlan);
+          setRawPlanJSON(parsedJSON);
+          console.log("Raw plan JSON stored for database:", parsedJSON);
+        } catch (e) {
+          // If it's not JSON, that's ok - it might be formatted markdown already
+          console.log("Plan is not JSON format, likely already formatted");
+        }
+        
+        console.log("Plan from backend planner detected and set in state");
+        
+        // Show summary message instead of full plan
+        removeThinkingMessage();
+        await addBotMessage("✅ Your personalized retirement plan has been generated successfully! You can view the complete plan on the right side of the screen. \n\nDo you have any other questions about your plan or would you like to adjust any parameters?");
+      } else {
+        removeThinkingMessage();
+        await addBotMessage(data.response);
+      }
 
 
     }
@@ -295,18 +323,34 @@ export default function PlannerBot() {
     return lastBotMessage ? lastBotMessage.content : '';
   };
 
+  // Function to extract plan if from_planner flag is true
+  // The backend explicitly tells us when it's a plan response
+  const detectAndExtractPlan = (response, fromPlannerFlag) => {
+    if (!response) return null;
+
+    // Check the explicit from_planner flag from backend
+    console.log("Detecting plan in response. from_planner flag:", fromPlannerFlag);
+    if (fromPlannerFlag === true) {
+      return response;
+    }
+
+    return null;
+  };
+
 
 
 
 
 
   // -----------------Implentation For Saving Chat State-----------------
-  const saveToSessionStorage = (messages, sessionId, profileData, conversationTitle) => {
+  const saveToSessionStorage = (messages, sessionId, profileData, conversationTitle, generatedPlan, rawPlanJSON) => {
     const chatState = {
       messages,
       sessionId,
       profileData,
       conversationTitle,
+      generatedPlan,
+      rawPlanJSON,
       timestamp: Date.now()
     };
     sessionStorage.setItem('plannerBotState', JSON.stringify(chatState));
@@ -336,6 +380,8 @@ export default function PlannerBot() {
         setSessionId(savedState.sessionId || null);
         setProfileData(savedState.profileData || {});
         setConversationTitle(savedState.conversationTitle || '');
+        setGeneratedPlan(savedState.generatedPlan || null);
+        setRawPlanJSON(savedState.rawPlanJSON || null);
         console.log('Restored chat state from session storage');
       }
     }
@@ -346,9 +392,9 @@ export default function PlannerBot() {
   // Add this useEffect to save state whenever it changes
   React.useEffect(() => {
     if (initialized.current && (messages.length > 0 || sessionId)) {
-      saveToSessionStorage(messages, sessionId, profileData, conversationTitle);
+      saveToSessionStorage(messages, sessionId, profileData, conversationTitle, generatedPlan, rawPlanJSON);
     }
-  }, [messages, sessionId, profileData, conversationTitle]);
+  }, [messages, sessionId, profileData, conversationTitle, generatedPlan, rawPlanJSON]);
 
 
 
@@ -359,6 +405,8 @@ export default function PlannerBot() {
     setSessionId(null);
     setProfileData({});
     setConversationTitle('');
+    setGeneratedPlan(null);
+    setRawPlanJSON(null);
 
     sessionStorage.removeItem('plannerBotState');
 
@@ -428,6 +476,7 @@ export default function PlannerBot() {
                 profileData={profileData}
                 lastChatbotResponse={getLastChatbotResponse}
                 conversationTitle={conversationTitle}
+                generatedPlan={generatedPlan}
               />
             </div>
           </div>

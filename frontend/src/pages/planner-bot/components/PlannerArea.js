@@ -4,20 +4,35 @@ import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '../../../components/shared/shadcn/components/ui/card';
 import ReactMarkdown from 'react-markdown';
 import { markdownHandler } from '../../../utils/markdownHandler';
+import { formatPlanFromJSON } from '../../../utils/planFormatter';
 import ProfileDataArea from './ProfileDataArea';
 import { Button } from '../../../components/shared/shadcn/components/ui/button';
 
-export default function PlannerArea({ animationTriggered, profileData, lastChatbotResponse, conversationTitle }) {
+export default function PlannerArea({ animationTriggered, profileData, lastChatbotResponse, conversationTitle, generatedPlan }) {
     const [plan, setPlanContent] = useState('Your personalized financial plan will appear here once generated...');
+    const [rawPlanJSON, setRawPlanJSON] = useState(null); // Keep raw JSON for database
     const [isGenerating, setIsGenerating] = useState(false);
     const markdownRef = useRef(null);
 
-    // Generate or update planner content based on profile data changes
+    // Update plan content when generatedPlan is provided from backend
     useEffect(() => {
-        if (Object.keys(profileData).length > 0 && lastChatbotResponse) {
+        if (generatedPlan) {
+            // Store the raw JSON
+            setRawPlanJSON(generatedPlan);
+            
+            // Format for display
+            const formattedPlan = formatPlanFromJSON(generatedPlan);
+            setPlanContent(formattedPlan);
+            console.log("Plan received from backend and formatted for display");
+        }
+    }, [generatedPlan]);
+
+    // Generate or update planner content based on profile data changes (fallback)
+    useEffect(() => {
+        if (!generatedPlan && Object.keys(profileData).length > 0 && lastChatbotResponse) {
             updatePlanContent();
         }
-    }, [profileData, lastChatbotResponse]);
+    }, [profileData, lastChatbotResponse, generatedPlan]);
 
     // Update plan and reflect in UI.
     const updatePlanContent = async () => {
@@ -25,25 +40,8 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
 
         try {
             const samplePlan = `
-## 📊 Current Profile Overview
-Based on your recent conversation, here's what we know about your financial situation.
+# Your personalized Retirement Plan will appear here once generated...
 
-## 🎯 Recommended Actions
-- Review your current financial goals
-- Assess risk tolerance
-- Optimize investment portfolio
-- Plan for retirement milestones
-
-## 📈 Investment Strategy
-Your personalized investment recommendations will be generated based on your profile data and recent discussions.
-
-## 🛡️ Risk Management
-Evaluate insurance coverage and emergency fund requirements.
-
-## 📅 Timeline & Milestones
-- **Short-term (1-2 years)**: Emergency fund establishment
-- **Medium-term (3-10 years)**: Investment growth phase
-- **Long-term (10+ years)**: Retirement preparation
             `;
 
             setPlanContent(samplePlan.trim());

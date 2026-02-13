@@ -5,6 +5,7 @@ import { Card, CardContent } from '../../../components/shared/shadcn/components/
 import ReactMarkdown from 'react-markdown';
 import { markdownHandler } from '../../../utils/markdownHandler';
 import ProfileDataArea from './ProfileDataArea';
+import { Button } from '../../../components/shared/shadcn/components/ui/button';
 
 export default function PlannerArea({ animationTriggered, profileData, lastChatbotResponse, conversationTitle }) {
     const [plan, setPlanContent] = useState('Your personalized financial plan will appear here once generated...');
@@ -113,6 +114,18 @@ Evaluate insurance coverage and emergency fund requirements.
                                             className="w-5 h-5 border-2 border-yellow-400 border-t-transparent rounded-full"
                                         />
                                     )}
+
+                                    {/* Save Button */}
+                                    <div className="flex items-center">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => {/* Add save functionality here */ }}
+                                            className="bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 border-0 rounded-2xl shadow-lg transition-all duration-300 px-4 py-3"
+                                        >
+                                            <span className="text-white font-semibold">Save</span>
+                                        </Button>
+                                    </div>
                                 </div>
 
                                 <div

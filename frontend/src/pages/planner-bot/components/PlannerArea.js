@@ -117,14 +117,16 @@ Evaluate insurance coverage and emergency fund requirements.
 
                                     {/* Save Button */}
                                     <div className="flex items-center">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => {/* Add save functionality here */ }}
-                                            className="bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 border-0 rounded-2xl shadow-lg transition-all duration-300 px-4 py-3"
-                                        >
-                                            <span className="text-white font-semibold">Save</span>
-                                        </Button>
+                                        <div className="border border-gray-200 rounded-2xl">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => {/* Add save functionality here */ }}
+                                                className="bg-white hover:bg-gray-50 rounded-2xl shadow-lg transition-all duration-300 px-4 py-3"
+                                            >
+                                                <span className="bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent font-semibold">Save</span>
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
 

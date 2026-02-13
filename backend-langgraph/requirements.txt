@@ -14,3 +14,4 @@ pdfminer.six
 pydantic[email]
 dnspython
 python-jose
+flask

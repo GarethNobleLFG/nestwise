@@ -33,22 +33,13 @@ export default function Header({
                             <Button
                                 variant="outline"
                                 onClick={() => setIsModalOpen(true)}
-                                className="bg-white/40 backdrop-blur-sm rounded-2xl shadow-lg border-0 px-4 py-3 text-base font-semibold text-gray-800 hover:bg-white/60 transition-all duration-300 max-w-60"
+                                className="bg-white/40 backdrop-blur-sm rounded-2xl shadow-lg border-0 px-4 py-3 text-base font-semibold text-gray-800 hover:bg-white/60 transition-all duration-300 max-w-96"
                             >
                                 <span className="truncate">{headerTitle}</span>
                                 <EditIcon className="h-4 w-4 ml-2 flex-shrink-0" />
                             </Button>
 
                             <div className="flex items-center space-x-3">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {/* Add save functionality here */ }}
-                                    className="bg-white/40 backdrop-blur-sm hover:bg-white/60 border-0 rounded-2xl shadow-lg transition-all duration-300 px-4 py-3"
-                                >
-                                    <span className="bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent font-semibold">Save</span>
-                                </Button>
-
                                 <Button
                                     variant="ghost"
                                     size="sm"

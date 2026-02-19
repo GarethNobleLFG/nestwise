@@ -436,7 +436,7 @@ export default function PlannerBot() {
 
       <div className="relative z-10 h-screen flex overflow-hidden pt-6">
         {/* Navigation Index */}
-        <NavIndex />
+        <NavIndex navType={'planner'} />
 
         <div className="flex-1 grid grid-cols-6">
           {/* Left side - takes 3 columns */}

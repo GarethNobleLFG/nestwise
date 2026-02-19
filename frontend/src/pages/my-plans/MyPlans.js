@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import MetricsArea from './components/MetricsArea';
-import PlanArea from './components/PlanArea';
+import PlanArea from './components/plan-area/PlanArea';
 
 export default function MyPlans() {
     const [animationTriggered, setAnimationTriggered] = useState(false);

@@ -20,7 +20,7 @@ export default function MyPlansNav() {
         },
         {
             id: 2,
-            name: 'Plan 2', 
+            name: 'Plan 2',
             icon: AssignmentTurnedIn,
             bgOpacity: 'bg-white/15',
             hoverOpacity: 'hover:bg-white/25',
@@ -44,7 +44,23 @@ export default function MyPlansNav() {
     };
 
     return (
-        <div className="flex flex-col space-y-2 flex-1 px-2">
+        <div className="flex flex-col space-y-1 flex-1 px-2">
+            {/* Header */}
+            <motion.div
+                className="mb-1"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.2 }}
+            >
+                <div className="px-3">
+                    <h3 className="text-sm font-medium text-white tracking-wide whitespace-nowrap">
+                        Select Plan to View
+                    </h3>
+                    {/* Custom underline */}
+                    <div className="w-full h-px bg-gradient-to-r from-transparent via-white/40 to-transparent mt-1"></div>
+                </div>
+            </motion.div>
+
             {plans.map((plan) => {
                 const IconComponent = plan.icon;
                 return (

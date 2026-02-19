@@ -80,7 +80,7 @@ export default function NavIndexLayout({ activeView, children }) {
 
                 {/* Main Content Area */}
                 <div className="flex-1 ml-40">
-                    {children}
+                    {children} {/* Then renders whatever this layout is wrapping. */}
                 </div>
             </div>
         </div>

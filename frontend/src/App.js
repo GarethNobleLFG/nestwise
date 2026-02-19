@@ -4,7 +4,7 @@ import AppBar from './components/shared/app-bar/AppBar';
 import MarketingPage from './pages/marketing-page/MarketingPage';
 import SignIn from './pages/sign-in/SignIn';
 import SignUp from './pages/sign-up/SignUp';
-import NavIndexLayout from './layouts/NavIndexLayout';
+import NavIndexLayout from './layouts/nav-index-layout/NavIndexLayout';
 import PlannerBot from './pages/planner-bot/PlannerBot';
 import MyPlans from './pages/my-plans/MyPlans';
 import ProtectedRoute from './components/shared/protected-route/ProtectedRoute';

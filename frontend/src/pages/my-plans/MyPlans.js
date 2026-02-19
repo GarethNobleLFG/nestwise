@@ -52,7 +52,7 @@ export default function MyPlans() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 relative overflow-hidden">
+        <div className="h-screen bg-gradient-to-br from-slate-50 to-gray-100 relative overflow-hidden">
             {/* Background decoration */}
             <div className="absolute inset-0">
                 <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-yellow-400/20 to-amber-600/20 rounded-full blur-3xl"></div>
@@ -60,29 +60,26 @@ export default function MyPlans() {
                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-full blur-3xl"></div>
             </div>
 
-            <div className="relative z-10 h-screen flex overflow-hidden pt-6">
+            <div className="relative z-10 h-screen flex">
                 {/* Navigation Index */}
                 <NavIndex navType={'myplans'} />
 
-                <div className="flex-1 grid grid-cols-6">
+                {/* Main Content */}
+                <div className="flex-1 flex h-screen ml-40">
                     {/* Plan Area */}
-                    <div className="col-span-4 flex flex-col px-8 h-full ml-40">
-                        <div className="w-full flex flex-col h-full min-h-0">
-                            <PlanArea 
-                                planData={planData} 
-                                animationTriggered={animationTriggered} 
-                            />
-                        </div>
+                    <div className="flex-[7] p-6">
+                        <PlanArea 
+                            planData={planData} 
+                            animationTriggered={animationTriggered} 
+                        />
                     </div>
 
-                    {/*Metrics */}
-                    <div className="col-span-2 flex flex-col px-8 h-full">
-                        <div className="w-full flex flex-col h-full min-h-0">
-                            <MetricsArea 
-                                metrics={planData.metrics} 
-                                animationTriggered={animationTriggered} 
-                            />
-                        </div>
+                    {/* Metrics Area */}
+                    <div className="flex-[3] p-6">
+                        <MetricsArea 
+                            metrics={planData.metrics} 
+                            animationTriggered={animationTriggered} 
+                        />
                     </div>
                 </div>
             </div>

@@ -6,7 +6,7 @@ import TimelineIcon from '@mui/icons-material/Timeline';
 
 export default function MetricsArea({ metrics, animationTriggered }) {
     return (
-        <div className="col-span-2 flex flex-col px-8 h-full space-y-4">
+        <div className="w-full h-full flex flex-col space-y-4">
             {/* Quick Metrics Header */}
             <motion.div
                 className="mb-2"
@@ -20,7 +20,7 @@ export default function MetricsArea({ metrics, animationTriggered }) {
 
             {/* Metric Box 1 - Projected Value */}
             <motion.div
-                className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/50 shadow-sm p-6"
+                className="bg-white/70 backdrop-blur-sm rounded-xl border-2 border-gray-200 shadow-sm p-6"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: animationTriggered ? 1 : 0, x: animationTriggered ? 0 : 20 }}
                 transition={{ duration: 0.5, delay: 0.5 }}
@@ -39,7 +39,7 @@ export default function MetricsArea({ metrics, animationTriggered }) {
 
             {/* Metric Box 2 - Timeline & Progress */}
             <motion.div
-                className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/50 shadow-sm p-6"
+                className="bg-white/70 backdrop-blur-sm rounded-xl border-2 border-gray-200 shadow-sm p-6"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: animationTriggered ? 1 : 0, x: animationTriggered ? 0 : 20 }}
                 transition={{ duration: 0.5, delay: 0.6 }}
@@ -74,7 +74,7 @@ export default function MetricsArea({ metrics, animationTriggered }) {
 
             {/* Additional Metric Box - Monthly Target */}
             <motion.div
-                className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/50 shadow-sm p-6"
+                className="bg-white/70 backdrop-blur-sm rounded-xl border-2 border-gray-200 shadow-sm p-6"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: animationTriggered ? 1 : 0, x: animationTriggered ? 0 : 20 }}
                 transition={{ duration: 0.5, delay: 0.7 }}

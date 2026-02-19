@@ -6,10 +6,8 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import PlannerNav from './components/PlannerNav';
-import MyPlansNav from './components/MyPlansNav';
-import SmartToyIcon from '@mui/icons-material/SmartToy';
 
-export default function NavIndex({ navType }) {
+export default function NavIndex() {
     const navigate = useNavigate();
 
     return (
@@ -43,42 +41,10 @@ export default function NavIndex({ navType }) {
                 </motion.button>
             </div>
 
-            {/* Navigation Items */}
-            {navType === 'planner' && <PlannerNav />}
-            {navType === 'myplans' && <MyPlansNav />}
-
+            <PlannerNav />
+            
             {/* Bottom Section */}
             <div className="px-2 space-y-2">
-
-                {/* Planner Bot - Only show on My Plans page */}
-                {navType === 'myplans' && (
-                    <motion.button
-                        onClick={() => navigate('/plannerbot')}
-                        className="flex items-center justify-between w-full px-3 py-2.5 rounded-lg border border-white/30 cursor-pointer transition-all duration-300"
-                        style={{
-                            backgroundColor: '#c47c1eff',
-                            color: 'white'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.target.style.backgroundColor = '#a66a1a';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.target.style.backgroundColor = '#c47c1eff';
-                        }}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: 0.4 }}
-                        whileHover={{ scale: 1.02, x: 2 }}
-                        whileTap={{ scale: 0.98 }}
-                    >
-                        <div className="flex items-center">
-                            <SmartToyIcon className="w-4 h-4 mr-2.5" />
-                            <span className="text-sm font-medium">Planner Bot</span>
-                        </div>
-                        <ChevronRightIcon className="w-4 h-4 opacity-70" />
-                    </motion.button>
-                )}
-
                 {/* Profile */}
                 <motion.button
                     onClick={() => navigate('/profile')}

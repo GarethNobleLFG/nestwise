@@ -62,7 +62,7 @@ export default function MyPlans() {
 
             <div className="relative z-10 h-screen flex">
                 {/* Navigation Index */}
-                <NavIndex navType={'myplans'} />
+                <NavIndex />
 
                 {/* Main Content */}
                 <div className="flex-1 flex h-screen ml-40">

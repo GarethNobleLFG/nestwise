@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import NavIndex from '../../components/shared/nav-index/NavIndex';
 import MetricsArea from './components/MetricsArea';
 import PlanArea from './components/PlanArea';
 
@@ -52,35 +51,23 @@ export default function MyPlans() {
     }, []);
 
     return (
-        <div className="h-screen bg-gradient-to-br from-slate-50 to-gray-100 relative overflow-hidden">
-            {/* Background decoration */}
-            <div className="absolute inset-0">
-                <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-yellow-400/20 to-amber-600/20 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-amber-700/20 to-yellow-500/20 rounded-full blur-3xl"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-blue-400/10 to-purple-400/10 rounded-full blur-3xl"></div>
-            </div>
+        <div className="h-screen flex">
+            {/* Main Content */}
+            <div className="flex-1 flex h-screen">
+                {/* Plan Area */}
+                <div className="flex-[7] p-6">
+                    <PlanArea 
+                        planData={planData} 
+                        animationTriggered={animationTriggered} 
+                    />
+                </div>
 
-            <div className="relative z-10 h-screen flex">
-                {/* Navigation Index */}
-                <NavIndex />
-
-                {/* Main Content */}
-                <div className="flex-1 flex h-screen ml-40">
-                    {/* Plan Area */}
-                    <div className="flex-[7] p-6">
-                        <PlanArea 
-                            planData={planData} 
-                            animationTriggered={animationTriggered} 
-                        />
-                    </div>
-
-                    {/* Metrics Area */}
-                    <div className="flex-[3] p-6">
-                        <MetricsArea 
-                            metrics={planData.metrics} 
-                            animationTriggered={animationTriggered} 
-                        />
-                    </div>
+                {/* Metrics Area */}
+                <div className="flex-[3] p-6">
+                    <MetricsArea 
+                        metrics={planData.metrics} 
+                        animationTriggered={animationTriggered} 
+                    />
                 </div>
             </div>
         </div>

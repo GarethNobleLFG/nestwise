@@ -6,6 +6,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import PlannerNav from './components/PlannerNav';
+import MyPlansNav from './components/MyPlansNav';
 
 export default function NavIndex({ navType }) {
     const navigate = useNavigate();
@@ -43,6 +44,7 @@ export default function NavIndex({ navType }) {
 
             {/* Navigation Items */}
             {navType === 'planner' && <PlannerNav />}
+            {navType === 'myplans' && <MyPlansNav />}
 
             {/* Bottom Section */}
             <div className="px-2 space-y-2">

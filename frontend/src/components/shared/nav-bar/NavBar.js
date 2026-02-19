@@ -82,7 +82,7 @@ export default function NavBar({ page }) {
                     >
                         {/* Planner Bot Button */}
                         <motion.button
-                            onClick={() => navigate('/dashboard?view=planner')}
+                            onClick={() => navigate('/plannerbot')}
                             className="!flex !items-center !space-x-2 !font-medium !text-gray-700 hover:!text-gray-900 !transition-colors !rounded-full hover:!bg-yellow-50 !border-none !cursor-pointer !px-5 !py-3 !text-base"
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -101,7 +101,7 @@ export default function NavBar({ page }) {
 
                         {/* Plans Button */}
                         <motion.button
-                            onClick={() => navigate('/dashboard?view=myplans')}
+                            onClick={() => navigate('/myplans')}
                             className="!flex !items-center !space-x-2 !font-medium !text-gray-700 hover:!text-gray-900 !transition-colors !rounded-full hover:!bg-yellow-50 !border-none !cursor-pointer !px-5 !py-3 !text-base"
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}

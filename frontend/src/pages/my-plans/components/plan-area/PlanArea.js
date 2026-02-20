@@ -15,11 +15,16 @@ export default function PlanArea({ planData, animationTriggered }) {
         >
             <div className="h-full bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 shadow-sm flex flex-col">
                 {/* Plan Header */}
-                <div className="p-4 border-b border-gray-200">
+                <div className="p-4">
                     <PlanIdentifier 
                         planData={planData} 
                         animationTriggered={animationTriggered} 
                     />
+                </div>
+
+                {/* Gold Divider */}
+                <div className="px-4 pb-4">
+                    <div className="w-full h-0.5 bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full"></div>
                 </div>
 
                 {/* Plan Content - Scrollable */}

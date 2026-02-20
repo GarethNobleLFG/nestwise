@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import MetricsArea from './components/MetricsArea';
 import PlanArea from './components/plan-area/PlanArea';
+import PlansIndex from './components/PlansIndex';
 
 export default function MyPlans() {
     const [animationTriggered, setAnimationTriggered] = useState(false);
@@ -52,21 +53,30 @@ export default function MyPlans() {
 
     return (
         <div className="h-screen flex">
+
             {/* Main Content */}
             <div className="flex-1 flex h-screen">
+
+                {/* Plans Index */}
+                <div className="flex-[1.5] p-6">
+                    <PlansIndex
+                        selectedPlan={selectedPlan}
+                    />
+                </div>
+
                 {/* Plan Area */}
-                <div className="flex-[7] p-6">
-                    <PlanArea 
-                        planData={planData} 
-                        animationTriggered={animationTriggered} 
+                <div className="flex-[6] p-6">
+                    <PlanArea
+                        planData={planData}
+                        animationTriggered={animationTriggered}
                     />
                 </div>
 
                 {/* Metrics Area */}
                 <div className="flex-[3] p-6">
-                    <MetricsArea 
-                        metrics={planData.metrics} 
-                        animationTriggered={animationTriggered} 
+                    <MetricsArea
+                        metrics={planData.metrics}
+                        animationTriggered={animationTriggered}
                     />
                 </div>
             </div>

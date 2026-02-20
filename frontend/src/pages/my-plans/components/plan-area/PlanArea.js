@@ -15,9 +15,9 @@ export default function PlanArea({ planData, animationTriggered }) {
             <div className="h-full bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 shadow-sm flex flex-col">
                 {/* Plan Header */}
                 <div className="p-4">
-                    <PlanIdentifier 
-                        planData={planData} 
-                        animationTriggered={animationTriggered} 
+                    <PlanIdentifier
+                        planData={planData}
+                        animationTriggered={animationTriggered}
                     />
                 </div>
 
@@ -27,7 +27,7 @@ export default function PlanArea({ planData, animationTriggered }) {
                 </div>
 
                 {/* Plan Content - Scrollable */}
-                <div 
+                <div
                     className="flex-1 overflow-y-auto p-4"
                     style={{
                         scrollbarWidth: 'thin',

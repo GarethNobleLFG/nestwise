@@ -25,3 +25,7 @@ class PlanResponse(BaseModel):
         "arbitrary_types_allowed": True,
         "from_attributes": True
     }
+
+class PlanListItem(BaseModel):
+    id: str
+    name: str

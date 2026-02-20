@@ -44,7 +44,7 @@ export default function MetricsArea({ metrics, animationTriggered }) {
                                         Projected Value:
                                     </p>
                                     <p className="text-sm font-bold break-words text-gray-700">
-                                        {metrics.projectedValue}
+                                        {/* {metrics.projectedValue} */}
                                     </p>
                                     <p className="text-xs text-green-600 mt-1">↗ On track for retirement goal</p>
                                 </div>
@@ -72,7 +72,7 @@ export default function MetricsArea({ metrics, animationTriggered }) {
                                         Timeline:
                                     </p>
                                     <p className="text-sm font-bold break-words text-gray-700">
-                                        {metrics.monthsToGoal}
+                                        {/* {metrics.monthsToGoal} */}
                                     </p>
                                     <p className="text-xs text-blue-600 mt-1">Until retirement target</p>
                                 </div>
@@ -100,14 +100,14 @@ export default function MetricsArea({ metrics, animationTriggered }) {
                                         Current Progress:
                                     </p>
                                     <p className="text-sm font-bold break-words text-gray-700 mb-2">
-                                        {metrics.currentProgress}
+                                        {/* {metrics.currentProgress} */}
                                     </p>
                                     {/* Progress Bar */}
                                     <div className="w-full bg-gray-200 rounded-full h-2">
                                         <motion.div
                                             className="bg-gradient-to-r from-yellow-400 to-amber-500 h-2 rounded-full"
                                             initial={{ width: 0 }}
-                                            animate={{ width: animationTriggered ? metrics.currentProgress : 0 }}
+                                            // animate={{ width: animationTriggered ? metrics.currentProgress : 0 }}
                                             transition={{ duration: 1, delay: 0.8 }}
                                         />
                                     </div>

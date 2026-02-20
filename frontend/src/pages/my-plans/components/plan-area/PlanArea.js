@@ -3,8 +3,11 @@ import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { markdownHandler } from '../../../../utils/markdownHandler';
 import PlanIdentifier from './components/PlanIdentifier';
+import { formatPlanFromJSON } from '../../../../utils/planFormatter';
 
 export default function PlanArea({ planData, animationTriggered }) {
+
+    const planContent = planData?.data ? formatPlanFromJSON(planData.data) : null;
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -40,7 +43,7 @@ export default function PlanArea({ planData, animationTriggered }) {
                         transition={{ duration: 0.6, delay: 0.5 }}
                     >
                         <ReactMarkdown components={markdownHandler}>
-                            {planData.content}
+                            {planContent || "Select a plan to view details."}
                         </ReactMarkdown>
                     </motion.div>
                 </div>

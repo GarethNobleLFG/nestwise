@@ -5,8 +5,6 @@ from typing import List
 
 # import models
 from models.user import User, Token, UserUpdate
-from models.plans import PlanCreate, PlanUpdate, PlanResponse
-
 
 # import contollers
 from models.user import User, Token
@@ -18,13 +16,7 @@ from controllers.userAuth import (
     create_access_token,
     update_user_profile,
 )
-from controllers.plans import (
-    create_plan,
-    get_user_plans,
-    get_plan,
-    update_plan,
-    delete_plan
-)
+
 
 authRouter = APIRouter()
 
@@ -94,34 +86,3 @@ async def validate_token(token: str = Depends(oauth2_scheme)):
     }
 
 
-# Plan Management Endpoints
-@authRouter.post("/plans", response_model=PlanResponse)
-async def create_new_plan(plan: PlanCreate, token: str = Depends(oauth2_scheme)):
-    email = verify_token(token)
-    return create_plan(email, plan.name, plan.description, plan.data)
-
-@authRouter.get("/", response_model=List[PlanResponse])
-async def list_plans(token: str = Depends(oauth2_scheme)):
-    email = verify_token(token)
-    return get_user_plans(email)
-
-@authRouter.get("/{plan_id}", response_model=PlanResponse)
-async def get_single_plan(plan_id: str, token: str = Depends(oauth2_scheme)):
-    email = verify_token(token)
-    plan = get_plan(email, plan_id)
-    if not plan:
-        raise HTTPException(404, "Plan not found")
-    return plan
-
-@authRouter.put("/{plan_id}", response_model=PlanResponse)
-async def update_existing_plan(plan_id: str, updates: PlanUpdate, token: str = Depends(oauth2_scheme)):
-    email = verify_token(token)
-    updated = update_plan(email, plan_id, updates.dict(exclude_none=True))
-    if not updated:
-        raise HTTPException(404, "Plan not found")
-    return updated
-
-@authRouter.delete("/{plan_id}")
-async def delete_existing_plan(plan_id: str, token: str = Depends(oauth2_scheme)):
-    email = verify_token(token)
-    return delete_plan(email, plan_id)

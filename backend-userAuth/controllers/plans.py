@@ -21,8 +21,18 @@ def create_plan(email: str, name: str, description: str, data: dict):
     return serialize_plan(plan)
 
 def get_user_plans(email: str):
-    plans = plans_collection.find({"user_email": email}).sort("created_at", -1)
-    return [serialize_plan(p) for p in plans]
+    plans = plans_collection.find(
+        {"user_email": email},
+        {"name": 1}  # Only return name (and _id automatically)
+    ).sort("created_at", -1)
+
+    return [
+        {
+            "id": str(plan["_id"]),
+            "name": plan["name"]
+        }
+        for plan in plans
+    ]
 
 def get_plan(email: str, plan_id: str):
     plan = plans_collection.find_one({"_id": ObjectId(plan_id), "user_email": email})

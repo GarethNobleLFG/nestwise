@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 
 from routers.userAuth import authRouter
+from routers.plans import planRouter
 
 app = FastAPI(title="NestWise UserAuth Service", version="1.0.0")
 
@@ -34,3 +35,4 @@ def root():
     return {"service": "UserAuth", "status": "running"}
 
 app.include_router(authRouter, prefix="/userauth")
+app.include_router(planRouter, prefix="/plans")

@@ -3,17 +3,12 @@ import { motion } from 'framer-motion';
 import { Card, CardContent } from '../../../components/shared/shadcn/components/ui/card';
 import { cn } from '../../../components/shared/shadcn/lib/utils';
 
-const PlansIndex = ({ onPlanSelect }) => {
+const PlansIndex = ({ plans = [], onPlanSelect }) => {
     const [selectedPlan, setSelectedPlan] = useState(null);
-
-    const plans = [
-        { id: 1, title: "Plan 1" },
-        { id: 2, title: "Plan 2" },
-        { id: 3, title: "Plan 3" }
-    ];
 
     const handlePlanSelect = (plan) => {
         setSelectedPlan(plan.id);
+
         if (onPlanSelect) {
             onPlanSelect(plan);
         }
@@ -68,7 +63,7 @@ const PlansIndex = ({ onPlanSelect }) => {
                                             "text-sm font-bold break-words",
                                             selectedPlan === plan.id ? "text-blue-700" : "text-gray-700"
                                         )}>
-                                            {plan.title}
+                                            {plan.name}
                                         </p>
                                     </div>
                                 </div>

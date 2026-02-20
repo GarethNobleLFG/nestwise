@@ -62,11 +62,11 @@ export default function PlanIdentifier({ planData, animationTriggered }) {
                                 {/* Plan info */}
                                 <div className="flex-1 min-w-0 flex flex-col justify-center">
                                     <h2 className="text-xl font-bold bg-gradient-to-r from-amber-700 to-yellow-600 bg-clip-text text-transparent mb-2">
-                                        {planData?.title || "Premium Plan"}
+                                        {planData?.name || "Premium Plan"}
                                     </h2>
                                     <p className="text-sm text-amber-600/80 font-medium flex items-center space-x-1">
                                         <TrendingUpIcon className="w-4 h-4" />
-                                        <span>Active • Last updated {new Date().toLocaleDateString()}</span>
+                                        <span>Active • Last updated {new Date(planData.updated_at).toLocaleDateString()}</span>
                                     </p>
                                 </div>
                             </div>

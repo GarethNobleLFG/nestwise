@@ -3,44 +3,30 @@ import { useState, useEffect } from 'react';
 import MetricsArea from './components/MetricsArea';
 import PlanArea from './components/plan-area/PlanArea';
 import PlansIndex from './components/PlansIndex';
+import { usePlanHooks } from '../../hooks/plans'; 
 
 export default function MyPlans() {
     const [animationTriggered, setAnimationTriggered] = useState(false);
-    const [selectedPlan, setSelectedPlan] = useState(null);
+    const [plans, setPlans] = useState([]);          // list of plans
+    const [selectedPlanData, setSelectedPlanData] = useState(null);
 
-    // Sample plan data - replace with real data from your backend
-    const [planData] = useState({
-        title: "Retirement Plan 2024",
-        content: `
-## Key Recommendations
-- **Target Retirement Age**: 65
-- **Monthly Contribution**: $2,500
-- **Investment Strategy**: Diversified portfolio with 70% stocks, 30% bonds
-- **Expected Annual Return**: 7.5%
+    const { getUserPlans, getPlanById } = usePlanHooks();
 
-## Investment Allocation
-- **Large Cap Stocks**: 40%
-- **International Stocks**: 20%
-- **Small Cap Stocks**: 10%
-- **Bonds**: 25%
-- **Cash/Money Market**: 5%
-
-## Milestones
-1. **Year 1-5**: Build emergency fund and maximize employer matching
-2. **Year 6-10**: Increase contributions and diversify investments  
-3. **Year 11-15**: Rebalance portfolio and optimize tax strategies
-4. **Pre-retirement**: Shift to more conservative investments
-
-## Next Steps
-- Set up automatic contributions
-- Review and rebalance quarterly
-- Monitor progress annually`,
-        metrics: {
-            projectedValue: "$1,250,000",
-            monthsToGoal: "180 months",
-            currentProgress: "32%"
+    // Fetch all plans on mount
+    useEffect(() => {
+        async function fetchPlans() {
+            const userPlans = await getUserPlans();
+            setPlans(userPlans);
         }
-    });
+
+        fetchPlans();
+    }, []);
+
+    // Handle plan selection
+    const handlePlanSelect = async (plan) => {
+        const fullPlan = await getPlanById(plan.id);
+        setSelectedPlanData(fullPlan);
+    };
 
     useEffect(() => {
         document.title = "NestWise - My Plans";
@@ -53,21 +39,20 @@ export default function MyPlans() {
 
     return (
         <div className="h-screen flex">
-
-            {/* Main Content */}
             <div className="flex-1 flex h-screen">
 
                 {/* Plans Index */}
                 <div className="flex-[1.5] p-6">
                     <PlansIndex
-                        selectedPlan={selectedPlan}
+                        plans={plans}
+                        onPlanSelect={handlePlanSelect}
                     />
                 </div>
 
                 {/* Plan Area */}
                 <div className="flex-[6] p-6">
                     <PlanArea
-                        planData={planData}
+                        planData={selectedPlanData}
                         animationTriggered={animationTriggered}
                     />
                 </div>
@@ -75,7 +60,7 @@ export default function MyPlans() {
                 {/* Metrics Area */}
                 <div className="flex-[3] p-6">
                     <MetricsArea
-                        metrics={planData.metrics}
+                        // metrics = {planData.metrucs}
                         animationTriggered={animationTriggered}
                     />
                 </div>

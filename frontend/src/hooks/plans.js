@@ -37,25 +37,25 @@ export const usePlanHooks = () => {
   };
 
   const savePlan = (name, data, description) =>
-    request("http://localhost:7001/userauth/plans", {
+    request("http://localhost:7001/plans", {
       method: "POST",
       body: JSON.stringify({ name, description, data }),
     });
 
-  const getUserPlans = () =>
-    request("http://localhost:7001/userauth/plans");
+  const getUserPlans = async () =>
+    request("http://localhost:7001/plans");
 
-  const getPlanById = (id) =>
-    request(`http://localhost:7001/userauth/plans/${id}`);
+  const getPlanById = async(id) =>
+    request(`http://localhost:7001/plans/${id}`);
 
   const updatePlan = (id, name, data, description) =>
-    request(`http://localhost:7001/userauth/plans/${id}`, {
+    request(`http://localhost:7001/plans/${id}`, {
       method: "PUT",
       body: JSON.stringify({ name, description, data }),
     });
 
   const deletePlan = (id) =>
-    request(`http://localhost:7001/userauth/plans/${id}`, {
+    request(`http://localhost:7001/plans/${id}`, {
       method: "DELETE",
     });
 

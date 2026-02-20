@@ -4,24 +4,34 @@ import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '../../../components/shared/shadcn/components/ui/card';
 import ReactMarkdown from 'react-markdown';
 import { markdownHandler } from '../../../utils/markdownHandler';
-import { formatPlanFromJSON } from '../../../utils/planFormatter';
+import { formatPlanFromJSON, extractRawPlanJSON } from '../../../utils/planFormatter';
 import ProfileDataArea from './ProfileDataArea';
 import { Button } from '../../../components/shared/shadcn/components/ui/button';
+import { usePlanHooks } from '../../../hooks/plans';
 
 export default function PlannerArea({ animationTriggered, profileData, lastChatbotResponse, conversationTitle, generatedPlan }) {
     const [plan, setPlanContent] = useState('Your personalized financial plan will appear here once generated...');
     const [rawPlanJSON, setRawPlanJSON] = useState(null); // Keep raw JSON for database
     const [isGenerating, setIsGenerating] = useState(false);
     const markdownRef = useRef(null);
+    const { savePlan } = usePlanHooks();
 
     // Update plan content when generatedPlan is provided from backend
     useEffect(() => {
         if (generatedPlan) {
-            // Store the raw JSON
-            setRawPlanJSON(generatedPlan);
-            
+            // Store the raw JSON (use extractor to handle string inputs)
+            const raw = extractRawPlanJSON(generatedPlan);
+            setRawPlanJSON(raw || generatedPlan);
+
             // Format for display
-            const formattedPlan = formatPlanFromJSON(generatedPlan);
+            let formattedPlan = formatPlanFromJSON(generatedPlan);
+
+            // Ensure we always pass a string to ReactMarkdown. If formatter
+            // returned a non-string, fall back to pretty-printed JSON code block.
+            if (typeof formattedPlan !== 'string') {
+                formattedPlan = `\`\`\`json\n${JSON.stringify(raw || generatedPlan, null, 2)}\n\`\`\``;
+            }
+
             setPlanContent(formattedPlan);
             console.log("Plan received from backend and formatted for display");
         }
@@ -62,6 +72,27 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
     else {
         headerTitle = conversationTitle || 'NestWise Agent';
     }
+
+    // Add functionality to save the plan using the `savePlan` hook
+    const handleSavePlan = async () => {
+        if (!rawPlanJSON) {
+            console.log("No plan JSON");
+            return;
+        }
+
+        try {
+            const cleanedPlanJSON = rawPlanJSON.replace(/```json|```/g, '').trim();
+            const parsedPlan = JSON.parse(cleanedPlanJSON);
+
+            const name = conversationTitle || "Generated Plan";
+            const description = "NestWise generated plan";
+
+            await savePlan(name, parsedPlan, description);
+            alert("Saved!");
+        } catch (e) {
+            alert("Save failed");
+        }
+    };
 
     return (
         <motion.div
@@ -119,7 +150,7 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                onClick={() => {/* Add save functionality here */ }}
+                                                onClick={handleSavePlan}
                                                 className="bg-white hover:bg-gray-50 rounded-2xl shadow-lg transition-all duration-300 px-4 py-3"
                                             >
                                                 <span className="bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent font-semibold">Save</span>
@@ -141,9 +172,11 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ duration: 0.6, delay: 0.5 }}
                                     >
-                                        <ReactMarkdown components={markdownHandler}>
-                                            {plan}
-                                        </ReactMarkdown>
+                                        <div className="max-w-none break-words whitespace-pre-wrap text-sm">
+                                            <ReactMarkdown components={markdownHandler}>
+                                                {plan}
+                                            </ReactMarkdown>
+                                        </div>
                                     </motion.div>
                                 </div>
                             </div>

@@ -1,9 +1,11 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer
+from typing import List
 
 
 # import models
-from models.user import User, Token, UserUpdate, Plan, PlanResponse
+from models.user import User, Token, UserUpdate
+from models.plans import PlanCreate, PlanUpdate, PlanResponse
 
 
 # import contollers
@@ -15,9 +17,11 @@ from controllers.userAuth import (
     verify_token,
     create_access_token,
     update_user_profile,
-    save_plan,
+)
+from controllers.plans import (
+    create_plan,
     get_user_plans,
-    get_plan_by_id,
+    get_plan,
     update_plan,
     delete_plan
 )
@@ -91,97 +95,33 @@ async def validate_token(token: str = Depends(oauth2_scheme)):
 
 
 # Plan Management Endpoints
-
-@authRouter.post("/plans", response_model=PlanResponse, status_code=status.HTTP_201_CREATED)
-async def create_plan(plan: Plan, token: str = Depends(oauth2_scheme)):
-    """
-    Save a new plan for the authenticated user.
-    
-    Frontend should pass the data in the following format:
-    {
-        "name": "Plan Name",
-        "description": "Optional plan description",
-        "data": {
-            "key1": "value1",
-            "key2": 123,
-            "nested": {
-                "field": "any JSON structure"
-            }
-        }
-    }
-    
-    Headers required:
-    - Authorization: Bearer <jwt_token>
-    """
+@authRouter.post("/plans", response_model=PlanResponse)
+async def create_new_plan(plan: PlanCreate, token: str = Depends(oauth2_scheme)):
     email = verify_token(token)
-    return save_plan(
-        email=email,
-        plan_name=plan.name,
-        plan_data=plan.data,
-        description=plan.description
-    )
+    return create_plan(email, plan.name, plan.description, plan.data)
 
-
-@authRouter.get("/plans")
+@authRouter.get("/", response_model=List[PlanResponse])
 async def list_plans(token: str = Depends(oauth2_scheme)):
-    """
-    Retrieve all plans for the authenticated user.
-    """
     email = verify_token(token)
-    plans = get_user_plans(email)
-    return {
-        "plans": plans,
-        "count": len(plans)
-    }
+    return get_user_plans(email)
 
-
-@authRouter.get("/plans/{plan_id}")
-async def retrieve_plan(plan_id: str, token: str = Depends(oauth2_scheme)):
-    """
-    Retrieve a specific plan by ID for the authenticated user.
-    """
+@authRouter.get("/{plan_id}", response_model=PlanResponse)
+async def get_single_plan(plan_id: str, token: str = Depends(oauth2_scheme)):
     email = verify_token(token)
-    return get_plan_by_id(email, plan_id)
+    plan = get_plan(email, plan_id)
+    if not plan:
+        raise HTTPException(404, "Plan not found")
+    return plan
 
-
-@authRouter.put("/plans/{plan_id}")
-async def modify_plan(plan_id: str, plan: Plan, token: str = Depends(oauth2_scheme)):
-    """
-    Update a plan for the authenticated user.
-    
-    Frontend should pass the data in the following format:
-    {
-        "name": "Updated Plan Name",
-        "description": "Updated plan description",
-        "data": {
-            "key1": "updated_value1",
-            "key2": 456,
-            "nested": {
-                "field": "updated JSON structure"
-            }
-        }
-    }
-    
-    URL parameter:
-    - plan_id: The MongoDB ObjectId of the plan to update
-    
-    Headers required:
-    - Authorization: Bearer <jwt_token>
-    """
+@authRouter.put("/{plan_id}", response_model=PlanResponse)
+async def update_existing_plan(plan_id: str, updates: PlanUpdate, token: str = Depends(oauth2_scheme)):
     email = verify_token(token)
-    return update_plan(
-        email=email,
-        plan_id=plan_id,
-        plan_name=plan.name,
-        plan_data=plan.data,
-        description=plan.description
-    )
+    updated = update_plan(email, plan_id, updates.dict(exclude_none=True))
+    if not updated:
+        raise HTTPException(404, "Plan not found")
+    return updated
 
-
-@authRouter.delete("/plans/{plan_id}")
-async def remove_plan(plan_id: str, token: str = Depends(oauth2_scheme)):
-    """
-    Delete a plan for the authenticated user.
-    """
+@authRouter.delete("/{plan_id}")
+async def delete_existing_plan(plan_id: str, token: str = Depends(oauth2_scheme)):
     email = verify_token(token)
     return delete_plan(email, plan_id)

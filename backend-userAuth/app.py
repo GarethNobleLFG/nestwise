@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from pymongo import MongoClient
+# from pymongo import MongoClient
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
@@ -16,18 +16,18 @@ app.add_middleware(
 )
 
 
-MONGO_URL = os.getenv("MONGO_URL", "mongodb://mongo:27017")
-DB_NAME = os.getenv("MONGO_DB_AUTH", "nestwise_auth")
+# MONGO_URL = os.getenv("MONGO_URL", "mongodb://mongo:27017")
+# DB_NAME = os.getenv("MONGO_DB_AUTH", "nestwise_auth")
 
-client = MongoClient(MONGO_URL)
-db = client[DB_NAME]
-users_collection = db["users"]
-plans_collection = db["plans"]
+# client = MongoClient(MONGO_URL)
+# db = client[DB_NAME]
+# users_collection = db["users"]
+# plans_collection = db["plans"]
 
-# Inject collections into controllers so they can use it
-import controllers.userAuth as userAuthController
-userAuthController.users_collection = users_collection
-userAuthController.plans_collection = plans_collection
+# # Inject collections into controllers so they can use it
+# import controllers.userAuth as userAuthController
+# userAuthController.users_collection = users_collection
+# userAuthController.plans_collection = plans_collection
 
 @app.get("/")
 def root():

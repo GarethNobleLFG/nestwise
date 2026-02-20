@@ -5,10 +5,11 @@ from argon2.exceptions import VerifyMismatchError
 from fastapi import HTTPException
 from bson import ObjectId
 import os
+from utils.database import users_collection, plans_collection
 
-# DB INJECTION (set from app.py)#
-users_collection = None
-plans_collection = None
+# # DB INJECTION (set from app.py)#
+# users_collection = None
+# plans_collection = None
 
 
 pwd_hasher = PasswordHasher()
@@ -120,144 +121,3 @@ def update_user_profile(current_email: str, new_email: str = None, new_name: str
 
     # Return updated values
     return users_collection.find_one({"email": update_data.get("email", current_email)})
-
-
-def save_plan(email: str, plan_name: str, plan_data: dict, description: str = None):
-    """
-    Save a plan for a user.
-    """
-    user = users_collection.find_one({"email": email})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    plan_document = {
-        "user_id": user["_id"],
-        "user_email": email,
-        "plan_name": plan_name,
-        "description": description,
-        "plan_data": plan_data,
-        "created_at": datetime.utcnow(),
-        "updated_at": datetime.utcnow()
-    }
-    
-    result = plans_collection.insert_one(plan_document)
-    
-    return {
-        "message": "Plan saved successfully",
-        "plan_id": str(result.inserted_id),
-        "plan_name": plan_name,
-        "user_id": str(user["_id"])
-    }
-
-
-def get_user_plans(email: str):
-    """
-    Retrieve all plans for a user.
-    """
-    user = users_collection.find_one({"email": email})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    plans = list(plans_collection.find({"user_id": user["_id"]}))
-    
-    # Convert ObjectIds to strings for JSON serialization
-    for plan in plans:
-        plan["_id"] = str(plan["_id"])
-        plan["user_id"] = str(plan["user_id"])
-    
-    return plans
-
-
-def get_plan_by_id(email: str, plan_id: str):
-    """
-    Retrieve a specific plan by ID for a user.
-    """
-    user = users_collection.find_one({"email": email})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    try:
-        plan = plans_collection.find_one({
-            "_id": ObjectId(plan_id),
-            "user_id": user["_id"]
-        })
-    except:
-        raise HTTPException(status_code=400, detail="Invalid plan ID")
-    
-    if not plan:
-        raise HTTPException(status_code=404, detail="Plan not found")
-    
-    plan["_id"] = str(plan["_id"])
-    plan["user_id"] = str(plan["user_id"])
-    
-    return plan
-
-
-def update_plan(email: str, plan_id: str, plan_name: str = None, plan_data: dict = None, description: str = None):
-    """
-    Update a plan for a user.
-    """
-    user = users_collection.find_one({"email": email})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    try:
-        plan_obj_id = ObjectId(plan_id)
-    except:
-        raise HTTPException(status_code=400, detail="Invalid plan ID")
-    
-    plan = plans_collection.find_one({
-        "_id": plan_obj_id,
-        "user_id": user["_id"]
-    })
-    
-    if not plan:
-        raise HTTPException(status_code=404, detail="Plan not found")
-    
-    update_data = {"updated_at": datetime.utcnow()}
-    
-    if plan_name:
-        update_data["plan_name"] = plan_name
-    if plan_data:
-        update_data["plan_data"] = plan_data
-    if description is not None:
-        update_data["description"] = description
-    
-    plans_collection.update_one(
-        {"_id": plan_obj_id},
-        {"$set": update_data}
-    )
-    
-    updated_plan = plans_collection.find_one({"_id": plan_obj_id})
-    updated_plan["_id"] = str(updated_plan["_id"])
-    updated_plan["user_id"] = str(updated_plan["user_id"])
-    
-    return {
-        "message": "Plan updated successfully",
-        "plan_id": str(updated_plan["_id"]),
-        "plan_name": updated_plan["plan_name"]
-    }
-
-
-def delete_plan(email: str, plan_id: str):
-    """
-    Delete a plan for a user.
-    """
-    user = users_collection.find_one({"email": email})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    try:
-        plan_obj_id = ObjectId(plan_id)
-    except:
-        raise HTTPException(status_code=400, detail="Invalid plan ID")
-    
-    result = plans_collection.delete_one({
-        "_id": plan_obj_id,
-        "user_id": user["_id"]
-    })
-    
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Plan not found")
-    
-    return {"message": "Plan deleted successfully"}

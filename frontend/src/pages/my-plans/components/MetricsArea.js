@@ -48,8 +48,8 @@ export default function MetricsArea({ metrics, animationTriggered }) {
                                     </p>
                                     <p className="text-xs text-green-600 mt-1">↗ On track for retirement goal</p>
                                 </div>
-                                <div className="p-2 bg-green-100 rounded-lg">
-                                    <TrendingUpIcon className="w-5 h-5 text-green-600" />
+                                <div className="p-2 bg-yellow-500 rounded-lg">
+                                    <TrendingUpIcon className="w-5 h-5 text-white" />
                                 </div>
                             </div>
                         </motion.div>
@@ -76,8 +76,8 @@ export default function MetricsArea({ metrics, animationTriggered }) {
                                     </p>
                                     <p className="text-xs text-blue-600 mt-1">Until retirement target</p>
                                 </div>
-                                <div className="p-2 bg-blue-100 rounded-lg">
-                                    <TimelineIcon className="w-5 h-5 text-blue-600" />
+                                <div className="p-2 bg-yellow-500 rounded-lg">
+                                    <TimelineIcon className="w-5 h-5 text-white" />
                                 </div>
                             </div>
                         </motion.div>
@@ -112,8 +112,8 @@ export default function MetricsArea({ metrics, animationTriggered }) {
                                         />
                                     </div>
                                 </div>
-                                <div className="p-2 bg-yellow-100 rounded-lg">
-                                    <TrendingUpIcon className="w-5 h-5 text-yellow-600" />
+                                <div className="p-2 bg-yellow-500 rounded-lg">
+                                    <TrendingUpIcon className="w-5 h-5 text-white" />
                                 </div>
                             </div>
                         </motion.div>
@@ -140,8 +140,8 @@ export default function MetricsArea({ metrics, animationTriggered }) {
                                     </p>
                                     <p className="text-xs text-purple-600 mt-1">Recommended contribution</p>
                                 </div>
-                                <div className="p-2 bg-purple-100 rounded-lg">
-                                    <AccountBalanceIcon className="w-5 h-5 text-purple-600" />
+                                <div className="p-2  bg-yellow-500 rounded-lg">
+                                    <AccountBalanceIcon className="w-5 h-5 text-white" />
                                 </div>
                             </div>
                         </motion.div>

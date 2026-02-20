@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import ReactMarkdown from 'react-markdown';
 import { markdownHandler } from '../../../../utils/markdownHandler';
 import PlanIdentifier from './components/PlanIdentifier';

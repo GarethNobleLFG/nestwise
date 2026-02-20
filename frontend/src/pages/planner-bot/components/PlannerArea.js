@@ -18,23 +18,40 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
 
     // Update plan content when generatedPlan is provided from backend
     useEffect(() => {
-        if (generatedPlan) {
-            // Store the raw JSON (use extractor to handle string inputs)
-            const raw = extractRawPlanJSON(generatedPlan);
-            setRawPlanJSON(raw || generatedPlan);
+        if (!generatedPlan) return;
 
-            // Format for display
-            let formattedPlan = formatPlanFromJSON(generatedPlan);
+        console.log("Raw plan data received:", generatedPlan);
 
-            // Ensure we always pass a string to ReactMarkdown. If formatter
-            // returned a non-string, fall back to pretty-printed JSON code block.
-            if (typeof formattedPlan !== 'string') {
-                formattedPlan = `\`\`\`json\n${JSON.stringify(raw || generatedPlan, null, 2)}\n\`\`\``;
+        let parsedPlan = generatedPlan;
+
+        try {
+            // If backend returned markdown-wrapped JSON, strip fences
+            if (typeof generatedPlan === "string") {
+                const cleaned = generatedPlan
+                    .replace(/```json/g, "")
+                    .replace(/```/g, "")
+                    .trim();
+
+                parsedPlan = JSON.parse(cleaned);
             }
-
-            setPlanContent(formattedPlan);
-            console.log("Plan received from backend and formatted for display");
+        } catch (err) {
+            console.error("Failed to parse JSON:", err);
+            return;
         }
+
+        // Store actual object
+        setRawPlanJSON(parsedPlan);
+
+        // Format properly (pass object, NOT string)
+        let formattedPlan = formatPlanFromJSON(parsedPlan);
+
+        // Safety fallback
+        if (typeof formattedPlan !== "string") {
+            formattedPlan = `\`\`\`json\n${JSON.stringify(parsedPlan, null, 2)}\n\`\`\``;
+        }
+
+        setPlanContent(formattedPlan);
+        console.log("Plan parsed and formatted successfully");
     }, [generatedPlan]);
 
     // Generate or update planner content based on profile data changes (fallback)
@@ -81,13 +98,13 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
         }
 
         try {
-            const cleanedPlanJSON = rawPlanJSON.replace(/```json|```/g, '').trim();
-            const parsedPlan = JSON.parse(cleanedPlanJSON);
+            // const cleanedPlanJSON = rawPlanJSON.replace(/```json|```/g, '').trim();
+            // const parsedPlan = JSON.parse(cleanedPlanJSON);
 
             const name = conversationTitle || "Generated Plan";
             const description = "NestWise generated plan";
 
-            await savePlan(name, parsedPlan, description);
+            await savePlan(name, rawPlanJSON, description);
             alert("Saved!");
         } catch (e) {
             alert("Save failed");

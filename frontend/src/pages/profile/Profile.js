@@ -269,6 +269,27 @@ export default function Profile() {
                                 Profile
                             </Typography>
 
+                            <Button
+                                variant="outlined"
+                                onClick={() => {
+                                    localStorage.removeItem('token');
+                                    navigate('/signin');
+                                }}
+                                sx={{
+                                    mb: 2,
+                                    borderColor: '#c47c1eff',
+                                    color: '#c47c1eff',
+                                    fontWeight: 600,
+                                    '&:hover': {
+                                        backgroundColor: '#ffe0b3',
+                                        borderColor: '#a05e13',
+                                        color: '#a05e13',
+                                    },
+                                }}
+                            >
+                                Logout
+                            </Button>
+
                             {/* Name Field */}
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%', px: 1, py: 1 }}>
                                 <PersonIcon sx={{ color: '#c47c1eff' }} />

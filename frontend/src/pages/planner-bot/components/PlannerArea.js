@@ -8,6 +8,7 @@ import { formatPlanFromJSON, extractRawPlanJSON } from '../../../utils/planForma
 import ProfileDataArea from './ProfileDataArea';
 import { Button } from '../../../components/shared/shadcn/components/ui/button';
 import { usePlanHooks } from '../../../hooks/plans';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../components/shared/shadcn/components/ui/tooltip';
 
 export default function PlannerArea({ animationTriggered, profileData, lastChatbotResponse, conversationTitle, generatedPlan }) {
     const [plan, setPlanContent] = useState('Your personalized financial plan will appear here once generated...');
@@ -150,9 +151,22 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                         >
                             <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 flex flex-col h-full min-h-0">
                                 <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-xl font-semibold text-gray-800 flex items-center">
-                                        {headerTitle}
-                                    </h3>
+
+                                    {/* Title of plan with tooltip functionality from Shadcn. */}
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <h3 className="text-xl font-semibold text-gray-800">
+                                                    <span className="block truncate max-w-[28ch]">
+                                                        {headerTitle}
+                                                    </span>
+                                                </h3>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>{headerTitle}</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                     {isGenerating && (
                                         <motion.div
                                             animate={{ rotate: 360 }}

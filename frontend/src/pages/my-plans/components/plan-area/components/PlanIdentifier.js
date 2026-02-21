@@ -66,8 +66,7 @@ export default function PlanIdentifier({ planData, animationTriggered }) {
                                     </h2>
                                     <p className="text-sm text-amber-600/80 font-medium flex items-center space-x-1">
                                         <TrendingUpIcon className="w-4 h-4" />
-                                        <span>Active • Last updated {new Date(planData.updated_at).toLocaleDateString()}</span>
-                                    </p>
+                                        <span>Active • Last updated {planData?.updated_at ? new Date(planData.updated_at).toLocaleDateString() : 'Never'}</span>                                    </p>
                                 </div>
                             </div>
                         </motion.div>

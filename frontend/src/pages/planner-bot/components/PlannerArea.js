@@ -203,7 +203,15 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ duration: 0.6, delay: 0.5 }}
                                     >
-                                        <div className="max-w-none break-words whitespace-pre-wrap text-sm">
+                                        <div
+                                            className="max-w-none break-words whitespace-pre-wrap text-sm"
+                                            style={{
+                                                fontFamily: 'Segoe UI, Inter, Roboto, Helvetica Neue, Arial, sans-serif',
+                                                fontWeight: 400,
+                                                letterSpacing: '0.01em',
+                                                color: '#23272f'
+                                            }}
+                                        >
                                             <ReactMarkdown components={markdownHandler}>
                                                 {plan}
                                             </ReactMarkdown>

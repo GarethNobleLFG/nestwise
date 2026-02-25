@@ -31,6 +31,7 @@ model_summarizer = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 model_matcher = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 model_extractor = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 model_planner= ChatOpenAI(model="gpt-4o-mini", temperature=0)
+model_query_rewriter = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
 embeddings = OpenAIEmbeddings()
 vector_store = InMemoryVectorStore(embeddings)
@@ -181,6 +182,26 @@ shadow_profile = {
     "location" : False
 }
 """
+QUERY_REWRITE_SYSTEM = SystemMessage(content="""
+You are a financial document retrieval specialist.
+
+Your task is to rewrite user retirement planning questions into
+precise, technical retrieval queries suitable for searching:
+
+- IRS publications
+- Retirement tax law documents
+- Investment policy documents
+- Life expectancy tables
+- Contribution limit regulations
+
+Rules:
+1. Be specific and technical.
+2. Include regulatory terms if relevant.
+3. Include age thresholds (e.g., 59.5).
+4. Include jurisdiction (U.S.) when appropriate.
+5. Do NOT answer the question.
+6. Return ONLY the optimized retrieval query.
+""")
 
 from typing import Literal,TypedDict
 from langgraph.graph import MessagesState
@@ -637,7 +658,7 @@ def call_planner(state: PlannerState):
   1. Fill all fields with actionable, evidence-based recommendations.
   2. Include citations for all numerical data or regulatory references.
   3. Provide step-by-step advice for retirement savings, investment allocation, and milestones.
-  4. Give the plan in a pretty print format. No JSON
+  4. Output ONLY valid JSON. Do not include markdown, explanations, or extra text.
   """
   state["messages"] =  [SystemMessage(system_message_content)] + state["messages"]
   response = model_planner.invoke(state["messages"])
@@ -706,11 +727,43 @@ splits = splitter.split_documents(loaded_docs)
 _ = vector_store.add_documents(documents=splits)
 print("Added PDF documents to InMemoryVectorStore. Total chunks:", len(splits))
 
+#Rewrite query to be more effective for retrieval
+def rewrite_query(user_query: str, real_profile: dict) -> str:
+    """
+    Rewrite a user retirement question into a precise retrieval query.
+    """
+
+    profile_context = f"""
+    User Profile Context:
+    Age: {real_profile.get("age")}
+    Retirement Age: {real_profile.get("retirement_age")}
+    Salary: {real_profile.get("salary")}
+    Savings: {real_profile.get("savings")}
+    Location: {real_profile.get("location")}
+    """
+
+    messages = [
+        QUERY_REWRITE_SYSTEM,
+        HumanMessage(content=f"""
+        Original User Question:
+        {user_query}
+
+        {profile_context}
+        """)
+    ]
+
+    response = model_query_rewriter.invoke(messages)
+    return response.content.strip()
+
 # Define retriever tool
 @tool(response_format="content_and_artifact")
 def retrieve(query: str):
     """Retrieve information related to a query from the vector store."""
-    retrieved_docs = vector_store.similarity_search(query, k=3)
+    optimized_query = rewrite_query(query, real_profile)
+
+    print("Original Query:", query)
+    print("Optimized Query:", optimized_query)
+    retrieved_docs = vector_store.similarity_search(optimized_query, k=5)
     formatted_snippets = []
     for doc in retrieved_docs:
         meta = getattr(doc, "metadata", {})

@@ -8,7 +8,7 @@ export const downloadPlanUtil = async (planData) => {
     }
 
     try {
-        pdfMake.default.vfs = pdfFonts.default;
+        pdfMake.vfs = pdfFonts;
 
         // Define PDF document structure in JSON
         const docDefinition = {
@@ -125,7 +125,7 @@ export const downloadPlanUtil = async (planData) => {
         };
 
         // Generate and download PDF
-        pdfMake.default.createPdf(docDefinition).download(`${planData.name || 'retirement-plan'}.pdf`);
+        pdfMake.createPdf(docDefinition).download(`${planData.name || 'retirement-plan'}.pdf`);
     } 
     catch (error) {
         console.error('Error generating PDF:', error);

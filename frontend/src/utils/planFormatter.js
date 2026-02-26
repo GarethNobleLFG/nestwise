@@ -85,7 +85,7 @@ export const formatPlanFromJSON = (planData) => {
       markdown += `**Expected Outcome**: ${milestone.expected_outcome}\n\n`;
       if (milestone.source) {
         const sources = Array.isArray(milestone.source) ? milestone.source.join(', ') : milestone.source;
-        markdown += `**Source**: ${sources}\n`;
+        markdown += `- *Source: ${sources}*\n`;
       }
       markdown += '\n';
     });
@@ -99,7 +99,7 @@ export const formatPlanFromJSON = (planData) => {
 
     planData.citations.forEach((citation, index) => {
       markdown += `**${index + 1}**. **${citation.fact}**\n`;
-      markdown += `   - *Source: ${citation.source} (Page ${citation.page})*\n\n`;
+      markdown += `- *Source: ${citation.source} (Page ${citation.page})*\n\n`;
     });
   }
 

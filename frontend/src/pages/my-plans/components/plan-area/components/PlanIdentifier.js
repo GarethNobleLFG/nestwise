@@ -3,8 +3,15 @@ import { motion } from 'framer-motion';
 import DescriptionIcon from '@mui/icons-material/Description';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import DownloadIcon from '@mui/icons-material/Download';
+import { downloadPlanUtil } from '../../../../../utils/downloadPlanUtil';
 
 export default function PlanIdentifier({ planData, animationTriggered }) {
+
+    const handleDownload = async () => {
+        await downloadPlanUtil(planData);
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -64,10 +71,24 @@ export default function PlanIdentifier({ planData, animationTriggered }) {
                                     <h2 className="text-xl font-bold bg-gradient-to-r from-amber-700 to-yellow-600 bg-clip-text text-transparent mb-2">
                                         {planData?.name || "Premium Plan"}
                                     </h2>
-                                    <p className="text-sm text-amber-600/80 font-medium flex items-center space-x-1">
+                                    <p className="text-sm text-amber-600/80 font-medium flex items-center space-x-1 mb-3">
                                         <TrendingUpIcon className="w-4 h-4" />
-                                        <span>Active • Last updated {planData?.updated_at ? new Date(planData.updated_at).toLocaleDateString() : 'Never'}</span>                                    </p>
+                                        <span>Active • Last updated {planData?.updated_at ? new Date(planData.updated_at).toLocaleDateString() : 'Never'}</span>
+                                    </p>
+
+
                                 </div>
+
+                                {/* Download Button */}
+                                <motion.button
+                                    onClick={handleDownload}
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="inline-flex items-center space-x-2 px-3 py-1.5 bg-gradient-to-r from-amber-600 to-yellow-500 text-white text-xs font-medium rounded-md hover:from-amber-700 hover:to-yellow-600 transition-all duration-200 shadow-md hover:shadow-lg self-start"
+                                >
+                                    <DownloadIcon className="w-3 h-3" />
+                                    <span>Download Plan</span>
+                                </motion.button>
                             </div>
                         </motion.div>
                     </div>

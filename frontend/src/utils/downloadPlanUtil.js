@@ -1,3 +1,6 @@
+import pdfMake from 'pdfmake/build/pdfmake';
+import pdfFonts from 'pdfmake/build/vfs_fonts';
+
 export const downloadPlanUtil = async (planData) => {
     if (!planData?.data) {
         console.error('No plan data available for download');
@@ -5,8 +8,6 @@ export const downloadPlanUtil = async (planData) => {
     }
 
     try {
-        const pdfMake = await import('pdfmake/build/pdfmake');
-        const pdfFonts = await import('pdfmake/build/vfs_fonts');
         pdfMake.default.vfs = pdfFonts.default;
 
         // Define PDF document structure in JSON

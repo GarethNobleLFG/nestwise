@@ -19,10 +19,10 @@ export const formatPlanFromJSON = (planData) => {
 
   // Investment Strategy Section
   if (planData.investment_strategy) {
-    markdown += '## 📈 Investment Strategy\n\n';
+    markdown += '## Investment Strategy\n';
     
     if (planData.investment_strategy.asset_allocation) {
-      markdown += '### Asset Allocation\n';
+      markdown += '## Asset Allocation\n';
       const allocation = planData.investment_strategy.asset_allocation;
       markdown += `- **Stocks**: ${allocation.stocks}%\n`;
       markdown += `- **Bonds**: ${allocation.bonds}%\n`;
@@ -37,7 +37,7 @@ export const formatPlanFromJSON = (planData) => {
 
   // Savings Plan Section
   if (planData.savings_plan && Array.isArray(planData.savings_plan)) {
-    markdown += '## 💰 Savings Plan\n\n';
+    markdown += '## Savings Plan\n\n';
     markdown += '| Year | Annual Contribution | Expected Growth | Source |\n';
     markdown += '|------|-------------------|-----------------|--------|\n';
     
@@ -50,7 +50,7 @@ export const formatPlanFromJSON = (planData) => {
 
   // Risk Assessment Section
   if (planData.risk_assessment) {
-    markdown += '## 🛡️ Risk Assessment\n\n';
+    markdown += '## Risk Assessment\n\n';
     
     if (planData.risk_assessment.inflation) {
       markdown += `**Inflation Risk**: ${planData.risk_assessment.inflation}\n\n`;

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '../../../components/shared/shadcn/components/ui/card';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { markdownHandler } from '../../../utils/markdownHandler';
 import { formatPlanFromJSON, extractRawPlanJSON } from '../../../utils/planFormatter';
 import ProfileDataArea from './ProfileDataArea';
@@ -159,7 +160,9 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                                                     <span className="block truncate max-w-[28ch]">
                                                         {headerTitle}
                                                     </span>
-                                                </h3>
+                                                    <div className="pb-2">
+                                                        <div className="w-full h-0.5 bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full"></div>
+                                                    </div>                                                </h3>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p>{headerTitle}</p>
@@ -187,11 +190,11 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                                             </Button>
                                         </div>
                                     </div>
-                                </div>
+                                </div>               
 
                                 {/* Plan Content - Scrollable */}
                                 <div
-                                    className="flex-1 overflow-y-auto p-4"
+                                    className="flex-1 overflow-y-auto p-2"
                                     style={{
                                         scrollbarWidth: 'thin',
                                         scrollbarColor: '#d4a574 transparent'
@@ -202,7 +205,7 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ duration: 0.6, delay: 0.5 }}
                                     >
-                                        <ReactMarkdown components={markdownHandler}>
+                                        <ReactMarkdown components={markdownHandler} remarkPlugins={[remarkGfm]}>
                                             {plan || "Select a plan to view details."}
                                         </ReactMarkdown>
                                     </motion.div>

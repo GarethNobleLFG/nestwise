@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { markdownHandler } from '../../../../utils/markdownHandler';
 import PlanIdentifier from './components/PlanIdentifier';
 import { formatPlanFromJSON } from '../../../../utils/planFormatter';
@@ -42,7 +43,7 @@ export default function PlanArea({ planData, animationTriggered }) {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.5 }}
                     >
-                        <ReactMarkdown components={markdownHandler}>
+                        <ReactMarkdown components={markdownHandler} remarkPlugins={[remarkGfm]}>
                             {planContent || "Select a plan to view details."}
                         </ReactMarkdown>
                     </motion.div>

@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { motion } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '../../../components/shared/shadcn/components/ui/card';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { markdownHandler } from '../../../utils/markdownHandler';
 import { formatPlanFromJSON, extractRawPlanJSON } from '../../../utils/planFormatter';
 import ProfileDataArea from './ProfileDataArea';
@@ -14,7 +15,6 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
     const [plan, setPlanContent] = useState('Your personalized financial plan will appear here once generated...');
     const [rawPlanJSON, setRawPlanJSON] = useState(null); // Keep raw JSON for database
     const [isGenerating, setIsGenerating] = useState(false);
-    const markdownRef = useRef(null);
     const { savePlan } = usePlanHooks();
 
     // Update plan content when generatedPlan is provided from backend
@@ -160,7 +160,9 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                                                     <span className="block truncate max-w-[28ch]">
                                                         {headerTitle}
                                                     </span>
-                                                </h3>
+                                                    <div className="pb-2">
+                                                        <div className="w-full h-0.5 bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full"></div>
+                                                    </div>                                                </h3>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p>{headerTitle}</p>
@@ -188,11 +190,11 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                                             </Button>
                                         </div>
                                     </div>
-                                </div>
+                                </div>               
 
+                                {/* Plan Content - Scrollable */}
                                 <div
-                                    ref={markdownRef}
-                                    className="flex-1 overflow-y-auto h-0"
+                                    className="flex-1 overflow-y-auto p-2"
                                     style={{
                                         scrollbarWidth: 'thin',
                                         scrollbarColor: '#d4a574 transparent'
@@ -203,19 +205,9 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ duration: 0.6, delay: 0.5 }}
                                     >
-                                        <div
-                                            className="max-w-none break-words whitespace-pre-wrap text-sm"
-                                            style={{
-                                                fontFamily: 'Segoe UI, Inter, Roboto, Helvetica Neue, Arial, sans-serif',
-                                                fontWeight: 400,
-                                                letterSpacing: '0.01em',
-                                                color: '#23272f'
-                                            }}
-                                        >
-                                            <ReactMarkdown components={markdownHandler}>
-                                                {plan}
-                                            </ReactMarkdown>
-                                        </div>
+                                        <ReactMarkdown components={markdownHandler} remarkPlugins={[remarkGfm]}>
+                                            {plan || "Select a plan to view details."}
+                                        </ReactMarkdown>
                                     </motion.div>
                                 </div>
                             </div>

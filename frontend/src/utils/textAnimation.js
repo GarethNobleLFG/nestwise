@@ -1,6 +1,6 @@
 // Simple typing animation utility
 export const typeText = (text, onUpdate) => {
-  const chunkSize = Math.ceil(text.length / 75);
+  const chunkSize = Math.ceil(text.length / 50);
   let i = 0;
 
   return new Promise((resolve) => {

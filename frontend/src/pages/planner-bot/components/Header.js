@@ -27,13 +27,13 @@ export default function Header({
                 <div className="max-w-4xl mx-auto flex flex-col items-start space-y-4">
                     <div className="flex items-center space-x-8">
                         <div className="flex items-center space-x-2">
-                            <div className="text-base font-semibold text-gray-800 flex items-center">
+                            <div className="font-semibold text-gray-800 flex items-center text-sm md:text-base lg:text-lg">
                                 Plan:
                             </div>
                             <Button
                                 variant="outline"
                                 onClick={() => setIsModalOpen(true)}
-                                className="bg-white/40 backdrop-blur-sm rounded-2xl shadow-lg border-0 px-4 py-3 text-base font-semibold text-gray-800 hover:bg-white/60 transition-all duration-300 max-w-96"
+                                className="bg-white/40 backdrop-blur-sm rounded-2xl shadow-lg border-0 px-4 py-3 font-semibold text-gray-800 hover:bg-white/60 transition-all duration-300 max-w-96 text-sm md:text-base lg:text-lg"
                             >
                                 <span className="truncate">{headerTitle}</span>
                                 <EditIcon className="h-4 w-4 ml-2 flex-shrink-0" />
@@ -44,7 +44,7 @@ export default function Header({
                                     variant="ghost"
                                     size="sm"
                                     onClick={clearChat}
-                                    className="bg-white/40 backdrop-blur-sm hover:bg-red-50/80 border-0 rounded-2xl shadow-lg transition-all duration-300 px-4 py-3"
+                                    className="bg-white/40 backdrop-blur-sm hover:bg-red-50/80 border-0 rounded-2xl shadow-lg transition-all duration-300 px-4 py-3 text-xs md:text-sm lg:text-base"
                                 >
                                     <ClearIcon className="h-4 w-4 mr-2" />
                                     <span>Clear Chat</span>

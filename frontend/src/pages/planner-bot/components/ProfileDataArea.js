@@ -13,7 +13,7 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
     useEffect(() => {
         if (isFormatting) return;
         textizer(profileData, lastChatbotResponse, formattedData, setFormattedData, setIsFormatting);
-    }, [profileData, lastChatbotResponse]); 
+    }, [profileData, lastChatbotResponse]);
 
     // Separate useEffect For Auto Scrolling When formattedData Changes - keeping your original logic
     useEffect(() => {
@@ -36,7 +36,7 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
                 <CardContent className="p-4 h-full flex flex-col">
                     {/* Header */}
                     <div className="mb-3">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                        <h3 className="text-base md:text-lg lg:text-xl font-semibold text-gray-800 mb-2">
                             Your Info
                         </h3>
                         <div className="w-full h-0.5 bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full"></div>
@@ -63,11 +63,11 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
                                     <div className="flex items-start space-x-2">
                                         <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
                                         <div className="flex-1 min-w-0">
-                                            <p className={`text-sm font-medium italic mb-1 ${index > 4 ? 'text-amber-600' : 'text-gray-600'
+                                            <p className={`text-xs md:text-sm lg:text-base font-medium italic mb-1 ${index > 4 ? 'text-amber-600' : 'text-gray-600'
                                                 }`}>
                                                 {key}:
                                             </p>
-                                            <p className={`text-sm font-bold break-words ${index > 4 ? 'text-amber-700' : 'text-gray-700'
+                                            <p className={`text-xs md:text-sm lg:text-base font-bold break-words ${index > 4 ? 'text-amber-700' : 'text-gray-700'
                                                 }`}>
                                                 {typeof value === "object" && value !== null
                                                     ? String(value.Value ?? "")
@@ -90,7 +90,7 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
                                 </div>
-                                <p className="text-sm text-gray-500">
+                                <p className="text-xs md:text-sm lg:text-base text-gray-500">
                                     No data available yet.
                                 </p>
                             </motion.div>

@@ -78,7 +78,7 @@ export default function SelectPlanModal({
                     <Card className="bg-white/95 backdrop-blur-xl border-white/30 shadow-2xl">
                         <CardHeader className="pb-4">
                             <div className="flex items-center justify-between">
-                                <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                                <CardTitle className="text-lg md:text-xl lg:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
                                     Select a Plan to Edit
                                 </CardTitle>
                                 <Button
@@ -90,7 +90,7 @@ export default function SelectPlanModal({
                                     <CloseIcon className="h-5 w-5" />
                                 </Button>
                             </div>
-                            <p className="text-gray-600 text-sm">
+                            <p className="text-gray-600 text-xs md:text-sm lg:text-base">
                                 Choose an existing plan to modify or create a new one
                             </p>
                         </CardHeader>
@@ -110,8 +110,8 @@ export default function SelectPlanModal({
                                         >
                                             <Card
                                                 className={`cursor-pointer transition-all duration-300 border-2 hover:shadow-lg ${isSelected
-                                                        ? 'border-yellow-400 bg-yellow-50 shadow-lg'
-                                                        : 'border-gray-200 hover:border-gray-300'
+                                                    ? 'border-yellow-400 bg-yellow-50 shadow-lg'
+                                                    : 'border-gray-200 hover:border-gray-300'
                                                     }`}
                                                 onClick={() => handleSelectPlan(plan.id)}
                                             >
@@ -121,10 +121,10 @@ export default function SelectPlanModal({
                                                             <IconComponent className="h-6 w-6 text-white" />
                                                         </div>
                                                         <div className="flex-1">
-                                                            <h3 className="font-semibold text-lg text-gray-800">
+                                                            <h3 className="font-semibold text-sm md:text-base lg:text-lg text-gray-800">
                                                                 {plan.title}
                                                             </h3>
-                                                            <p className="text-sm text-gray-600">
+                                                            <p className="text-xs md:text-sm lg:text-base text-gray-600">
                                                                 {plan.description}
                                                             </p>
                                                         </div>
@@ -152,7 +152,7 @@ export default function SelectPlanModal({
                                     onClick={handleCreateNew}
                                 >
                                     <AddIcon className="h-5 w-5 mr-2" />
-                                    <span className="font-medium">Create New Plan</span>
+                                    <span className="font-medium text-xs md:text-sm lg:text-base">Create New Plan</span>
                                 </Button>
                             </motion.div>
 

@@ -156,13 +156,14 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <h3 className="text-xl font-semibold text-gray-800">
+                                                <h3 className="text-base md:text-lg lg:text-xl font-semibold text-gray-800">
                                                     <span className="block truncate max-w-[28ch]">
                                                         {headerTitle}
                                                     </span>
                                                     <div className="pb-2">
                                                         <div className="w-full h-0.5 bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full"></div>
-                                                    </div>                                                </h3>
+                                                    </div>
+                                                </h3>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p>{headerTitle}</p>
@@ -186,11 +187,11 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                                                 onClick={handleSavePlan}
                                                 className="bg-white hover:bg-gray-50 rounded-2xl shadow-lg transition-all duration-300 px-4 py-3"
                                             >
-                                                <span className="bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent font-semibold">Save</span>
+                                                <span className="bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent font-semibold text-xs md:text-sm lg:text-base">Save</span>
                                             </Button>
                                         </div>
                                     </div>
-                                </div>               
+                                </div>
 
                                 {/* Plan Content - Scrollable */}
                                 <div

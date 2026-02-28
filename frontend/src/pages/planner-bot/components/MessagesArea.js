@@ -63,13 +63,12 @@ export default function MessagesArea({ safeMessages }) {
                                                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75"></div>
                                                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150"></div>
                                             </div>
-                                            <span className="text-gray-500 text-sm">NestWise Agent is thinking...</span>
+                                            <span className="text-gray-500 md:text-sm lg:text-base">NestWise Agent is thinking...</span>
                                         </div>
                                     ) : (
-                                        <div className="text-sm leading-relaxed prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-800 prose-strong:text-gray-900 prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded prose-pre:bg-gray-100 prose-pre:p-3 prose-pre:rounded-lg">
-                                            <ReactMarkdown components={message.role === 'bot' ? markdownHandler : {}}>
-                                                {message.content}
-                                            </ReactMarkdown>
+                                        <div className="text-xs md:text-sm lg:text-base leading-relaxed prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-800 prose-strong:text-gray-900 prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded prose-pre:bg-gray-100 prose-pre:p-3 prose-pre:rounded-lg">                                            <ReactMarkdown components={message.role === 'bot' ? markdownHandler : {}}>
+                                            {message.content}
+                                        </ReactMarkdown>
                                         </div>
                                     )}
                                 </div>

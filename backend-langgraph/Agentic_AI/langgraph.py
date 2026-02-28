@@ -13,6 +13,49 @@ from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_core.tools import tool
 from langgraph.prebuilt import ToolNode, tools_condition, create_react_agent
 from datetime import date
+from pydantic import BaseModel, Field
+from typing import List
+
+# Pydantic models for structured planner output
+class AssetAllocation(BaseModel):
+    stocks: float
+    bonds: float
+    cash: float
+    other: float
+
+class InvestmentStrategy(BaseModel):
+    asset_allocation: AssetAllocation
+    justification: str
+
+class SavingsPlanItem(BaseModel):
+    year: int
+    annual_contribution: float
+    expected_growth: float
+    source: List[str]
+
+class RiskAssessment(BaseModel):
+    inflation: str
+    market_volatility: str
+    mitigation_strategy: str
+
+class Milestone(BaseModel):
+    age: int
+    action: str
+    expected_outcome: str
+    source: List[str]
+
+class Citation(BaseModel):
+    fact: str
+    source: str
+    page: int
+
+class RetirementPlan(BaseModel):
+    investment_strategy: InvestmentStrategy
+    savings_plan: List[SavingsPlanItem]
+    risk_assessment: RiskAssessment
+    milestones: List[Milestone]
+    citations: List[Citation]
+
 
 COMPLETENESSRATIO = 1.0
 
@@ -27,6 +70,7 @@ model_summarizer = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 model_matcher = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 model_extractor = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 model_planner= ChatOpenAI(model="gpt-4o-mini", temperature=0)
+model_planner_json = ChatOpenAI(model="gpt-4o", temperature=1)
 model_query_rewriter = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
 embeddings = OpenAIEmbeddings()
@@ -530,7 +574,6 @@ def call_extractor(state: ExtractorState):
     """
     state["messages"] = [system_prompt_extract] + [SystemMessage(content=shadow_system_prompt)] + state["messages"]
     print([SystemMessage(content=shadow_system_prompt)])
-    #print(f"\nEXTRACTOR: {state['messages']}")
     response = model_extractor.invoke(state["messages"])
     print(f"Extractor response: {response.content}")
     response_dict = json.loads(response.content)
@@ -548,7 +591,7 @@ def call_extractor(state: ExtractorState):
         return state
 
     if not response_dict:
-        return
+        return state
 
         # Ensure all fields have a status
     for field, info in shadow_profile.items():
@@ -728,19 +771,21 @@ def call_summarizer(state: SummarizerState):
 
 ## To call RAG Agent
 def query_or_respond(state: PlannerState):
+    real_profile_local = state.get("real_profile", {})
     rag_query = (
-      "You are a Retrieval Assistant. Given the user's retirement profile below, prepare up to 3 targeted retrieval "
-  "queries (each 1–2 sentences) that will return the most relevant PDF chunks for building a retirement plan. "
-  "For each retrieval query include: (1) what fact/type of evidence you want (e.g., contribution limits, withdrawal "
-  "rates, tax rules, life expectancy tables), (2) any date or jurisdiction constraints, and (3) why the snippet is needed. "
-  f"User Profile:\n{real_profile}\n\n"
-
-
-  )
-    state["messages"] =  [SystemMessage(rag_query)] + state["messages"]
-    model_planner_with_tools = model_planner.bind_tools([retrieve])
+        "You are a Retrieval Assistant. You MUST call the retrieve tool at least 3 times "
+        "with different queries to gather relevant retirement planning information. "
+        "Do NOT write out the queries as text — call the retrieve tool directly. "
+        "Use the following 3 queries:\n"
+        "1. IRS contribution limits for 401(k), IRA, Roth IRA for current tax year including catch-up amounts and income phase-outs\n"
+        "2. Required Minimum Distribution rules SECURE 2.0 RMD age 73 withdrawal strategies tax-efficient\n"
+        "3. Social Security claiming strategies retirement age benefits optimization\n\n"
+        f"User Profile:\n{real_profile_local}\n\n"
+        "Call retrieve() now with each of these queries."
+    )
+    state["messages"] = [SystemMessage(rag_query)] + state["messages"]
+    model_planner_with_tools = model_planner.bind_tools([retrieve], tool_choice="required")
     response = model_planner_with_tools.invoke(state["messages"])
-    #print(f"Planner response: {response.content}")
     return {"messages": [response]}
 
 # To Call Planner to give final resposnse
@@ -754,10 +799,10 @@ def call_planner(state: PlannerState):
   flattened_profile = {}
   for k, v in user_profile_to_use.items():
       if isinstance(v, dict):
-          # Choose a value to include — often 'value' or 'collected'
           flattened_profile[k] = str(v.get("value", v.get("collected", "unknown")))
       else:
           flattened_profile[k] = str(v)
+
   recent_tool_messages = []
   for message in reversed(state["messages"]):
       if message.type == "tool":
@@ -765,109 +810,37 @@ def call_planner(state: PlannerState):
       else:
           break
   tool_messages = recent_tool_messages[::-1]
-
   docs_content = "\n\n".join(doc.content for doc in tool_messages)
   import json
 
-  structured_json_schema = {
-      "investment_strategy": {
-          "type": "object",
-          "properties": {
-              "asset_allocation": {
-                  "type": "object",
-                  "properties": {
-                      "stocks": {"type": "number"},
-                      "bonds": {"type": "number"},
-                      "cash": {"type": "number"},
-                      "other": {"type": "number"}
-                  },
-                  "required": ["stocks", "bonds", "cash", "other"]
-              },
-              "justification": {"type": "string"}
-          },
-          "required": ["asset_allocation", "justification"]
-      },
-      "savings_plan": {
-          "type": "array",
-          "items": {
-              "type": "object",
-              "properties": {
-                  "year": {"type": "integer"},
-                  "annual_contribution": {"type": "number"},
-                  "expected_growth": {"type": "number"},
-                  "source": {"type": "array", "items": {"type": "string"}}
-              },
-              "required": ["year", "annual_contribution", "expected_growth"]
-          }
-      },
-      "risk_assessment": {
-          "type": "object",
-          "properties": {
-              "inflation": {"type": "string"},
-              "market_volatility": {"type": "string"},
-              "mitigation_strategy": {"type": "string"}
-          },
-          "required": ["inflation", "market_volatility", "mitigation_strategy"]
-      },
-      "milestones": {
-          "type": "array",
-          "items": {
-              "type": "object",
-              "properties": {
-                  "age": {"type": "integer"},
-                  "action": {"type": "string"},
-                  "expected_outcome": {"type": "string"},
-                  "source": {"type": "array", "items": {"type": "string"}}
-              },
-              "required": ["age", "action", "expected_outcome"]
-          }
-      },
-      "citations": {
-          "type": "array",
-          "items": {
-              "type": "object",
-              "properties": {
-                  "fact": {"type": "string"},
-                  "source": {"type": "string"},
-                  "page": {"type": "integer"}
-              },
-              "required": ["fact", "source", "page"]
-          }
-      },
-      "required": [
-          "investment_strategy",
-          "savings_plan",
-          "risk_assessment",
-          "milestones",
-          "citations"
-      ]
-  }
+
   system_message_content = f"""
   You are a Retirement Planning Assistant. Your task is to produce a comprehensive, structured retirement plan
-  for a user with profile {real_profile}, comparable to a professional financial advisor. Use the provided user profile to build a customize plan.
+  for a user with profile {real_profile}, comparable to a professional financial advisor. Use the provided user profile to build a customized plan.
   Use ONLY the retrieved context below. Each fact must cite the source (filename and page).
-  If unknown, write "unknown". Follow this schema strictly in JSON:
+  If unknown, write "unknown".
 
   Today's Date: {date.today().isoformat()}
 
   Your output must use the current year when generating projections, retirement timelines, contribution limits, and all forward-looking estimates.
 
-
-  {json.dumps(structured_json_schema)}
-
   Retrieved Context:
   {docs_content}
-
 
   Instructions:
   1. Fill all fields with actionable, evidence-based recommendations.
   2. Include citations for all numerical data or regulatory references.
   3. Provide step-by-step advice for retirement savings, investment allocation, and milestones.
-  4. Output ONLY valid JSON. Do not include markdown, explanations, or extra text.
   """
-  state["messages"] =  [SystemMessage(system_message_content)] + state["messages"]
-  response = model_planner.invoke(state["messages"])
+  state["messages"] = [SystemMessage(system_message_content)] + state["messages"]
+
+  # Use Pydantic model with with_structured_output for guaranteed schema enforcement
+  structured_model = model_planner_json.with_structured_output(RetirementPlan)
+  plan: RetirementPlan = structured_model.invoke(state["messages"])
+  # Serialize to JSON string and wrap in AIMessage for graph state consistency
+  response = AIMessage(content=plan.model_dump_json())
   return {"messages": [response]}
+
 
 ## to decide to call the planner agent.
 def route_decision_extractor(state: MasterState) -> str:
@@ -970,29 +943,30 @@ def rewrite_query(user_query: str, real_profile: dict) -> str:
     return response.content.strip()
 
 # Define retriever tool
-@tool(response_format="content_and_artifact")
-def retrieve(query: str):
-    """Retrieve information related to a query from the vector store."""
-    optimized_query = rewrite_query(query, real_profile)
+class RetrieveInput(BaseModel):
+    query: str = Field(..., description="Optimized retrieval query")
 
-    print("Original Query:", query)
-    print("Optimized Query:", optimized_query)
+@tool(
+    args_schema=RetrieveInput,
+)
+def retrieve(query: str) -> str:
+    """Retrieve relevant information from the vector store."""
+    
+    optimized_query = rewrite_query(query, real_profile)
     retrieved_docs = vector_store.similarity_search(optimized_query, k=5)
+
     formatted_snippets = []
     for doc in retrieved_docs:
         meta = getattr(doc, "metadata", {})
         source = meta.get("source", "Unknown source")
-        print("Doc source:", source)
         page = meta.get("page", "N/A")
+
         formatted_snippets.append(
             f"Source: {os.path.basename(source)}, Page: {page}\n"
-            f"Content:\n{doc.page_content.strip()}"
+            f"{doc.page_content.strip()}"
         )
 
-
-    serialized = "\n\n---\n\n".join(formatted_snippets)
-    return serialized, retrieved_docs
-
+    return "\n\n---\n\n".join(formatted_snippets)
 
 
 
@@ -1026,13 +1000,17 @@ extractor_graph.add_edge(START, "extractor")
 extractor_subgraph = extractor_graph.compile()
 
 ## Planner
+def route_after_tools(state: PlannerState):
+    """After tools run, always proceed to call_planner to generate the plan."""
+    return "call_planner"
+
 planner_graph = StateGraph(PlannerState)
 planner_graph.add_node(query_or_respond)
 planner_graph.add_node(tools_node)
 planner_graph.add_node(call_planner)
 planner_graph.set_entry_point("query_or_respond")
 planner_graph.add_conditional_edges(
-    "query_or_respond", tools_condition, {END: END, "tools": "tools"}
+    "query_or_respond", tools_condition, {END: "call_planner", "tools": "tools"}
 )
 planner_graph.add_edge("tools", "call_planner")
 planner_graph.add_edge("call_planner", END)
@@ -1115,11 +1093,16 @@ def run_matcher(master_state: MasterState):
 
 def run_planner(master_state: MasterState):
     planner_data = master_state.get("planner", {})
+    planner_data["real_profile"] = master_state.get("real_profile", {})
+    planner_data["shadow_profile"] = master_state.get("shadow_profile", {})
     planner_state = PlannerState(**planner_data)
-    planner_state=planner_subgraph.invoke(planner_state)
+    planner_state = planner_subgraph.invoke(planner_state)
     master_state["planner"] = dict(planner_state)
-    master_state["is_plan_generated"] = True
-    master_state["extractor"]["extractor_role"] = "check_for_negatives"
+    master_state["is_plan_generated"] = True  # persists — tells router a plan exists
+    # Switch extractor to update mode so next turn asks user if they want to change anything
+    extractor_data = master_state.get("extractor", {})
+    extractor_data["extractor_role"] = "check_for_negatives"
+    master_state["extractor"] = extractor_data
     return master_state
 
 def run_summarizer(master_state: MasterState):
@@ -1143,35 +1126,35 @@ def run_summarizer(master_state: MasterState):
 
 workflow = StateGraph(MasterState)
 
-workflow.add_node("chatbot", run_chatbot)
-workflow.add_node("extractor", run_extractor)
-workflow.add_node("matcher", run_matcher)
-workflow.add_node("planner", run_planner)
-workflow.add_node("summarizer", run_summarizer)
+workflow.add_node("chatbot_node", run_chatbot)
+workflow.add_node("extractor_node", run_extractor)
+workflow.add_node("matcher_node", run_matcher)
+workflow.add_node("planner_node", run_planner)
+workflow.add_node("summarizer_node", run_summarizer)
 
-workflow.add_edge(START, "extractor")
+workflow.add_edge(START, "extractor_node")
 
 workflow.add_conditional_edges(
-    "extractor",
+    "extractor_node",
     route_decision_extractor,
     {
-        "matcher": "matcher",
-        "planner": "planner",
-        "chatbot": "chatbot",
+        "matcher": "matcher_node",
+        "planner": "planner_node",
+        "chatbot": "chatbot_node",
     },
 )
 
-workflow.add_edge("matcher", "chatbot")
+workflow.add_edge("matcher_node", "chatbot_node")
 
 workflow.add_conditional_edges(
-    "chatbot",
+    "chatbot_node",
     route_decision_summarize,
     {
-        "summarizer": "summarizer",
+        "summarizer": "summarizer_node",
         "__end__": "__end__",
     },
 )
-workflow.add_edge("planner", END)
+workflow.add_edge("planner_node", END)
 
 graph = workflow.compile()
 
@@ -1253,24 +1236,36 @@ def chat_step(user_message: str, session_id: str):
     state["messages"].append(human_message)
     state = graph.invoke(state)
 
-    # Print the assistant's reply
-    assistant_message = state['chatbot']['messages'][-1]
-    
-    if assistant_message == prev_assistant_message:
-        planner_message = state['planner']['messages'][-1]
-        response_text= planner_message.content
-        from_planner = True
+    # Check if the planner ran this turn by seeing if the chatbot message changed
+    current_assistant_message = state["chatbot"]["messages"][-1]
+    planner_ran_this_turn = (current_assistant_message == prev_assistant_message)
 
-        # Call the formatter agent
-       # response_text = call_formatter(raw_json)
-        
+    if planner_ran_this_turn:
+        # Planner ran — extract the latest AI message from planner messages
+        planner_messages = state.get("planner", {}).get("messages", [])
+        planner_message = None
+        for m in reversed(planner_messages):
+            if hasattr(m, "type") and m.type == "ai" and hasattr(m, "content"):
+                planner_message = m
+                break
+            if isinstance(m, dict) and m.get("type") == "ai" and m.get("content"):
+                planner_message = type("Msg", (), {"content": m["content"]})()
+                break
 
+        if planner_message and planner_message.content:
+            from_planner = True
+            response_text = planner_message.content
+            print("response text: " + response_text)
+        else:
+            # Planner messages empty — fall back to chatbot
+            from_planner = False
+            response_text = current_assistant_message.content
+            prev_assistant_message = current_assistant_message
     else:
-        response_text = assistant_message.content
-        prev_assistant_message = assistant_message
         from_planner = False
+        response_text = current_assistant_message.content
+        prev_assistant_message = current_assistant_message
 
-    
     ## Pass to the frontend.
     conversation_title = state["conversation_title"]
 
@@ -1279,11 +1274,10 @@ def chat_step(user_message: str, session_id: str):
         field: state["real_profile"].get(field, False)
         for field in state["shadow_profile"]
     }
-    #print(profile_data)
 
     return {
-        "response": response_text,
+        "response": response_text, 
         "real_profile": profile_data,
         "conversation_title": conversation_title,
         "from_planner": from_planner
-    } 
+    }

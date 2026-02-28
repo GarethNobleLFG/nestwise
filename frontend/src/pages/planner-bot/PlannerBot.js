@@ -261,22 +261,11 @@ export default function PlannerBot() {
 
       // Check if response is from planner and extract plan
       const detectedPlan = detectAndExtractPlan(data.response, data.from_planner);
-      if (detectedPlan) {
-        setGeneratedPlan(detectedPlan);
+      if (data.from_planner) {
+        setGeneratedPlan(data.response);   // already a parsed object
+        setRawPlanJSON(data.response);     // same object, no JSON.parse needed
+        console.log("Structured plan received:", data.response);
 
-        // Also try to parse and store the raw JSON for database
-        try {
-          const parsedJSON = JSON.parse(detectedPlan);
-          setRawPlanJSON(parsedJSON);
-          console.log("Raw plan JSON stored for database:", parsedJSON);
-        } catch (e) {
-          // If it's not JSON, that's ok - it might be formatted markdown already
-          console.log("Plan is not JSON format, likely already formatted");
-        }
-
-        console.log("Plan from backend planner detected and set in state");
-
-        // Show summary message instead of full plan
         removeThinkingMessage();
         await addBotMessage("✅ Your personalized retirement plan has been generated successfully! You can view the complete plan on the right side of the screen. \n\nDo you have any other questions about your plan or would you like to adjust any parameters?");
       } else {

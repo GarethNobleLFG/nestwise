@@ -69,7 +69,10 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
                                             </p>
                                             <p className={`text-sm font-bold break-words ${index > 4 ? 'text-amber-700' : 'text-gray-700'
                                                 }`}>
-                                                {value}
+                                                {typeof value === "object" && value !== null
+                                                    ? String(value.Value ?? "")
+                                                    : String(value)
+                                                }
                                             </p>
                                         </div>
                                     </div>

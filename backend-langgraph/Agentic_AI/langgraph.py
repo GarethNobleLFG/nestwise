@@ -65,7 +65,7 @@ openai_api_key = os.getenv('OPENAI_API_KEY')
 # Set the API key as an environment variable
 os.environ['OPENAI_API_KEY'] = openai_api_key
 
-model_chatbot = ChatOpenAI(model="gpt-4o", temperature=0)
+model_chatbot = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 model_summarizer = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 model_matcher = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 model_extractor = ChatOpenAI(model="gpt-4o-mini", temperature=0)

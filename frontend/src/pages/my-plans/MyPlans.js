@@ -42,7 +42,7 @@ export default function MyPlans() {
             <div className="flex-1 flex h-screen">
 
                 {/* Plans Index */}
-                <div className="flex-[1.5] p-6">
+                <div className="flex-[1.75] p-6">
                     <PlansIndex
                         plans={plans}
                         onPlanSelect={handlePlanSelect}
@@ -50,7 +50,7 @@ export default function MyPlans() {
                 </div>
 
                 {/* Plan Area */}
-                <div className="flex-[6] p-6">
+                <div className="flex-[5.25] p-6">
                     <PlanArea
                         planData={selectedPlanData}
                         animationTriggered={animationTriggered}

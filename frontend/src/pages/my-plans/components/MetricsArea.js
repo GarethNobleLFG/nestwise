@@ -17,7 +17,7 @@ export default function MetricsArea({ metrics, animationTriggered }) {
                 <CardContent className="p-4 h-full flex flex-col">
                     {/* Header */}
                     <div className="mb-3">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                        <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-800 mb-2">
                             Quick Metrics
                         </h3>
                         <div className="w-full h-0.5 bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full"></div>
@@ -40,13 +40,13 @@ export default function MetricsArea({ metrics, animationTriggered }) {
                             <div className="flex items-start space-x-2">
                                 <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium italic mb-1 text-gray-600">
+                                    <p className="text-sm md:text-base lg:text-lg font-medium italic mb-1 text-gray-600">
                                         Projected Value:
                                     </p>
-                                    <p className="text-sm font-bold break-words text-gray-700">
+                                    <p className="text-sm md:text-base lg:text-lg font-bold break-words text-gray-700">
                                         {/* {metrics.projectedValue} */}
                                     </p>
-                                    <p className="text-xs text-green-600 mt-1">↗ On track for retirement goal</p>
+                                    <p className="text-xs md:text-sm lg:text-base text-green-600 mt-1">↗ On track for retirement goal</p>
                                 </div>
                                 <div className="p-2 bg-yellow-500 rounded-lg">
                                     <TrendingUpIcon className="w-5 h-5 text-white" />
@@ -132,13 +132,13 @@ export default function MetricsArea({ metrics, animationTriggered }) {
                             <div className="flex items-start space-x-2">
                                 <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium italic mb-1 text-gray-600">
+                                    <p className="text-sm md:text-base lg:text-lg  font-medium italic mb-1 text-gray-600">
                                         Monthly Target:
                                     </p>
-                                    <p className="text-sm font-bold break-words text-gray-700">
+                                    <p className="text-sm md:text-base lg:text-lg  font-bold break-words text-gray-700">
                                         $2,500
                                     </p>
-                                    <p className="text-xs text-purple-600 mt-1">Recommended contribution</p>
+                                    <p className="text-sm md:text-base lg:text-lg  text-purple-600 mt-1">Recommended contribution</p>
                                 </div>
                                 <div className="p-2  bg-yellow-500 rounded-lg">
                                     <AccountBalanceIcon className="w-5 h-5 text-white" />

@@ -200,7 +200,7 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                                     )}
 
                                     {/* Save Button */}
-                                    <div className="flex items-center">
+                                    <div className="flex items-center -mt-4">
                                         <div className="border border-gray-200 rounded-2xl">
                                             <Button
                                                 variant="ghost"

@@ -8,10 +8,12 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { markdownHandler } from '../../../utils/markdownHandler';
 import { formatCitations } from '../../../utils/planFormatter';
+import { calculateProgress } from '../../../utils/calculateProgress';
 
 export default function MetricsArea({ planData, animationTriggered }) {
 
     const citations = planData?.data ? formatCitations(planData.data) : null;
+    const progressPercentage = planData?.data ? calculateProgress(planData.data) : 0;
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -80,17 +82,14 @@ export default function MetricsArea({ planData, animationTriggered }) {
                                 <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium italic mb-1 text-gray-600">
-                                        Current Progress:
-                                    </p>
-                                    <p className="text-sm font-bold break-words text-gray-700 mb-2">
-                                        {/* {metrics.currentProgress} */}
+                                        Current Progress:  <span className="bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent font-bold">{`${progressPercentage.toFixed(1)}%`}</span>
                                     </p>
                                     {/* Progress Bar */}
                                     <div className="w-full bg-gray-200 rounded-full h-2">
                                         <motion.div
                                             className="bg-gradient-to-r from-yellow-400 to-amber-500 h-2 rounded-full"
                                             initial={{ width: 0 }}
-                                            // animate={{ width: animationTriggered ? metrics.currentProgress : 0 }}
+                                            animate={{ width: animationTriggered ? `${progressPercentage}%` : 0 }}
                                             transition={{ duration: 1, delay: 0.8 }}
                                         />
                                     </div>

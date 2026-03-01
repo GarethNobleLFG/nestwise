@@ -446,7 +446,7 @@ export default function PlannerBot() {
 
         {/* Right side - takes half */}
         <div className="flex-1 flex flex-col px-8 h-full">
-          <div className="w-[725px] flex flex-col h-full min-h-0">
+          <div className="w-[47vw] flex flex-col h-full min-h-0">
             <PlannerArea
               animationTriggered={animationTriggered}
               profileData={profileData}

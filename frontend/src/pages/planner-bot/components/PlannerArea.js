@@ -174,19 +174,17 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                         >
                             <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 flex flex-col h-full min-h-0 w-full">
                                 <div className="flex items-center justify-between mb-4">
-
-                                    {/* Title of plan with tooltip functionality from Shadcn. */}
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <h3 className="text-base md:text-lg lg:text-xl font-semibold text-gray-800">
-                                                    <span className="block truncate max-w-[28ch]">
-                                                        {headerTitle}
-                                                    </span>
-                                                    <div className="pb-2">
-                                                        <div className="w-full h-0.5 bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full"></div>
-                                                    </div>
-                                                </h3>
+                                                <div className="mb-3 flex-1 min-w-0 mr-4">
+                                                    <h3 className="text-base md:text-lg lg:text-xl font-semibold text-gray-800 mb-2">
+                                                        <span className="block truncate">
+                                                            {headerTitle}
+                                                        </span>
+                                                    </h3>
+                                                    <div className="w-full h-0.5 bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full"></div>
+                                                </div>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p>{headerTitle}</p>

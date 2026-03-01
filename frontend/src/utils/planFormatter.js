@@ -90,7 +90,7 @@ export const formatPlanFromJSON = (planData) => {
       markdown += '\n';
     });
   }
-
+  
   // If there's additional content that doesn't fit the schema
   if (markdown === '') {
     // Fallback: just pretty-print the JSON
@@ -100,6 +100,7 @@ export const formatPlanFromJSON = (planData) => {
   return markdown;
 };
 
+// Formats the citation section of the plan in markdown only.
 export const formatCitations = (planData) => {
   let markdown = '';
 

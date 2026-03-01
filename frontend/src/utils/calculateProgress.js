@@ -6,10 +6,7 @@ export const calculateProgress = (planData) => {
     // Find the starting (lowest) and final (highest) age milestones
     const startingAge = Math.min(...planData.milestones.map(m => m.age));
     const finalAge = Math.max(...planData.milestones.map(m => m.age));
-    
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-        
+            
     const currentAge = startingAge + 5; // Replace with actual current age calculation. WE NEED TO IMPLEMENT BIRTH DATE IN THEIR PROFILE.
     
     // Calculate progress percentage

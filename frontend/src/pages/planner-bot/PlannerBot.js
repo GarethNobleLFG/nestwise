@@ -360,7 +360,7 @@ export default function PlannerBot() {
     return null;
   };
 
-  // Function to check if all keys have values in profile data to set animation trigger in Messages Area.
+  // Function to check if all keys but one or all keys have values in profile data to set animation trigger in Messages Area.
   const checkProfileDataComplete = (profileData) => {
     if (!profileData || typeof profileData !== 'object') {
       return false;
@@ -372,7 +372,7 @@ export default function PlannerBot() {
       return false;
     }
 
-    // Check each key individually - ALL must have meaningful values (not placeholders)
+    // Check each key individually - count how many have meaningful values (not placeholders)
     const results = keys.map(key => {
       const value = profileData[key];
       let isValid = false;
@@ -397,9 +397,14 @@ export default function PlannerBot() {
       return isValid;
     });
 
-    const allValid = results.every(result => result);
+    // Count how many fields have valid values
+    const validCount = results.filter(result => result).length;
+    const totalCount = keys.length;
 
-    return allValid;
+    // Return true if ALL fields are valid OR all but one field is valid
+    const isComplete = validCount === totalCount || validCount === totalCount - 1;
+
+    return isComplete;
   };
 
 

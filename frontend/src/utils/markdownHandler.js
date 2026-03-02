@@ -1,9 +1,9 @@
 export const markdownHandler = {
     // Typography
-    p: ({ children }) => <p className="text-sm leading-relaxed text-gray-800 mb-3 last:mb-0">{children}</p>,
-    h1: ({ children }) => <h1 className="text-xl font-bold text-gray-900 mb-4 mt-6 first:mt-0 border-b border-gray-200 pb-2">{children}</h1>,
-    h2: ({ children }) => <h2 className="text-lg font-bold text-gray-900 mb-3 mt-5 first:mt-0">{children}</h2>,
-    h3: ({ children }) => <h3 className="text-base font-semibold text-gray-800 mb-2 mt-4 first:mt-0">{children}</h3>,
+    p: ({ children }) => <p className="text-xs md:text-sm lg:text-base leading-relaxed text-gray-800 mb-3 last:mb-0">{children}</p>,
+    h1: ({ children }) => <h1 className="text-sm md:text-base lg:text-lg font-bold text-gray-900 mb-4 mt-6 first:mt-0 border-b border-gray-200 pb-2">{children}</h1>,
+    h2: ({ children }) => <h2 className="text-xs md:text-sm lg:text-base font-bold text-gray-900 mb-3 mt-5 first:mt-0">{children}</h2>,
+    h3: ({ children }) => <h3 className="text-sm md:text-base lg:text-lg font-semibold text-gray-800 mb-2 mt-4 first:mt-0">{children}</h3>,
     h4: ({ children }) => <h4 className="text-sm font-semibold text-gray-800 mb-2 mt-3 first:mt-0">{children}</h4>,
     h5: ({ children }) => <h5 className="text-sm font-medium text-gray-700 mb-1 mt-3 first:mt-0">{children}</h5>,
     h6: ({ children }) => <h6 className="text-xs font-medium text-gray-600 mb-1 mt-2 first:mt-0 uppercase tracking-wide">{children}</h6>,
@@ -23,8 +23,8 @@ export const markdownHandler = {
     pre: ({ children }) => <pre className="bg-gray-900 rounded-lg my-4 overflow-hidden shadow-sm border border-gray-200">{children}</pre>,
 
     // Lists
-    ul: ({ children }) => <ul className="list-disc list-inside space-y-1 mb-4 text-sm text-gray-800 ml-4">{children}</ul>,
-    ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 mb-4 text-sm text-gray-800 ml-4">{children}</ol>,
+    ul: ({ children }) => <ul className="list-disc list-inside space-y-1 mb-4 text-xs md:text-sm lg:text-base text-gray-800 ml-4">{children}</ul>,
+    ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 mb-4 text-xs md:text-sm lg:text-base text-gray-800 ml-4">{children}</ol>,
     li: ({ children }) => <li className="leading-relaxed">{children}</li>,
 
     // Links

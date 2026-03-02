@@ -90,12 +90,22 @@ export const formatPlanFromJSON = (planData) => {
       markdown += '\n';
     });
   }
+  
+  // If there's additional content that doesn't fit the schema
+  if (markdown === '') {
+    // Fallback: just pretty-print the JSON
+    markdown = `\`\`\`json\n${JSON.stringify(planData, null, 2)}\n\`\`\``;
+  }
 
-  markdown += '---\n';
+  return markdown;
+};
+
+// Formats the citation section of the plan in markdown only.
+export const formatCitations = (planData) => {
+  let markdown = '';
 
   // Citations Section
   if (planData.citations && Array.isArray(planData.citations)) {
-    markdown += '## References & Citations\n\n';
 
     planData.citations.forEach((citation, index) => {
       markdown += `**${index + 1}**. **${citation.fact}**\n`;
@@ -110,6 +120,6 @@ export const formatPlanFromJSON = (planData) => {
   }
 
   return markdown;
-};
+}
 
 // Keep the raw JSON for database storage

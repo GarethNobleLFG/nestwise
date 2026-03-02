@@ -19,6 +19,7 @@ export default function PlannerBot() {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [generatedPlan, setGeneratedPlan] = useState(null); // Store plan from backend (formatted text)
   const [rawPlanJSON, setRawPlanJSON] = useState(null); // Store raw JSON for database
+  const [planAnimationNeeded, setPlanAnimationNeeded] = useState(false); // For animations related to if plan was recieved.
 
 
 
@@ -331,7 +332,7 @@ export default function PlannerBot() {
 
 
   // -----------------Implentation For Saving Chat State-----------------
-  const saveToSessionStorage = (messages, sessionId, profileData, conversationTitle, generatedPlan, rawPlanJSON) => {
+  const saveToSessionStorage = (messages, sessionId, profileData, conversationTitle, generatedPlan, rawPlanJSON, fromPlannerFlag) => {
     const chatState = {
       messages,
       sessionId,
@@ -339,6 +340,7 @@ export default function PlannerBot() {
       conversationTitle,
       generatedPlan,
       rawPlanJSON,
+      planAnimationNeeded,
       timestamp: Date.now()
     };
     sessionStorage.setItem('plannerBotState', JSON.stringify(chatState));
@@ -358,6 +360,53 @@ export default function PlannerBot() {
     return null;
   };
 
+  // Function to check if all keys but one or all keys have values in profile data to set animation trigger in Messages Area.
+  const checkProfileDataComplete = (profileData) => {
+    if (!profileData || typeof profileData !== 'object') {
+      return false;
+    }
+
+    const keys = Object.keys(profileData);
+
+    if (keys.length === 0) {
+      return false;
+    }
+
+    // Check each key individually - count how many have meaningful values (not placeholders)
+    const results = keys.map(key => {
+      const value = profileData[key];
+      let isValid = false;
+
+      // Reject placeholders and empty values
+      if (value === null || value === undefined || value === false) {
+        isValid = false; // Reject false placeholders
+      } else if (typeof value === 'string') {
+        isValid = value.trim() !== ''; // Must have non-whitespace content
+      } else if (typeof value === 'number') {
+        isValid = !isNaN(value); // Allow 0, but not NaN
+      } else if (typeof value === 'boolean') {
+        isValid = value === true; // Only allow true, reject false placeholders
+      } else if (Array.isArray(value)) {
+        isValid = value.length > 0; // Array must have items
+      } else if (typeof value === 'object') {
+        isValid = Object.keys(value).length > 0; // Object must have properties
+      } else {
+        isValid = true; // Other types considered valid
+      }
+
+      return isValid;
+    });
+
+    // Count how many fields have valid values
+    const validCount = results.filter(result => result).length;
+    const totalCount = keys.length;
+
+    // Return true if ALL fields are valid OR all but one field is valid
+    const isComplete = validCount === totalCount || validCount === totalCount - 1;
+
+    return isComplete;
+  };
+
 
 
   React.useEffect(() => {
@@ -370,20 +419,25 @@ export default function PlannerBot() {
         setConversationTitle(savedState.conversationTitle || '');
         setGeneratedPlan(savedState.generatedPlan || null);
         setRawPlanJSON(savedState.rawPlanJSON || null);
+        setPlanAnimationNeeded(savedState.planAnimationNeeded || false); // Add this line
         console.log('Restored chat state from session storage');
       }
     }
   }, []);
 
-
-
   // Add this useEffect to save state whenever it changes
   React.useEffect(() => {
     if (initialized.current && (messages.length > 0 || sessionId)) {
-      saveToSessionStorage(messages, sessionId, profileData, conversationTitle, generatedPlan, rawPlanJSON);
+      saveToSessionStorage(messages, sessionId, profileData, conversationTitle, generatedPlan, rawPlanJSON, planAnimationNeeded);
     }
-  }, [messages, sessionId, profileData, conversationTitle, generatedPlan, rawPlanJSON]);
+  }, [messages, sessionId, profileData, conversationTitle, generatedPlan, rawPlanJSON, planAnimationNeeded]); // Add fromPlannerFlag to dependencies
 
+  // Check if profile data is complete and set animation flag.
+  React.useEffect(() => {
+    const isComplete = checkProfileDataComplete(profileData);
+    setPlanAnimationNeeded(isComplete);
+    console.log('Profile data complete:', isComplete, profileData);
+  }, [profileData]);
 
 
   const clearChat = () => {
@@ -395,6 +449,7 @@ export default function PlannerBot() {
     setConversationTitle('');
     setGeneratedPlan(null);
     setRawPlanJSON(null);
+    setPlanAnimationNeeded(false);
 
     sessionStorage.removeItem('plannerBotState');
 
@@ -428,7 +483,7 @@ export default function PlannerBot() {
 
             {/* Messages Area */}
             <div className="flex-1 min-h-0">
-              <MessagesArea safeMessages={safeMessages} />
+              <MessagesArea safeMessages={safeMessages} planAnimationNeeded={planAnimationNeeded} />
             </div>
 
             {/* Input Area */}
@@ -446,7 +501,7 @@ export default function PlannerBot() {
 
         {/* Right side - takes half */}
         <div className="flex-1 flex flex-col px-8 h-full">
-          <div className="w-full flex flex-col h-full min-h-0">
+          <div className="w-[47vw] flex flex-col h-full min-h-0">
             <PlannerArea
               animationTriggered={animationTriggered}
               profileData={profileData}

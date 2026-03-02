@@ -37,9 +37,8 @@ export default function NavIndexLayout({ activeView, children }) {
                     <div className="flex flex-col space-y-2 flex-1 px-2">
                         <motion.button
                             onClick={() => navigate('/plannerbot')}
-                            className={`flex items-center justify-between w-full px-3 py-2.5 rounded-lg backdrop-blur-sm border-0 cursor-pointer transition-all duration-300 text-white ${
-                                activeView === 'planner' ? 'bg-white/30' : 'bg-white/20 hover:bg-white/30'
-                            }`}
+                            className={`flex items-center justify-between w-full px-3 py-2.5 rounded-lg backdrop-blur-sm border-0 cursor-pointer transition-all duration-300 text-white ${activeView === 'planner' ? 'bg-white/30' : 'bg-white/20 hover:bg-white/30'
+                                }`}
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.3, delay: 0.3 }}
@@ -48,16 +47,15 @@ export default function NavIndexLayout({ activeView, children }) {
                         >
                             <div className="flex items-center">
                                 <SmartToyIcon className="w-4 h-4 mr-2.5" />
-                                <span className="text-sm font-medium">Chat Bot</span>
+                                <span className="text-sm md:text-base lg:text-lg font-medium">Chat Bot</span>
                             </div>
                             <ChevronRightIcon className="w-4 h-4 opacity-70" />
                         </motion.button>
 
                         <motion.button
                             onClick={() => navigate('/myplans')}
-                            className={`flex items-center justify-between w-full px-3 py-2.5 rounded-lg backdrop-blur-sm border-0 cursor-pointer transition-all duration-300 text-white ${
-                                activeView === 'myplans' ? 'bg-white/30' : 'bg-white/15 hover:bg-white/25'
-                            }`}
+                            className={`flex items-center justify-between w-full px-3 py-2.5 rounded-lg backdrop-blur-sm border-0 cursor-pointer transition-all duration-300 text-white ${activeView === 'myplans' ? 'bg-white/30' : 'bg-white/15 hover:bg-white/25'
+                                }`}
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.3, delay: 0.4 }}
@@ -66,12 +64,12 @@ export default function NavIndexLayout({ activeView, children }) {
                         >
                             <div className="flex items-center">
                                 <DescriptionIcon className="w-4 h-4 mr-2.5" />
-                                <span className="text-sm font-medium">My Plans</span>
+                                <span className="text-sm md:text-base lg:text-lg font-medium">My Plans</span>
                             </div>
                             <ChevronRightIcon className="w-4 h-4 opacity-70" />
                         </motion.button>
                     </div>
-                    
+
                     {/* Bottom Section */}
                     <div className="px-2 space-y-2">
                         <BottomButtons />

@@ -71,7 +71,7 @@ export default function InputArea({
                 }
               }}
               placeholder="Ask me anything about your financial planning..."
-              className="flex-1 resize-none border-0 bg-transparent p-2 focus:outline-none max-h-20 placeholder-gray-500 text-sm"
+              className="flex-1 resize-none border-0 bg-transparent p-2 focus:outline-none max-h-20 placeholder-gray-500 text-sm md:text-base lg:text-lg"
               rows="1"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

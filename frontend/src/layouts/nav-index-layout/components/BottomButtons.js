@@ -33,7 +33,7 @@ export default function BottomButtons() {
             >
                 <div className="flex items-center">
                     <PersonIcon className="w-4 h-4 mr-2.5" />
-                    <span className="text-sm font-medium">Profile</span>
+                    <span className="text-sm md:text-base lg:text-lg font-medium">Profile</span>
                 </div>
                 <ChevronRightIcon className="w-4 h-4 opacity-70" />
             </motion.button>
@@ -53,7 +53,7 @@ export default function BottomButtons() {
             >
                 <div className="flex items-center">
                     <HelpOutlineIcon className="w-3.5 h-3.5 mr-2.5" />
-                    <span className="text-xs font-medium">Support</span>
+                    <span className="text-xs md:text-sm lg:text-base font-medium">Support</span>
                 </div>
                 <ChevronRightIcon className="w-3.5 h-3.5 opacity-60" />
             </motion.button>
@@ -70,7 +70,7 @@ export default function BottomButtons() {
             >
                 <div className="flex items-center">
                     <SettingsIcon className="w-3.5 h-3.5 mr-2.5" />
-                    <span className="text-xs font-medium">Settings</span>
+                    <span className="text-xs md:text-sm lg:text-base font-medium">Settings</span>
                 </div>
                 <ChevronRightIcon className="w-3.5 h-3.5 opacity-60" />
             </motion.button>

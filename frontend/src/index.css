@@ -5,16 +5,26 @@
 @layer base {
   :root {
     /* Brand colors from themePrimitives.js */
-    --brand-50: 30 40% 96%;   /* cream */
-    --brand-100: 30 40% 90%;  /* light beige */
-    --brand-200: 30 35% 80%;  /* tan */
-    --brand-300: 30 35% 65%;  /* light brown */
-    --brand-400: 30 40% 50%;  /* medium brown */
-    --brand-500: 30 45% 40%;  /* rich brown */
-    --brand-600: 30 45% 32%;  /* dark brown */
-    --brand-700: 30 50% 24%;  /* deeper brown */
-    --brand-800: 30 55% 16%;  /* espresso */
-    --brand-900: 30 60% 10%;  /* almost black-brown */
+    --brand-50: 30 40% 96%;
+    /* cream */
+    --brand-100: 30 40% 90%;
+    /* light beige */
+    --brand-200: 30 35% 80%;
+    /* tan */
+    --brand-300: 30 35% 65%;
+    /* light brown */
+    --brand-400: 30 40% 50%;
+    /* medium brown */
+    --brand-500: 30 45% 40%;
+    /* rich brown */
+    --brand-600: 30 45% 32%;
+    /* dark brown */
+    --brand-700: 30 50% 24%;
+    /* deeper brown */
+    --brand-800: 30 55% 16%;
+    /* espresso */
+    --brand-900: 30 60% 10%;
+    /* almost black-brown */
 
     /* Gray colors */
     --gray-50: 0 0% 97%;
@@ -91,17 +101,17 @@
   .tw-override {
     @apply !important;
   }
-  
+
   /* Override MUI button styles specifically */
   .MuiButton-root {
     @apply !bg-transparent !shadow-none;
   }
-  
+
   /* Override MUI typography */
   .MuiTypography-root {
     @apply !m-0;
   }
-  
+
   /* Override MUI container */
   .MuiContainer-root {
     @apply !p-0;
@@ -116,22 +126,22 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
+
   .text-gradient-brand-warm {
     background: linear-gradient(45deg, hsl(var(--orange-400)), hsl(var(--brand-500)));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
+
   .bg-gradient-brand {
     background: linear-gradient(45deg, hsl(var(--brand-400)), hsl(var(--brand-600)));
   }
-  
+
   .bg-gradient-brand-warm {
     background: linear-gradient(45deg, hsl(var(--orange-400)), hsl(var(--brand-500)));
   }
-  
+
   .bg-gradient-brand-hover:hover {
     background: linear-gradient(45deg, hsl(var(--brand-500)), hsl(var(--brand-700)));
   }
@@ -139,29 +149,76 @@
   .bg-gradient-warm-hover:hover {
     background: linear-gradient(45deg, hsl(var(--orange-500)), hsl(var(--brand-600)));
   }
-  
+
   /* Brand color utilities */
-  .text-brand-400 { color: hsl(var(--brand-400)); }
-  .text-brand-500 { color: hsl(var(--brand-500)); }
-  .text-brand-600 { color: hsl(var(--brand-600)); }
-  .text-brand-700 { color: hsl(var(--brand-700)); }
-  
-  .bg-brand-50 { background-color: hsl(var(--brand-50)); }
-  .bg-brand-100 { background-color: hsl(var(--brand-100)); }
-  .bg-brand-200 { background-color: hsl(var(--brand-200)); }
-  .bg-brand-400 { background-color: hsl(var(--brand-400)); }
-  .bg-brand-500 { background-color: hsl(var(--brand-500)); }
-  .bg-brand-600 { background-color: hsl(var(--brand-600)); }
-  .bg-brand-700 { background-color: hsl(var(--brand-700)); }
-  
-  .border-brand-300 { border-color: hsl(var(--brand-300)); }
-  .border-brand-400 { border-color: hsl(var(--brand-400)); }
-  
+  .text-brand-400 {
+    color: hsl(var(--brand-400));
+  }
+
+  .text-brand-500 {
+    color: hsl(var(--brand-500));
+  }
+
+  .text-brand-600 {
+    color: hsl(var(--brand-600));
+  }
+
+  .text-brand-700 {
+    color: hsl(var(--brand-700));
+  }
+
+  .bg-brand-50 {
+    background-color: hsl(var(--brand-50));
+  }
+
+  .bg-brand-100 {
+    background-color: hsl(var(--brand-100));
+  }
+
+  .bg-brand-200 {
+    background-color: hsl(var(--brand-200));
+  }
+
+  .bg-brand-400 {
+    background-color: hsl(var(--brand-400));
+  }
+
+  .bg-brand-500 {
+    background-color: hsl(var(--brand-500));
+  }
+
+  .bg-brand-600 {
+    background-color: hsl(var(--brand-600));
+  }
+
+  .bg-brand-700 {
+    background-color: hsl(var(--brand-700));
+  }
+
+  .border-brand-300 {
+    border-color: hsl(var(--brand-300));
+  }
+
+  .border-brand-400 {
+    border-color: hsl(var(--brand-400));
+  }
+
   /* Hover utilities */
-  .hover-text-brand-600:hover { color: hsl(var(--brand-600)); }
-  .hover-text-brand-700:hover { color: hsl(var(--brand-700)); }
-  .hover-bg-brand-50:hover { background-color: hsl(var(--brand-50)); }
-  .hover-bg-brand-100:hover { background-color: hsl(var(--brand-100)); }
+  .hover-text-brand-600:hover {
+    color: hsl(var(--brand-600));
+  }
+
+  .hover-text-brand-700:hover {
+    color: hsl(var(--brand-700));
+  }
+
+  .hover-bg-brand-50:hover {
+    background-color: hsl(var(--brand-50));
+  }
+
+  .hover-bg-brand-100:hover {
+    background-color: hsl(var(--brand-100));
+  }
 }
 
 /* Material-UI component overrides */
@@ -179,19 +236,25 @@
 
 /* Ensure Tailwind animations work */
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }
 }
 
 @keyframes bounce {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(-25%);
     animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
   }
+
   50% {
     transform: translateY(0);
     animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
@@ -258,11 +321,11 @@ a:hover {
   .text-5xl {
     font-size: 2.5rem !important;
   }
-  
+
   .text-7xl {
     font-size: 3.5rem !important;
   }
-  
+
   .text-4xl {
     font-size: 2rem !important;
   }

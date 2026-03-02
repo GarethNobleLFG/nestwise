@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '../../../components/shared/shadcn/components/ui/card';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -10,12 +10,15 @@ import ProfileDataArea from './ProfileDataArea';
 import { Button } from '../../../components/shared/shadcn/components/ui/button';
 import { usePlanHooks } from '../../../hooks/plans';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../components/shared/shadcn/components/ui/tooltip';
+import { typeText } from '../../../utils/textAnimation';
 
 export default function PlannerArea({ animationTriggered, profileData, lastChatbotResponse, conversationTitle, generatedPlan }) {
     const [plan, setPlanContent] = useState('Your personalized financial plan will appear here once generated...');
     const [rawPlanJSON, setRawPlanJSON] = useState(null); // Keep raw JSON for database
     const [isGenerating, setIsGenerating] = useState(false);
+    const [typedPlan, setTypedPlan] = useState('Your personalized financial plan will appear here once generated...');
     const { savePlan } = usePlanHooks();
+    const scrollRef = useRef(null);
 
     // Update plan content when generatedPlan is provided from backend
     useEffect(() => {
@@ -61,6 +64,25 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
             updatePlanContent();
         }
     }, [profileData, lastChatbotResponse, generatedPlan]);
+
+    // Use effect for typing animation.
+    useEffect(() => {
+        if (plan && plan !== 'Your personalized financial plan will appear here once generated...') {
+            // Reset typed content and start typing animation
+            setTypedPlan('');
+
+            typeText(plan, (partialText) => {
+                setTypedPlan(partialText);
+            });
+        }
+    }, [plan]);
+
+    // UseRef useEffect for moving as new text appears.
+    useEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+    }, [typedPlan]);
 
     // Update plan and reflect in UI.
     const updatePlanContent = async () => {
@@ -127,7 +149,7 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                 className="w-full h-full"
             >
                 <Card className="h-full bg-white/95 backdrop-blur-sm border-0 shadow-md hover:shadow-lg transition-shadow duration-300">
-                    <CardContent className="p-6 h-full flex flex-row space-x-3 min-h-0">
+                    <CardContent className="p-6 h-full flex flex-row space-x-3 min-h-0 w-full min-w-0">
                         {/* Profile Data Area - Left side, full height */}
                         <motion.div
                             initial={{ opacity: 0, x: -30 }}
@@ -143,26 +165,26 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                         </motion.div>
 
                         {/* Financial Plan Section - Right side, takes remaining space */}
+                        {/* Financial Plan Section - Right side, takes remaining space */}
                         <motion.div
                             initial={{ opacity: 0, x: 30 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5, delay: 0.4 }}
-                            className="flex-1 flex flex-col min-h-0"
+                            className="flex-1 flex flex-col min-h-0 min-w-0" // Add min-w-0
                         >
-                            <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 flex flex-col h-full min-h-0">
+                            <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 flex flex-col h-full min-h-0 w-full">
                                 <div className="flex items-center justify-between mb-4">
-
-                                    {/* Title of plan with tooltip functionality from Shadcn. */}
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <h3 className="text-xl font-semibold text-gray-800">
-                                                    <span className="block truncate max-w-[28ch]">
-                                                        {headerTitle}
-                                                    </span>
-                                                    <div className="pb-2">
-                                                        <div className="w-full h-0.5 bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full"></div>
-                                                    </div>                                                </h3>
+                                                <div className="mb-3 flex-1 min-w-0 mr-4">
+                                                    <h3 className="text-base md:text-lg lg:text-xl font-semibold text-gray-800 mb-2">
+                                                        <span className="block truncate">
+                                                            {headerTitle}
+                                                        </span>
+                                                    </h3>
+                                                    <div className="w-full h-0.5 bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full"></div>
+                                                </div>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p>{headerTitle}</p>
@@ -178,7 +200,7 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                                     )}
 
                                     {/* Save Button */}
-                                    <div className="flex items-center">
+                                    <div className="flex items-center -mt-4">
                                         <div className="border border-gray-200 rounded-2xl">
                                             <Button
                                                 variant="ghost"
@@ -186,28 +208,41 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                                                 onClick={handleSavePlan}
                                                 className="bg-white hover:bg-gray-50 rounded-2xl shadow-lg transition-all duration-300 px-4 py-3"
                                             >
-                                                <span className="bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent font-semibold">Save</span>
+                                                <span className="bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent font-semibold text-xs md:text-sm lg:text-base">Save</span>
                                             </Button>
                                         </div>
                                     </div>
-                                </div>               
+                                </div>
 
                                 {/* Plan Content - Scrollable */}
                                 <div
-                                    className="flex-1 overflow-y-auto p-2"
+                                    ref={scrollRef}
+                                    className="flex-1 overflow-y-auto p-2 overflow-x-hidden"
                                     style={{
                                         scrollbarWidth: 'thin',
-                                        scrollbarColor: '#d4a574 transparent'
+                                        scrollbarColor: '#d4a574 transparent',
+                                        wordWrap: 'break-word',
+                                        overflowWrap: 'break-word'
                                     }}
                                 >
                                     <motion.div
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ duration: 0.6, delay: 0.5 }}
+                                        style={{
+                                            minHeight: '100%', // Ensure consistent height
+                                            width: '100%'
+                                        }}
                                     >
-                                        <ReactMarkdown components={markdownHandler} remarkPlugins={[remarkGfm]}>
-                                            {plan || "Select a plan to view details."}
-                                        </ReactMarkdown>
+                                        <div style={{
+                                            minWidth: '100%',
+                                            maxWidth: '100%',
+                                            display: 'block'
+                                        }}>
+                                            <ReactMarkdown components={markdownHandler} remarkPlugins={[remarkGfm]}>
+                                                {typedPlan || "Select a plan to view details."}
+                                            </ReactMarkdown>
+                                        </div>
                                     </motion.div>
                                 </div>
                             </div>

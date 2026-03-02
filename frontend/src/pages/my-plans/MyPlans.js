@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import MetricsArea from './components/MetricsArea';
 import PlanArea from './components/plan-area/PlanArea';
 import PlansIndex from './components/PlansIndex';
-import { usePlanHooks } from '../../hooks/plans'; 
+import { usePlanHooks } from '../../hooks/plans';
 
 export default function MyPlans() {
     const [animationTriggered, setAnimationTriggered] = useState(false);
@@ -42,7 +42,7 @@ export default function MyPlans() {
             <div className="flex-1 flex h-screen">
 
                 {/* Plans Index */}
-                <div className="flex-[1.5] p-6">
+                <div className="flex-[1.75] p-6">
                     <PlansIndex
                         plans={plans}
                         onPlanSelect={handlePlanSelect}
@@ -50,7 +50,7 @@ export default function MyPlans() {
                 </div>
 
                 {/* Plan Area */}
-                <div className="flex-[6] p-6">
+                <div className="flex-[5.25] p-6">
                     <PlanArea
                         planData={selectedPlanData}
                         animationTriggered={animationTriggered}
@@ -61,6 +61,7 @@ export default function MyPlans() {
                 <div className="flex-[3] p-6">
                     <MetricsArea
                         // metrics = {planData.metrucs}
+                        planData={selectedPlanData}
                         animationTriggered={animationTriggered}
                     />
                 </div>

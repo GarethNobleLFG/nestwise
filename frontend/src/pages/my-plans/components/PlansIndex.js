@@ -25,7 +25,7 @@ const PlansIndex = ({ plans = [], onPlanSelect }) => {
                 <CardContent className="p-4 h-full flex flex-col">
                     {/* Header */}
                     <div className="mb-3">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                        <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-800 mb-2">
                             Your Plans
                         </h3>
                         <div className="w-full h-0.5 bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full"></div>
@@ -60,7 +60,7 @@ const PlansIndex = ({ plans = [], onPlanSelect }) => {
                                     )}></div>
                                     <div className="flex-1 min-w-0">
                                         <p className={cn(
-                                            "text-sm font-bold break-words",
+                                            "text-sm md:text-base lg:text-lg font-bold break-words",
                                             selectedPlan === plan.id ? "text-blue-700" : "text-gray-700"
                                         )}>
                                             {plan.name}
@@ -90,7 +90,7 @@ const PlansIndex = ({ plans = [], onPlanSelect }) => {
                                         <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                         </svg>
-                                        <p className="text-sm font-bold text-gray-500 break-words">
+                                        <p className="text-sm md:text-base lg:text-lg font-bold text-gray-500 break-words">
                                             New Plan
                                         </p>
                                     </div>
@@ -111,7 +111,7 @@ const PlansIndex = ({ plans = [], onPlanSelect }) => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
                                 </div>
-                                <p className="text-sm text-gray-500">
+                                <p className="text-sm md:text-base lg:text-lg text-gray-500">
                                     No plans available yet.
                                 </p>
                             </motion.div>

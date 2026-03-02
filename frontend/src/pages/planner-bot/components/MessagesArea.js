@@ -6,7 +6,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import ReactMarkdown from 'react-markdown';
 
-export default function MessagesArea({ safeMessages }) {
+export default function MessagesArea({ safeMessages, planAnimationNeeded }) {
     const messagesEndRef = React.useRef(null);
     const scrollAreaRef = React.useRef(null);
 
@@ -57,14 +57,41 @@ export default function MessagesArea({ safeMessages }) {
                                     )}
                                 >
                                     {message.isThinking ? (
-                                        <div className="flex items-center space-x-3">
-                                            <div className="flex space-x-1">
-                                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75"></div>
-                                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150"></div>
+                                        planAnimationNeeded ? (
+                                            // Special plan generation animation.
+                                            <div className="flex items-center space-x-3">
+                                                <div className="flex items-center space-x-2">
+                                                    {/* Animated chart bars */}
+                                                    <div className="flex space-x-1 items-end">
+                                                        <div className="w-2 h-3 bg-gradient-to-t from-yellow-400 to-yellow-500 rounded-sm animate-pulse"></div>
+                                                        <div className="w-2 h-5 bg-gradient-to-t from-amber-400 to-amber-500 rounded-sm animate-pulse delay-200"></div>
+                                                        <div className="w-2 h-4 bg-gradient-to-t from-yellow-500 to-amber-400 rounded-sm animate-pulse delay-400"></div>
+                                                        <div className="w-2 h-6 bg-gradient-to-t from-amber-500 to-yellow-400 rounded-sm animate-pulse delay-600"></div>
+                                                    </div>
+
+                                                    {/* Animated dollar signs */}
+                                                    <div className="flex space-x-1">
+                                                        <span className="text-yellow-500 animate-bounce text-sm">$</span>
+                                                        <span className="text-amber-500 animate-bounce delay-100 text-sm">$</span>
+                                                        <span className="text-yellow-500 animate-bounce delay-200 text-sm">$</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-[#c47c1eff] md:text-sm lg:text-base font-medium">🧠 Analyzing your financial data...</span>
+                                                    <span className="text-gray-500 text-xs md:text-sm">Crafting your personalized retirement plan</span>
+                                                </div>
                                             </div>
-                                            <span className="text-gray-500 md:text-sm lg:text-base">NestWise Agent is thinking...</span>
-                                        </div>
+                                        ) : (
+                                            // Default thinking animation
+                                            <div className="flex items-center space-x-3">
+                                                <div className="flex space-x-1">
+                                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75"></div>
+                                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150"></div>
+                                                </div>
+                                                <span className="text-gray-500 md:text-sm lg:text-base">NestWise Agent is thinking...</span>
+                                            </div>
+                                        )
                                     ) : (
                                         <div className="text-xs md:text-sm lg:text-base leading-relaxed prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-800 prose-strong:text-gray-900 prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded prose-pre:bg-gray-100 prose-pre:p-3 prose-pre:rounded-lg">                                            <ReactMarkdown components={message.role === 'bot' ? markdownHandler : {}}>
                                             {message.content}

@@ -362,18 +362,44 @@ export default function PlannerBot() {
 
   // Function to check if all keys have values in profile data to set animation trigger in Messages Area.
   const checkProfileDataComplete = (profileData) => {
-    if (!profileData || typeof profileData !== 'object') return false;
+    if (!profileData || typeof profileData !== 'object') {
+      return false;
+    }
 
     const keys = Object.keys(profileData);
-    if (keys.length === 0) return false;
 
-    // Check if all values are truthy (not empty, null, undefined, or empty strings)
-    return keys.every(key => {
+    if (keys.length === 0) {
+      return false;
+    }
+
+    // Check each key individually - ALL must have meaningful values (not placeholders)
+    const results = keys.map(key => {
       const value = profileData[key];
-      if (value === null || value === undefined || value === '') return false;
-      if (typeof value === 'string' && value.trim() === '') return false;
-      return true;
+      let isValid = false;
+
+      // Reject placeholders and empty values
+      if (value === null || value === undefined || value === false) {
+        isValid = false; // Reject false placeholders
+      } else if (typeof value === 'string') {
+        isValid = value.trim() !== ''; // Must have non-whitespace content
+      } else if (typeof value === 'number') {
+        isValid = !isNaN(value); // Allow 0, but not NaN
+      } else if (typeof value === 'boolean') {
+        isValid = value === true; // Only allow true, reject false placeholders
+      } else if (Array.isArray(value)) {
+        isValid = value.length > 0; // Array must have items
+      } else if (typeof value === 'object') {
+        isValid = Object.keys(value).length > 0; // Object must have properties
+      } else {
+        isValid = true; // Other types considered valid
+      }
+
+      return isValid;
     });
+
+    const allValid = results.every(result => result);
+
+    return allValid;
   };
 
 
@@ -418,7 +444,7 @@ export default function PlannerBot() {
     setConversationTitle('');
     setGeneratedPlan(null);
     setRawPlanJSON(null);
-    setPlanAnimationNeeded(false); 
+    setPlanAnimationNeeded(false);
 
     sessionStorage.removeItem('plannerBotState');
 

@@ -65,6 +65,9 @@ openai_api_key = os.getenv('OPENAI_API_KEY')
 # Set the API key as an environment variable
 os.environ['OPENAI_API_KEY'] = openai_api_key
 
+# Read enable rag flag (default to False if not set)
+ENABLE_RAG = os.getenv("ENABLE_RAG", "false").lower() == "true"
+
 model_chatbot = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 model_summarizer = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 model_matcher = ChatOpenAI(model="gpt-4o-mini", temperature=0)
@@ -892,27 +895,34 @@ def route_decision_summarize(state: MasterState) -> str:
 ## RAG Implementation
 
 # ---- Load PDFs from Google Drive folder ----
-pdf_folder = "./retirement_pdfs"
-pdf_files = glob.glob(f"{pdf_folder}/*.pdf")
+if ENABLE_RAG:
+    print("Enabled RAG: Loading PDF documents from Google Drive folder...")
+    pdf_folder = "./retirement_pdfs"
+    pdf_files = glob.glob(f"{pdf_folder}/*.pdf")
 
-loaded_docs = []
-for file_path in pdf_files:
-    try:
-        loader = PyPDFLoader(file_path)
-        pages = loader.load()   # returns one Document per page
-        print(f"Loaded {file_path} -> {len(pages)} pages")
-        loaded_docs.extend(pages)
-        print(f"Loaded {file_path} -> {len(pages)} pages")
-    except Exception as e:
-        print(f"Failed to load {file_path}: {e}")
+    loaded_docs = []
+    for file_path in pdf_files:
+        try:
+            loader = PyPDFLoader(file_path)
+            pages = loader.load()
+            print(f"Loaded {file_path} -> {len(pages)} pages")
+            loaded_docs.extend(pages)
+        except Exception as e:
+            print(f"Failed to load {file_path}: {e}")
 
-# Split docs into chunks
-splitter = RecursiveCharacterTextSplitter(chunk_size=900, chunk_overlap=150)
-splits = splitter.split_documents(loaded_docs)
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=900,
+        chunk_overlap=150
+    )
 
-# Add to vector store
-_ = vector_store.add_documents(documents=splits)
-print("Added PDF documents to InMemoryVectorStore. Total chunks:", len(splits))
+    splits = splitter.split_documents(loaded_docs)
+
+    _ = vector_store.add_documents(documents=splits)
+
+    print("Added PDF documents to InMemoryVectorStore. Total chunks:", len(splits))
+
+else:
+    print("RAG is disabled. Skipping PDF loading and vector store creation.")
 
 #Rewrite query to be more effective for retrieval
 def rewrite_query(user_query: str, real_profile: dict) -> str:

@@ -3,12 +3,14 @@ import { useState, useEffect } from 'react';
 import MetricsArea from './components/MetricsArea';
 import PlanArea from './components/plan-area/PlanArea';
 import PlansIndex from './components/PlansIndex';
+import ProfileDataArea from '../planner-bot/components/ProfileDataArea';
 import { usePlanHooks } from '../../hooks/plans';
 
 export default function MyPlans() {
     const [animationTriggered, setAnimationTriggered] = useState(false);
-    const [plans, setPlans] = useState([]);          // list of plans
+    const [plans, setPlans] = useState([]);         
     const [selectedPlanData, setSelectedPlanData] = useState(null);
+    const [profileData, setProfileData] = useState({}); // Need to set this in the return on get plan hook.
 
     const { getUserPlans, getPlanById } = usePlanHooks();
 
@@ -42,7 +44,7 @@ export default function MyPlans() {
             <div className="flex-1 flex h-screen">
 
                 {/* Plans Index */}
-                <div className="flex-[1.75] p-6">
+                <div className="flex-[1.5] p-6">
                     <PlansIndex
                         plans={plans}
                         onPlanSelect={handlePlanSelect}
@@ -57,8 +59,17 @@ export default function MyPlans() {
                     />
                 </div>
 
+                {/* Profile Data Area */}
+                <div className="flex-[1.25] p-6 pr-2">
+                    <ProfileDataArea
+                        animationTriggered={animationTriggered}
+                        profileData={profileData}
+                        lastChatbotResponse=""
+                    />
+                </div>
+
                 {/* Metrics Area */}
-                <div className="flex-[3] p-6">
+                <div className="flex-[2] p-6 pl-2">
                     <MetricsArea
                         // metrics = {planData.metrucs}
                         planData={selectedPlanData}

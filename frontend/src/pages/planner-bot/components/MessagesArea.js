@@ -18,6 +18,10 @@ export default function MessagesArea({ safeMessages, planAnimationNeeded }) {
         scrollToBottom();
     }, [safeMessages]);
 
+    const isSuccessMessage = (content) => {
+        return content.includes("✅ Your personalized retirement plan has been generated successfully!");
+    };
+
     return (
         <div ref={scrollAreaRef} className="flex-1 overflow-y-auto px-8 py-4 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" style={{ height: 'calc(100vh - 200px)' }}>
             <div className="max-w-4xl mx-auto space-y-4 min-h-full">
@@ -93,9 +97,21 @@ export default function MessagesArea({ safeMessages, planAnimationNeeded }) {
                                             </div>
                                         )
                                     ) : (
-                                        <div className="text-xs md:text-sm lg:text-base leading-relaxed prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-800 prose-strong:text-gray-900 prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded prose-pre:bg-gray-100 prose-pre:p-3 prose-pre:rounded-lg">                                            <ReactMarkdown components={message.role === 'bot' ? markdownHandler : {}}>
-                                            {message.content}
-                                        </ReactMarkdown>
+                                        <div className="text-xs md:text-sm lg:text-base leading-relaxed prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-800 prose-strong:text-gray-900 prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded prose-pre:bg-gray-100 prose-pre:p-3 prose-pre:rounded-lg">
+                                            {message.role === 'bot' && isSuccessMessage(message.content) ? (
+                                                <div>
+                                                    <p className="text-xs md:text-sm lg:text-base leading-relaxed text-gray-700 mb-3">
+                                                        ✅ <span className="bg-gradient-to-r from-yellow-400 to-amber-600 bg-clip-text text-transparent font-bold drop-shadow-lg">Your personalized retirement plan has been generated successfully!</span> You can view the complete plan on the right side of the screen.
+                                                    </p>
+                                                    <p className="text-xs md:text-sm lg:text-base leading-relaxed text-gray-700">
+                                                        Do you have any other questions about your plan or would you like to adjust any parameters?
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                <ReactMarkdown components={message.role === 'bot' ? markdownHandler : {}}>
+                                                    {message.content}
+                                                </ReactMarkdown>
+                                            )}
                                         </div>
                                     )}
                                 </div>

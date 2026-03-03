@@ -36,7 +36,7 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
                 <CardContent className="p-4 h-full flex flex-col">
                     {/* Header */}
                     <div className="mb-3">
-                        <h3 className="text-base md:text-lg lg:text-xl font-semibold text-gray-800 mb-2">
+                        <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-800 mb-2">
                             Your Info
                         </h3>
                         <div className="w-full h-0.5 bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full"></div>

@@ -26,9 +26,9 @@ export default function MetricsArea({ planData, animationTriggered }) {
         >
             <Card className="h-full bg-white/90 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <CardContent className="p-4 h-full flex flex-col">
-                    {/* Citations */}
+                    {/* Header */}
                     <div className="mb-3">
-                        <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-800 mb-2">
+                        <h3 className="text-base md:text-lg lg:text-xl font-semibold text-gray-800 mb-2">
                             Details
                         </h3>
                         <div className="w-full h-0.5 bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full"></div>

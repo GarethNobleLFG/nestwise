@@ -61,7 +61,7 @@ export default function MyPlans() {
                     />
                 </div>
 
-                {/* Profile Data Area */}
+                {/* Profile Data Area - same component in planner bot. */}
                 <div className="flex-[1.25] p-6 pr-2">
                     <ProfileDataArea
                         animationTriggered={animationTriggered}

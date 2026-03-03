@@ -148,7 +148,7 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                 transition={{ duration: 0.3, delay: 0.1 }}
                 className="w-full h-full"
             >
-                <Card className="h-full bg-white/95 backdrop-blur-sm border-0 shadow-md hover:shadow-lg transition-shadow duration-300">
+                <Card className="h-full bg-gradient-to-br from-gray-50 to-white backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
                     <CardContent className="p-4 h-full flex flex-row space-x-3 min-h-0 w-full min-w-0">
                         {/* Profile Data Area - Left side, full height */}
                         <motion.div

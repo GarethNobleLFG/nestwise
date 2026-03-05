@@ -65,7 +65,7 @@ export default function MyPlans() {
                 <div className="flex-[1.25] p-6 pr-2">
                     <ProfileDataArea
                         animationTriggered={animationTriggered}
-                        profileData={profileData}
+                        profileData={selectedPlanData?.profileData}
                         lastChatbotResponse=""
                     />
                 </div>

@@ -46,7 +46,7 @@ export default function MyPlans() {
             <div className="flex-1 flex h-screen">
 
                 {/* Plans Index */}
-                <div className="flex-[1.5] p-6">
+                <div className="flex-[1.5] h-full pr-2">
                     <PlansIndex
                         plans={plans}
                         onPlanSelect={handlePlanSelect}
@@ -54,7 +54,7 @@ export default function MyPlans() {
                 </div>
 
                 {/* Plan Area */}
-                <div className="flex-[5.25] p-6">
+                <div className="flex-[5] pl-2 pr-2">
                     <PlanArea
                         planData={selectedPlanData}
                         animationTriggered={animationTriggered}
@@ -62,7 +62,7 @@ export default function MyPlans() {
                 </div>
 
                 {/* Profile Data Area */}
-                <div className="flex-[1.25] p-6 pr-2 min-w-0">
+                <div className="flex-[1.5] px-6 pr-2 pl-2 min-w-0">
                     <div className="h-full w-full min-w-0 overflow-hidden">
                         <ProfileDataArea
                             animationTriggered={animationTriggered}
@@ -73,7 +73,7 @@ export default function MyPlans() {
                 </div>
 
                 {/* Metrics Area */}
-                <div className="flex-[2] p-6 pl-2">
+                <div className="flex-[1.5] px-6 pl-2">
                     <MetricsArea
                         planData={selectedPlanData}
                         animationTriggered={animationTriggered}

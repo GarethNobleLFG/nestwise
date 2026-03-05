@@ -24,7 +24,7 @@ const PlansIndex = ({ plans = [], onPlanSelect }) => {
             <Card className="h-full bg-white/90 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <CardContent className="p-4 h-full flex flex-col">
                     {/* Header */}
-                    <div className="mb-3">
+                    <div className="mb-3 pt-4">
                         <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-800 mb-2">
                             Your Plans
                         </h3>

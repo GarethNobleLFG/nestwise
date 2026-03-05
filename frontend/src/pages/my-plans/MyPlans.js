@@ -15,6 +15,7 @@ export default function MyPlans() {
     // Fetch all plans on mount
     useEffect(() => {
         async function fetchPlans() {
+            // only retruns the name and id of the plans, not the full plan data
             const userPlans = await getUserPlans();
             setPlans(userPlans);
         }
@@ -26,6 +27,7 @@ export default function MyPlans() {
     const handlePlanSelect = async (plan) => {
         const fullPlan = await getPlanById(plan.id);
         setSelectedPlanData(fullPlan);
+        console.log("selected plan profile data: ", fullPlan.profileData);
     };
 
     useEffect(() => {

@@ -23,7 +23,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/userauth/signin")
 @planRouter.post("/", response_model=PlanResponse)
 async def create_new_plan(plan: PlanCreate, token: str = Depends(oauth2_scheme)):
     email = verify_token(token)
-    return create_plan(email, plan.name, plan.description, plan.data)
+    return create_plan(email, plan.name, plan.description, plan.data, plan.profileData)
 
 @planRouter.get("/", response_model=List[PlanListItem])
 async def list_plans(token: str = Depends(oauth2_scheme)):

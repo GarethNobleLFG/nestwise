@@ -12,8 +12,11 @@ import { calculateProgress } from '../../../utils/calculateProgress';
 
 export default function MetricsArea({ planData, animationTriggered }) {
 
+    if (!planData) return null;
+    const profileData = planData.profileData;
     const citations = planData?.data ? formatCitations(planData.data) : null;
     const progressPercentage = planData?.data ? calculateProgress(planData.data) : 0;
+
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -33,7 +36,51 @@ export default function MetricsArea({ planData, animationTriggered }) {
 
                     {/* Scrollable Content Area */}
                     <div className="flex-1 flex flex-col py-2 px-1 space-y-3 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                        {/* Profile Overview */}
+                       <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={animationTriggered ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+                            transition={{
+                                duration: 0.6,
+                                delay: 0.2,
+                                ease: "easeOut"
+                            }}
+                            className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg p-3 border-l-4 border-yellow-400 hover:shadow-md transition-shadow duration-200"
+                        >
+                            <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                    <p className="text-sm font-medium italic mb-2 text-gray-600">
+                                        Profile Overview
+                                    </p>
 
+                                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
+                                        {profileData &&
+                                            Object.entries(profileData).map(([key, value]) => {
+                                                // If field has nested structure like { collected: true, value: 22 }
+                                                const displayValue =
+                                                    typeof value === "object" && value !== null
+                                                        ? value.value ?? JSON.stringify(value)
+                                                        : value;
+
+                                                return (
+                                                    <div key={key}>
+                                                        <span className="font-semibold capitalize">
+                                                            {key.replace(/_/g, " ")}:
+                                                        </span>{" "}
+                                                        {typeof displayValue === "number"
+                                                            ? displayValue.toLocaleString()
+                                                            : displayValue}
+                                                    </div>
+                                                );
+                                            })}
+                                    </div>
+                                </div>
+
+                                <div className="p-2 bg-yellow-500 rounded-lg ml-2">
+                                    <AccountBalanceIcon className="w-5 h-5 text-white" />
+                                </div>
+                            </div>
+                        </motion.div>
                         {/* Citations - takes remaining space */}
                         <div className="flex-1 min-h-0">
                             <motion.div

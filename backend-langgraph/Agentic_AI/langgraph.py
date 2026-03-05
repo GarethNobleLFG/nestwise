@@ -1202,32 +1202,63 @@ def call_formatter(raw_json_str: str):
 
 state = None
 initialMessage = 'Hello! I am NestWiseAI. I am here to help you with Retirement!'
-def start_session(session_id: str):
+def start_session(session_id: str, real_profile: dict = None) -> str:
+    if real_profile:
+        is_plan_generated = True
+    else:
+        is_plan_generated = False
+    print(f"Starting session {session_id} with real_profile={real_profile} and is_plan_generated={is_plan_generated}")
     """
-    Initialize a new session and store its MasterState in the global sessions dict.
+    Initialize a new session and store its MasterState in the global state.
+    If real_profile or is_plan_generated are passed, update them accordingly.
     """
     global state
-    state = MasterState(
-        messages=[],
-        chatbot={"messages": [system_prompt_chatbot, assistant_message],
-                 "chatbot_role": "default"},
-        matcher={"need_no_more_fields": False},
-        extractor={"all_fields_filled": False,
-                   "conversation_title":"None",
-                   "extractor_role": "default"},
-        real_profile={},
-        shadow_profile = {
+
+    # Default shadow profile template
+    shadow_profile_template = {
         "goal": {"collected": False, "importance": 5, "status": "missing"},
         "age": {"collected": False, "importance": 5, "status": "missing"},
         "salary": {"collected": False, "importance": 5, "status": "missing"},
         "savings": {"collected": False, "importance": 5, "status": "missing"},
-        "location": {"collected": False, "importance": 4, "status": "missing"}
+        "location": {"collected": False, "importance": 4, "status": "missing"},
+    }
+
+    # If real_profile is passed, sync shadow_profile
+    if real_profile:
+        updated_shadow = shadow_profile_template.copy()
+
+        for key, value in real_profile.items():
+            if isinstance(value, dict) and key in updated_shadow:
+                updated_shadow[key]["collected"] = value.get("collected", True)
+                updated_shadow[key]["status"] = value.get("status", "filled")
+                updated_shadow[key]["importance"] = value.get(
+                    "importance",
+                    updated_shadow[key]["importance"]
+                )
+
+        shadow_profile = updated_shadow
+        print(f"Initialized shadow_profile from real_profile: {shadow_profile}")
+    else:
+        shadow_profile = shadow_profile_template
+
+    state = MasterState(
+        messages=[],
+        chatbot={
+            "messages": [system_prompt_chatbot, assistant_message],
+            "chatbot_role": "default"
         },
+        matcher={"need_no_more_fields": False},
+        extractor={
+            "all_fields_filled": False,
+            "conversation_title": "None",
+            "extractor_role": "default"
+        },
+        real_profile=real_profile if real_profile else {},
+        shadow_profile=shadow_profile,
         conversation_title="initial",
-        is_plan_generated = False
+        is_plan_generated=is_plan_generated
     )
     return session_id
-
 
 # config = {"configurable": {"thread_id": "3"}}
 assistant_message = AIMessage(content="Hello there, I'm NestWise! How can I help you plan for your retirement?")

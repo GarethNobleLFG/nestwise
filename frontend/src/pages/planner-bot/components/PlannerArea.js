@@ -127,7 +127,7 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
             const name = conversationTitle || "Generated Plan";
             const description = "NestWise generated plan";
 
-            await savePlan(name, rawPlanJSON, description);
+            await savePlan(name, profileData, rawPlanJSON, description);
             alert("Saved!");
         } catch (e) {
             alert("Save failed");

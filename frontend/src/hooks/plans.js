@@ -36,10 +36,10 @@ export const usePlanHooks = () => {
     }
   };
 
-  const savePlan = (name, data, description) =>
+  const savePlan = (name, profileData, data, description) =>
     request("http://localhost:7001/plans", {
       method: "POST",
-      body: JSON.stringify({ name, description, data }),
+      body: JSON.stringify({ name, profileData, description, data }),
     });
 
   const getUserPlans = async () =>

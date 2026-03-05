@@ -7,17 +7,18 @@ from utils.database import users_collection, plans_collection
 # users_collection = None
 # plans_collection = None
 
-def create_plan(email: str, name: str, description: str, data: dict):
+def create_plan(email: str, name: str, description: str, data: dict, profileData: dict):
     plan = {
         "user_email": email,
         "name": name,
         "description": description,
         "data": data,
+        "profileData": profileData,
         "created_at": datetime.utcnow(),
         "updated_at": datetime.utcnow(),
     }
     result = plans_collection.insert_one(plan)
-    plan["_id"] = result.inserted_id
+    print(f"Inseted plan: {plan}")
     return serialize_plan(plan)
 
 def get_user_plans(email: str):

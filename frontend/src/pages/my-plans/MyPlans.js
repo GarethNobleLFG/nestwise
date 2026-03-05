@@ -8,7 +8,7 @@ import { usePlanHooks } from '../../hooks/plans';
 
 export default function MyPlans() {
     const [animationTriggered, setAnimationTriggered] = useState(false);
-    const [plans, setPlans] = useState([]);         
+    const [plans, setPlans] = useState([]);
     const [selectedPlanData, setSelectedPlanData] = useState(null);
     const [profileData, setProfileData] = useState({}); // Need to set this in the return on get plan hook.
 
@@ -61,13 +61,15 @@ export default function MyPlans() {
                     />
                 </div>
 
-                {/* Profile Data Area - same component in planner bot. */}
-                <div className="flex-[1.25] p-6 pr-2">
-                    <ProfileDataArea
-                        animationTriggered={animationTriggered}
-                        profileData={selectedPlanData?.profileData}
-                        lastChatbotResponse=""
-                    />
+                {/* Profile Data Area */}
+                <div className="flex-[1.25] p-6 pr-2 min-w-0">
+                    <div className="h-full w-full min-w-0 overflow-hidden">
+                        <ProfileDataArea
+                            animationTriggered={animationTriggered}
+                            profileData={selectedPlanData?.profileData}
+                            lastChatbotResponse=""
+                        />
+                    </div>
                 </div>
 
                 {/* Metrics Area */}

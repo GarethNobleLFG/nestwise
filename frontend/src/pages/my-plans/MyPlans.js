@@ -73,7 +73,6 @@ export default function MyPlans() {
                 {/* Metrics Area */}
                 <div className="flex-[2] p-6 pl-2">
                     <MetricsArea
-                        // metrics = {planData.metrucs}
                         planData={selectedPlanData}
                         animationTriggered={animationTriggered}
                     />

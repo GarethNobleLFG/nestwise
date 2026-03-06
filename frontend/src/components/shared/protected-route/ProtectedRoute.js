@@ -43,8 +43,6 @@ export default function ProtectedRoute({ children }) {
 
         // Check if token is vaild once.
         checkAuth();
-        const interval = setInterval(checkAuth, 2000); // Repeat check.
-        return () => clearInterval(interval);
     }, []);
 
 

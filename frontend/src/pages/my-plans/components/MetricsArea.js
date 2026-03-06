@@ -14,7 +14,7 @@ import ProfileDataArea from './ProfileDataArea';
 export default function MetricsArea({ planData, animationTriggered }) {
 
     const citations = planData?.data ? formatCitations(planData.data) : null;
-    const progressPercentage = planData?.data ? calculateProgress(planData.data) : 0;
+    const progressPercentage = planData?.data ? calculateProgress(planData) : 0;
 
     return (
         <motion.div

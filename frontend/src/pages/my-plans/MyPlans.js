@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import MetricsArea from './components/MetricsArea';
 import PlanArea from './components/plan-area/PlanArea';
 import PlansIndex from './components/PlansIndex';
-import ProfileDataArea from '../planner-bot/components/ProfileDataArea';
 import { usePlanHooks } from '../../hooks/plans';
 
 export default function MyPlans() {
@@ -54,26 +53,15 @@ export default function MyPlans() {
                 </div>
 
                 {/* Plan Area */}
-                <div className="flex-[5] pl-2 pr-2">
+                <div className="flex-[6] pl-2 pr-2">
                     <PlanArea
                         planData={selectedPlanData}
                         animationTriggered={animationTriggered}
                     />
                 </div>
 
-                {/* Profile Data Area */}
-                <div className="flex-[1.5] px-6 pr-2 pl-2 min-w-0">
-                    <div className="h-full w-full min-w-0 overflow-hidden">
-                        <ProfileDataArea
-                            animationTriggered={animationTriggered}
-                            profileData={selectedPlanData?.profileData}
-                            lastChatbotResponse=""
-                        />
-                    </div>
-                </div>
-
                 {/* Metrics Area */}
-                <div className="flex-[1.5] px-6 pl-2">
+                <div className="flex-[2.75] px-6 pl-2 pr-2">
                     <MetricsArea
                         planData={selectedPlanData}
                         animationTriggered={animationTriggered}

@@ -10,7 +10,7 @@ export const markdownHandler = {
 
     // Text formatting
     strong: ({ children }) => <strong className="font-semibold text-gray-700">{children}</strong>,
-    em: ({ children }) => <em className="italic text-amber-700">{children}</em>,
+    em: ({ children }) => <em className="italic bg-gradient-to-r from-yellow-400 to-amber-600 bg-clip-text text-transparent">{children}</em>,
 
     // Code and preformatted
     code: ({ children, className }) => {
@@ -23,8 +23,8 @@ export const markdownHandler = {
     pre: ({ children }) => <pre className="bg-gray-900 rounded-lg my-4 overflow-hidden shadow-sm border border-gray-200">{children}</pre>,
 
     // Lists
-    ul: ({ children }) => <ul className="list-disc list-inside space-y-1 mb-4 text-xs md:text-sm lg:text-base text-amber-700 ml-4">{children}</ul>,
-    ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 mb-4 text-xs md:text-sm lg:text-base text-amber-700 ml-4">{children}</ol>,
+    ul: ({ children }) => <ul className="list-disc list-inside space-y-1 mb-4 text-xs md:text-sm lg:text-base text-yellow-500 ml-4">{children}</ul>,
+    ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 mb-4 text-xs md:text-sm lg:text-base text-yellow-500 ml-4">{children}</ol>,
     li: ({ children }) => <li className="leading-relaxed">{children}</li>,
 
     // Links

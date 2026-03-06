@@ -24,9 +24,8 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
             className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg border-l-4 border-yellow-400 hover:shadow-md transition-shadow duration-200 overflow-hidden h-full"
         >
             <div className="flex items-start space-x-2 mb-2 p-2">
-                <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
                 <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium italic mb-1 text-gray-600">
+                    <p className="text-md font-bold mb-1 text-gray-600">
                         Profile Data:
                     </p>
                 </div>
@@ -50,15 +49,15 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
                                     duration: 0.3,
                                     delay: index * 0.05
                                 }}
-                                className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg p-2 border-l-4 border-yellow-400 hover:shadow-md transition-shadow duration-200 overflow-hidden"
+                                className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg p-2 border-yellow-400 hover:shadow-md transition-shadow duration-200 overflow-hidden"
                             >
                                 <div className="flex items-start space-x-2">
                                     <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-xs font-medium italic mb-1 text-gray-600">
+                                        <p className="text-sm font-medium italic mb-1 text-gray-600">
                                             {key}:
                                         </p>
-                                        <p className="text-xs font-bold break-words text-gray-700">
+                                        <p className="text-sm font-bold break-words text-gray-700">
                                             {typeof value === "object" && value !== null
                                                 ? String(value.Value ?? "")
                                                 : String(value)

@@ -58,9 +58,8 @@ export default function MetricsArea({ planData, animationTriggered }) {
                                     className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg border-l-4 border-yellow-400 hover:shadow-md transition-shadow duration-200 overflow-hidden h-full"
                                 >
                                     <div className="flex items-start space-x-2 mb-2 p-2">
-                                        <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-medium italic mb-1 text-gray-600">
+                                            <p className="text-md font-bold mb-1 text-gray-600">
                                                 Citations:
                                             </p>
                                         </div>
@@ -94,7 +93,7 @@ export default function MetricsArea({ planData, animationTriggered }) {
                                 <div className="flex items-start space-x-2">
                                     <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium italic mb-1 text-gray-600">
+                                        <p className="text-ms font-bold italic mb-1 text-gray-600">
                                             Current Progress:  <span className="bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent font-bold">{`${progressPercentage.toFixed(1)}%`}</span>
                                         </p>
                                         {/* Progress Bar */}

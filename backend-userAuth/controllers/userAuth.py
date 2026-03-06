@@ -3,10 +3,13 @@ from datetime import datetime, timedelta
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from fastapi import HTTPException
+from bson import ObjectId
 import os
+from utils.database import users_collection, plans_collection
 
-# DB INJECTION (set from app.py)#
-users_collection = None
+# # DB INJECTION (set from app.py)#
+# users_collection = None
+# plans_collection = None
 
 
 pwd_hasher = PasswordHasher()

@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer
+from typing import List
 
 
 # import models
 from models.user import User, Token, UserUpdate
-
 
 # import contollers
 from models.user import User, Token
@@ -14,8 +14,9 @@ from controllers.userAuth import (
     get_user_by_email,
     verify_token,
     create_access_token,
-    update_user_profile
+    update_user_profile,
 )
+
 
 authRouter = APIRouter()
 
@@ -83,4 +84,5 @@ async def validate_token(token: str = Depends(oauth2_scheme)):
         "name": user["name"],
         "user_id": user["user_id"]
     }
+
 

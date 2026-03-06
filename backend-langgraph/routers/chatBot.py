@@ -4,6 +4,7 @@ from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel
 import time
 import logging
+from typing import Optional
 from auth import verify_access_token
 
 # Import your langgraph functions and shared sessions
@@ -17,19 +18,20 @@ chatRouter = APIRouter()
 
 # --- Start a new session ---
 @chatRouter.post("/start", response_model=StartResponse)
-async def start_chat(user_email: str = Depends(verify_access_token)) -> StartResponse:
+async def start_chat(user_email: str = Depends(verify_access_token), real_profile: Optional[dict] = None) -> StartResponse:
     """
     Start a new chat session and return a unique session_id.
     """
     session_id = str(time.time())  # simple timestamp-based session id
     try:
-        await run_in_threadpool(start_session, session_id)
+        await run_in_threadpool(start_session, session_id, real_profile=real_profile)
     except Exception as exc:
         logger.exception("Failed to start session")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to start session",
         ) from exc
+
 
     return StartResponse(session_id=session_id)
 
@@ -54,11 +56,12 @@ async def answer_question(payload: AnswerRequest, user_email: str = Depends(veri
             return AnswerResponse(
                 response=result.get("response", ""),
                 real_profile=result.get("real_profile", {}),
-                conversation_title=result.get("conversation_title", None)
+                conversation_title=result.get("conversation_title", None),
+                from_planner=result.get("from_planner", False)
             )
         else:
             # backward compatibility fallback
-            return AnswerResponse(response=str(result), real_profile={})
+            return AnswerResponse(response=str(result), real_profile={}, from_planner=False)
 
     except Exception as exc:
         logger.exception("Error while generating chat response")

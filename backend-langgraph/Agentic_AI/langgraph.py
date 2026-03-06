@@ -12,12 +12,52 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_core.tools import tool
 from langgraph.prebuilt import ToolNode, tools_condition, create_react_agent
+from datetime import date
+from pydantic import BaseModel, Field
+from typing import List
 
-MAXNUMOFFIELDS = 10
-COMPLETENESSRATIO = 1
-MAXRATING = 5
+# Pydantic models for structured planner output
+class AssetAllocation(BaseModel):
+    stocks: float
+    bonds: float
+    cash: float
+    other: float
 
-MAXRATING = max(2, MAXRATING)
+class InvestmentStrategy(BaseModel):
+    asset_allocation: AssetAllocation
+    justification: str
+
+class SavingsPlanItem(BaseModel):
+    year: int
+    annual_contribution: float
+    expected_growth: float
+    source: List[str]
+
+class RiskAssessment(BaseModel):
+    inflation: str
+    market_volatility: str
+    mitigation_strategy: str
+
+class Milestone(BaseModel):
+    age: int
+    action: str
+    expected_outcome: str
+    source: List[str]
+
+class Citation(BaseModel):
+    fact: str
+    source: str
+    page: int
+
+class RetirementPlan(BaseModel):
+    investment_strategy: InvestmentStrategy
+    savings_plan: List[SavingsPlanItem]
+    risk_assessment: RiskAssessment
+    milestones: List[Milestone]
+    citations: List[Citation]
+
+
+COMPLETENESSRATIO = 1.0
 
 # Retrieve OpenAI API key securely
 openai_api_key = os.getenv('OPENAI_API_KEY')
@@ -25,17 +65,23 @@ openai_api_key = os.getenv('OPENAI_API_KEY')
 # Set the API key as an environment variable
 os.environ['OPENAI_API_KEY'] = openai_api_key
 
-model_chatbot = ChatOpenAI(model="gpt-4o", temperature=0)
+# Read enable rag flag (default to False if not set)
+ENABLE_RAG = os.getenv("ENABLE_RAG", "false").lower() == "true"
+
+model_chatbot = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 model_summarizer = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 model_matcher = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 model_extractor = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 model_planner= ChatOpenAI(model="gpt-4o-mini", temperature=0)
+model_planner_json = ChatOpenAI(model="gpt-4o", temperature=1)
+model_query_rewriter = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
 embeddings = OpenAIEmbeddings()
 vector_store = InMemoryVectorStore(embeddings)
 
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
-## System Propmt chatbot
+
+##### CHATBOT PROMPT #####
 system_prompt_chatbot = SystemMessage(content='''
 You are NestWise, a financial planning assistant.
 You must ONLY talk about retirement and personal finance.
@@ -50,101 +96,136 @@ Your task is to decide what the chatbot should ask the user next.
 Return only the next message the chatbot should send to the user — no explanations, no JSON, and no extra text.
 ''')
 
-# summarizer prompt
+##### CHATBOT PROMPT #####
+system_prompt_chatbot_ask_for_updates = SystemMessage(content='''
+You are NestWise, a financial planning assistant.
+You must ONLY talk about retirement and personal finance.
+If the user asks about unrelated topics (e.g., cooking, movies), politely redirect back:
+"I can’t provide recipes, but I can help you estimate your retirement savings instead."
+
+In some variation, ask the user if they want to continue
+to update their profile information before generating a new plan.
+
+Return only the next message the chatbot should send to the user — no explanations, no JSON, and no extra text.
+''')
+
+
+
+##### SUMMARIZER PROMPT #####
 system_prompt_summarize = SystemMessage(content='''
 You are a helpful assistant that summarizes conversations about retirement planning.
 Summarize the following conversation and the extracted user profile information.
 Present the summary clearly and concisely. Do Not Specify Next Steps.
 ''')
 
-## extractor
+
+
+##### EXTRACTOR PROMPT #####
 system_prompt_extract = SystemMessage(content='''
 You will be analyzing the conversation history between a user and a chatbot about retirement planning.
 ''')
 
+extractor_special_role_normal = SystemMessage(content='''
+SPECIAL RULES about skipped or refused answers:
+- If the user indicates they do not know the answer, are unsure, refuse to answer,
+  or ask to skip a field, treat the field as answered and assign it a placeholder value:
+  "unknown". Else, the field is still missing.
+- Examples include: "I don't know", "not sure", "I'd rather not answer", "skip",
+  "I prefer not to say", "I don't remember".
+''')
+
+extractor_special_role_update = SystemMessage(content='''
+SPECIAL RULES:
+- If the user responds with "no", or something suggesting that they are DONE, OR that they do NOT
+want to update any other fields, return a field called 'continue_asking' with a value of False.
+- Examples include: "no", "i'm good", "I'm done", "that's all", etc.
+''')
+
+
+
+##### MATCHER PROMPT #####
 prompt_infos = {
     "spend": {
         "description":
             """
-            For users whose primary goal is to fully enjoy their wealth during
-            retirement by actively spending down their savings. This template is intended
-            for individuals who prioritize lifestyle, travel, personal enjoyment, and maximizing
-            their quality of life rather than preserving or growing their assets long-term. They may want to
-            use their savings for experiences, luxury purchases, or major life goals, and are comfortable with their
-            funds being fully depleted by the end of retirement. These users generally prioritize comfort, enjoyment,
-            and life fulfillment over leaving an inheritance or long-term asset preservation.
+            Match when the user expresses a desire to:
+            - enjoy their money
+            - travel
+            - spend down their savings
+            - maximize lifestyle or comfort
+            - use their money now rather than preserve it
+            Keywords/concepts: travel, enjoy retirement, spend savings, lifestyle, experiences.
             """,
         "questions": {
-            "retirement_age": {"collected": False, "importance": 5},
-            "desired_monthly_spending": {"collected": False, "importance": 5},
-            "large_planned_expenses": {"collected": False, "importance": 4},
-            "travel_frequency": {"collected": False, "importance": 3},
-            "lifestyle_upgrades": {"collected": False, "importance": 2}
+            "retirement_age": {"collected": False, "importance": 5, "status":"missing"},
+            "desired_monthly_spending": {"collected": False, "importance": 5, "status":"missing"},
+            "large_planned_expenses": {"collected": False, "importance": 4, "status":"missing"},
+            "travel_frequency": {"collected": False, "importance": 3, "status":"missing"},
+            "lifestyle_upgrades": {"collected": False, "importance": 2, "status":"missing"}
             }
     },
     "leave": {
         "description":
             """
-            For users whose main goal is to leave a financial legacy to their children,
-            family members, or other chosen beneficiaries. This template focuses on estate planning, inheritance
-            allocation, and long-term financial security for loved ones. Individuals matched with this template
-            often want to ensure their assets outlive them, grow responsibly, and are passed down according to their
-            wishes. They highly value generational wealth, structured estate distribution, and making sure their family
-            is financially supported after their passing.
+            Match when the user expresses a desire to:
+            - leave money to children or family
+            - provide financial security after their passing
+            - preserve or grow assets for beneficiaries
+            - build generational wealth
+            Keywords/concepts: inheritance, family security, legacy, beneficiaries.
             """,
         "questions": {
-            "number_of_beneficiaries": {"collected": False, "importance": 5},
-            "beneficiary_relationships": {"collected": False, "importance": 4},
-            "inheritance_goal_amount": {"collected": False, "importance": 5},
-            "estate_distribution_preferences": {"collected": False, "importance": 3},
-            "life_insurance_status": {"collected": False, "importance": 2}
+            "number_of_beneficiaries": {"collected": False, "importance": 5, "status":"missing"},
+            "beneficiary_relationships": {"collected": False, "importance": 4, "status":"missing"},
+            "inheritance_goal_amount": {"collected": False, "importance": 5, "status":"missing"},
+            "estate_distribution_preferences": {"collected": False, "importance": 3, "status":"missing"},
+            "life_insurance_status": {"collected": False, "importance": 2, "status":"missing"}
         }
     },
     "save": {
         "description":
             """
-            For users who prioritize long-term financial stability, low-risk planning,
-            and maintaining their wealth throughout retirement. These individuals generally want their savings
-            to last as long as possible, focusing on essential spending, predictable budgeting, and protected investments.
-            They tend to prefer steady, conservative financial strategies aimed at minimizing risk and avoiding unnecessary
-            spending. The goal of this template is to help the user preserve their assets, sustain a reliable income stream,
-            and ensure they do not run out of money during retirement.
+            Match when the user expresses a desire to:
+            - maintain or preserve their wealth
+            - minimize financial risk
+            - ensure savings last throughout retirement
+            - live within a stable, predictable budget
+            Keywords/concepts: stability, long-term planning, low risk, budgeting, preservation.
             """,
         "questions": {
-            "retirement_age": {"collected": False, "importance": 4},
-            "expected_monthly_expenses": {"collected": False, "importance": 5},
-            "risk_tolerance": {"collected": False, "importance": 4},
-            "healthcare_budget": {"collected": False, "importance": 5},
-            "expected_retirement_duration": {"collected": False, "importance": 3}
+            "retirement_age": {"collected": False, "importance": 4, "status":"missing"},
+            "expected_monthly_expenses": {"collected": False, "importance": 5, "status":"missing"},
+            "risk_tolerance": {"collected": False, "importance": 4, "status":"missing"},
+            "healthcare_budget": {"collected": False, "importance": 5, "status":"missing"},
+            "social_security_start_age": { "collected": False, "importance": 3, "status":"missing"}
         }
     },
     "donate": {
         "description":
             """
-            For users whose primary retirement objective is to contribute a
-            portion of their wealth to charitable causes, nonprofit organizations, or philanthropic
-            efforts. This template supports individuals who value giving back to their community, supporting
-            specific missions, or making a positive social impact with their assets. Their focus may be on
-            planned giving, recurring donations, end-of-life charitable contributions, or allocating a percentage
-            of their estate to causes they care about. These users prioritize generosity, philanthropy, and
-            meaningful social contribution over personal or family financial accumulation.
+            Match when the user expresses a desire to:
+            - give money to charity
+            - donate part of their estate
+            - support a cause or organization
+            - engage in philanthropy
+            Keywords/concepts: charity, nonprofit, giving back, donation, philanthropy.
             """,
         "questions": {
-            "charity_names": {"collected": False, "importance": 4},
-            "donation_goal_amount": {"collected": False, "importance": 5},
-            "donation_frequency": {"collected": False, "importance": 3},
-            "donation_timing": {"collected": False, "importance": 4},
-            "legacy_donation_percentage": {"collected": False, "importance": 2}
+            "charity_names": {"collected": False, "importance": 4, "status":"missing"},
+            "donation_goal_amount": {"collected": False, "importance": 5, "status":"missing"},
+            "donation_frequency": {"collected": False, "importance": 3, "status":"missing"},
+            "planned_donation_time_period": {"collected": False, "importance": 4, "status":"missing"},
+            "legacy_donation_percentage": {"collected": False, "importance": 2, "status":"missing"}
         }
     },
     "default": {
         "description": "Used when the goal does not fit any category clearly.",
         "questions": {
-            "retirement_age": {"collected": False, "importance": 4},
-            "expected_monthly_expenses": {"collected": False, "importance": 5},
-            "risk_tolerance": {"collected": False, "importance": 4},
-            "healthcare_budget": {"collected": False, "importance": 5},
-            "inheritance_goal_amount":{"collected": False, "importance": 3}
+            "retirement_age": {"collected": False, "importance": 4, "status":"missing"},
+            "expected_monthly_expenses": {"collected": False, "importance": 5, "status":"missing"},
+            "risk_tolerance": {"collected": False, "importance": 4, "status":"missing"},
+            "healthcare_budget": {"collected": False, "importance": 5, "status":"missing"},
+            "inheritance_goal_amount":{"collected": False, "importance": 3, "status":"missing"}
         }
     }
 }
@@ -153,22 +234,63 @@ category_descriptions = "\n".join(
     [f"- {name}: {info['description']}" for name, info in prompt_infos.items()]
 )
 
-## Matcher
+
+
 system_prompt_matcher = PromptTemplate.from_template(f"""
-You are a classification expert.
+You are a retirement-goal classifier.
 
 Given this retirement goal:
-
 "{{user_goal}}"
 
-Choose ONE category based on the following descriptions:
+You must classify the user's goal into one or more of these categories:
 
 {category_descriptions}
 
-If the goal does not clearly match any category, respond with: default
-
-Answer with ONLY the category name.
+Rules:
+1. Prefer matching an existing category over default.
+2. Use "default" only when the user's goal does not express any financial intention.
+3. If the goal clearly fits multiple categories, return multiple categories.
+4. Never give a secondary category a score equal to the primary. Secondary scores must always be lower.
+5. Secondary categories should never be 'default'.
+6. Respond in JSON format:
+   {{{{
+     "primary": "...",
+     "secondary": "...",
+     "scores": {{{{
+       "spend": 0.0,
+       "leave": 0.0,
+       "save": 0.0,
+       "donate": 0.0,
+       "default": 0.0
+     }}}}
+   }}}}
 """)
+
+QUERY_REWRITE_SYSTEM = SystemMessage(content="""
+    You are a financial document retrieval specialist.
+
+    Your task is to rewrite user retirement planning questions into
+    precise, technical retrieval queries suitable for searching:
+
+    - IRS publications
+    - Retirement tax law documents
+    - Investment policy documents
+    - Life expectancy tables
+    - Contribution limit regulations
+
+    Rules:
+    1. Be specific and technical.
+    2. Include regulatory terms if relevant.
+    3. Include age thresholds (e.g., 59.5).
+    4. Include jurisdiction (U.S.) when appropriate.
+    5. Do NOT answer the question.
+    6. Return ONLY the optimized retrieval query.
+    """)
+
+from typing import Literal,TypedDict
+from langgraph.graph import MessagesState
+from langgraph.graph import StateGraph, START, END
+from langgraph.checkpoint.memory import MemorySaver
 
 real_profile = {}
 """
@@ -181,20 +303,18 @@ shadow_profile = {
 }
 """
 
-from typing import Literal,TypedDict
-from langgraph.graph import MessagesState
-from langgraph.graph import StateGraph, START, END
-from langgraph.checkpoint.memory import MemorySaver
-
 # State class to store messages
 class ChatbotState(MessagesState):
    shadow_profile: dict
+   chatbot_role: str
 
 # Extractor State
 class ExtractorState(MessagesState):
   real_profile: dict
   shadow_profile: dict
   all_fields_filled: bool
+  updated_some_fields: bool
+  extractor_role: str
   conversation_title: str
 
 # Matcher State
@@ -208,13 +328,10 @@ class SummarizerState(MessagesState):
   real_profile: dict
   summary: str
 
-
 # Planner state
 class PlannerState(MessagesState):
   real_profile: dict
   shadow_profile: dict
-
-
 
 # Master state for final graph
 class MasterState(MessagesState):
@@ -226,7 +343,9 @@ class MasterState(MessagesState):
   shadow_profile: dict
   conversation_title: str
   planner: dict
+  is_plan_generated: bool
 
+# Routes
 class RouterState(TypedDict):
     messages: list
     chosen_route: str
@@ -285,6 +404,8 @@ def call_chatbot(state: ChatbotState):
     # Build missing_fields robustly
     missing_fields = []
     for field, info in shadow_profile.items():
+        if "status" not in info:
+            info["status"] = "completed" if info.get("collected") else "missing"
         # Support both dict shape and direct boolean
         collected_val = None
         importance = 0
@@ -299,7 +420,15 @@ def call_chatbot(state: ChatbotState):
             missing_fields.append((field, importance))
 
     # Sort by importance desc
-    missing_fields.sort(key=lambda x: x[1], reverse=True)
+    missing_fields = sorted(
+      [
+          (field, info["importance"])
+          for field, info in shadow_profile.items()
+          if info.get("status", "missing") == "missing"
+      ],
+      key=lambda x: x[1],
+      reverse=True
+    )
 
     missing_fields_text = "\n".join([f"- {f} (importance: {imp})" for f, imp in missing_fields]) or "None"
 
@@ -313,22 +442,34 @@ def call_chatbot(state: ChatbotState):
     Missing fields sorted by importance:
     {missing_fields_text}
 
-    ## Your Task:
-    1. **If fields are missing**: Ask about the MOST important missing field in a conversational way
-    2. **If all collected**: Respond with "All necessary info collected. Proceeding to generate your plan."
+    Your job:
+    1. Identify which field is most important and still missing.
+    2. Ask the user about that specific field.
+    3. If all fields are collected, respond with: "All necessary info collected. Proceeding to generate your plan."
 
-  
-    
+    Return only the next chatbot message — no explanations, no JSON.
     """
 
-
     state["messages"].append(HumanMessage(content=profile_prompt))
+
+    temp_old_prompt = None
+
+    if state.get("chatbot_role", "") == "ask_for_updates":
+      temp_old_prompt = state["messages"][0]
+      state["messages"][0] = ""
+      state["messages"].append(system_prompt_chatbot_ask_for_updates)
 
     # Debug print (optional)
     #print("missing_fields:", missing_fields)
 
     # Invoke model
     response = model_chatbot.invoke(state["messages"])
+
+    # remove system prompt
+    if state.get("chatbot_role", "default") == "ask_for_updates":
+        state["chatbot_role"] = "default"
+        state["messages"][0] = temp_old_prompt
+        state["messages"] = state["messages"][:-1]
 
     # Get text
     reply_text = getattr(response, "content", None) or str(response)
@@ -378,110 +519,242 @@ def is_valid_matcher_response(response_text):
     except json.JSONDecodeError:
         return False
 
-# To call extractor
+def normalize_if_uncertain(user_answer, llm):
+    # Step 1: detect uncertainty
+    uncertainty_prompt = f"""
+    You are classifying whether the user is refusing to answer or genuinely does not know.
+    DO NOT mark a response as uncertain just because it uses relative or natural language
+    (e.g., "after I retire", "in a few years", "when I'm older").
+
+    Mark as "yes" ONLY when the user expresses:
+    - refusal (e.g., "I'd rather not say", "skip this")
+    - not knowing (e.g., "I don't know", "not sure", "I can't remember")
+    - avoidance (e.g., "let's move on")
+
+    Otherwise, even vague or approximate answers should be marked as "no".
+
+    Respond ONLY with:
+    "yes" or "no"
+
+    User answer: "{user_answer}"
+    """
+
+    response = llm.invoke([{"role": "user", "content": uncertainty_prompt}])
+    is_uncertain = response.content.strip().lower()
+
+    # Step 2: normalize ONLY if uncertain
+    if is_uncertain == "yes":
+        return "unknown"
+
+    return user_answer  # keep original
+
+    # To call extractor
 def call_extractor(state: ExtractorState):
-  shadow_system_prompt = f"""
-  Below is a dictionary representing the user's information.
-  Each key corresponds to a data field, and each value indicates whether the information has already been collected:{state.get("shadow_profile", {})}
+    if state["extractor_role"] == "check_for_negatives":
+      extractor_special_rules = extractor_special_role_update
+    elif state["extractor_role"] == "default":
+      extractor_special_rules = extractor_special_role_normal
+    shadow_system_prompt = f"""
+    Below is a dictionary representing the user's information. Each key corresponds
+    to a data field, and each value indicates whether the information has already
+    been collected:
 
-  Your task is to:
-  1. Examine the conversation history that follows.
+    {state.get("shadow_profile", {})}
 
-  2. For every field, check if the user has provided information that can fill that field.
+    Your task is to:
+    1. Examine the conversation history that follows.
+    2. For every field, check if the user has provided information that can fill that field.
+    3. If the user has supplied the missing information, extract it accurately.
+    4. If the user has supplies information of a field that is already completed, update the old value with the newly provided value.
 
-  3. If the user has supplied the missing information, extract it accurately.
+    {extractor_special_rules}
 
-  Respond only with a JSON object containing ONLY the previously false fields that you can now populate, using this exact structure:
-  {{
-    "fieldName1" : fieldValue1,
-    "fieldName2" : fieldValue2,
-    ...
-  }}
+    JSON Response rules:
+    - Respond ONLY with a JSON object containing ONLY the fields you can now populate.
+    - For updated fields, include the new value in the JSON.
+    - If no new information is found, return: {{}}.
+    - Do not include any explanation or text outside the JSON.
+    """
+    state["messages"] = [system_prompt_extract] + [SystemMessage(content=shadow_system_prompt)] + state["messages"]
+    print([SystemMessage(content=shadow_system_prompt)])
+    response = model_extractor.invoke(state["messages"])
+    print(f"Extractor response: {response.content}")
+    response_dict = json.loads(response.content)
+    shadow_profile = state.get("shadow_profile", {})
+    real_profile = state.get("real_profile", {})
+    updated_some_fields = False
 
-  If no new information is found, return an empty JSON object: {{}}.
-  If the user does not provide information for a field, do not include it in the JSON.
-  If the user explicitly provides updated information for a filled field, add it to the JSON.
-  Do not include explanations, reasoning, or extra text outside the JSON.
-  """
-  state["messages"] = [system_prompt_extract] + [SystemMessage(content=shadow_system_prompt)] + state["messages"]
-  #print(f"\nEXTRACTOR: {state['messages']}")
-  response = model_extractor.invoke(state["messages"])
-  #print(f"Extractor response: {response.content}")
-  response_dict = json.loads(response.content)
-  shadow_profile = state.get("shadow_profile", {})
-  real_profile = state.get("real_profile", {})
+    if state["extractor_role"] == "check_for_negatives":
+      print(response_dict.get("continue_asking", True))
+      print("\n" + str(response_dict))
+      if response_dict.get("continue_asking", True) == False:
+        print("\ncontinue asking is FALSE\n")
+        state["extractor_role"] = "default"
+        print(state["extractor_role"])
+        return state
 
-  if not response_dict:
-    return
+    if not response_dict:
+        return state
 
-  common_keys = response_dict.keys() & shadow_profile.keys()
+        # Ensure all fields have a status
+    for field, info in shadow_profile.items():
+        if "status" not in info:
+            info["status"] = "completed" if info.get("collected") else "missing"
 
-  for key in common_keys:
-    if isinstance(shadow_profile[key], dict):
+    common_keys = response_dict.keys() & shadow_profile.keys()
+
+    for key, raw_value in response_dict.items():
+        if key not in shadow_profile:
+            continue  # ignore unexpected fields
+
+        normalized_value = normalize_if_uncertain(raw_value, model_extractor)
+
+        # Case 1: user skipped/refused
+        if normalized_value == "unknown":
+            shadow_profile[key]["status"] = "skipped"
+            shadow_profile[key]["collected"] = True
+
+            real_profile[key] = "unknown"
+            continue
+
+        # Case 2: user gave REAL value (even if previously skipped)
+        shadow_profile[key]["status"] = "completed"
         shadow_profile[key]["collected"] = True
 
-  real_profile.update(response_dict)
-  if "goal" in response_dict:
-    # get last human message
-    real_profile["goal"] = state["messages"][-1].content
-    print("GOAL: " + str(real_profile["goal"]))
+        # Update real_profile
+        real_profile[key] = normalized_value
 
-    # Generate title for conversation
-    title_prompt = [
-        {"role": "system", "content": "You generate short, clear titles for retirement planning conversations."},
-        {"role": "user", "content": f"Create a concise, 3-8 word title summarizing this retirement goal: '{real_profile['goal']}'."}
-    ]
-    title_response = model_extractor.invoke(title_prompt)
-    conversation_title = title_response.content.strip()
-    state["conversation_title"] = conversation_title
-    #print(f"\n\nConversation title: {state["conversation_title"]}\n\n")
+        # Mark collected ONLY if we actually have a value or 'unknown'
+        if isinstance(shadow_profile[key], dict):
+            shadow_profile[key]["collected"] = True if normalized_value else False
 
+    if "goal" in response_dict:
+        # get last human message
+        real_profile["goal"] = state["messages"][-1].content
+        print("GOAL: " + str(real_profile["goal"]))
 
+        # Generate title for conversation
+        title_prompt = [
+            {"role": "system", "content": "You generate short, clear titles for retirement planning conversations."},
+            {"role": "user", "content": f"Create a concise, 3-8 word title summarizing this retirement goal: '{real_profile['goal']}'."}
+        ]
+        title_response = model_extractor.invoke(title_prompt)
+        conversation_title = title_response.content.strip()
+        state["conversation_title"] = conversation_title
+        #print(f"\n\nConversation title: {state["conversation_title"]}\n\n")
 
-  state["real_profile"] = real_profile
-  boolValue = all(
-    isinstance(info, dict) and info.get("collected", False)
-    for info in shadow_profile.values()
-  )
-  state["all_fields_filled"] = boolValue
-  state["real_profile"] = real_profile
-  state["shadow_profile"] = shadow_profile
-  #print("New shadow_profile = {")
-  for field, info in shadow_profile.items():
-    collected = info["collected"]
-    importance = info["importance"]
-    #print(f"  {field}: collected={collected}, importance={importance}")
-  #print("}")
-  return state
+    # Check if there are any differences between
+    # the state's real profile and the new real profile
+    if real_profile != state.get("real_profile", {}):
+        updated_some_fields = True
+
+    state["real_profile"] = real_profile
+    boolValue = all(
+        isinstance(info, dict) and info.get("collected", False)
+        for info in shadow_profile.values()
+    )
+    state["all_fields_filled"] = boolValue
+    state["real_profile"] = real_profile
+    state["shadow_profile"] = shadow_profile
+    state["updated_some_fields"] = updated_some_fields
+    #print("New shadow_profile = {")
+    for field, info in shadow_profile.items():
+        collected = info["collected"]
+        importance = info["importance"]
+       # print(f" - {field}: collected={collected}, importance={importance}")
+
+    print(real_profile)
+
+    return state
 
 ## Call Matcher
 def call_matcher(state: MatcherState):
+    real_profile = state.get("real_profile", {})
+    shadow_profile = state.get("shadow_profile", {})
 
-  real_profile = state.get("real_profile", {})
-  shadow_profile = state.get("shadow_profile", {})
+    # Read the user goal from state
+    user_goal = real_profile.get("goal", "")
+    #print(f"\n\nUSER GOAL: {user_goal}")
 
-  # Read the user goal from state
-  user_goal = real_profile.get("goal", "")
-  #print(f"\n\nUSER GOAL: {user_goal}")
-
-  chain = system_prompt_matcher | model_matcher
-  category = chain.invoke({"user_goal": user_goal}).content.strip().lower()
-  #print(f"\n\nCATEGORY: {category}")
-
-  if category not in prompt_infos:
-      category = "default"
-
-  # Store result inside state
-  state["selected_template"] = category
-  for field, info in prompt_infos[category]["questions"].items():
-      importance = info["importance"]
-      shadow_profile[field] = {"collected": False, "importance": importance}
-
-  #print(f"\n\nLLM MATCHED CATEGORY → {category}\n\n")
-  state["shadow_profile"] = shadow_profile
+    chain = system_prompt_matcher | model_matcher
+    raw = chain.invoke({"user_goal": user_goal}).content.strip()
+    #print(f"\n\nCATEGORY: {category}")
 
 
+    # --------------------------
+    # STEP 1: Parse JSON output
+    # --------------------------
+    # Remove all code fences
+    raw = raw.replace("```json", "").replace("```", "").strip()
+    try:
+        result = json.loads(raw)
+        primary = result.get("primary", "default").lower()
+        secondary = result.get("secondary", None)
+        if isinstance(secondary, str):
+            secondary = secondary.lower()
+        scores = result.get("scores", {})
 
+    except Exception as e:
+        print(f"JSON parsing error: {e}")
+        print("Falling back to default classification.")
+        primary = "default"
+        secondary = None
+        scores = {}
+
+    # Enforce sanity: unknown categories → default
+    valid_categories = set(prompt_infos.keys())
+    if primary not in valid_categories:
+        primary = "default"
+    if secondary not in valid_categories:
+        secondary = None
+
+    print(f"PRIMARY CATEGORY → {primary}")
+    print(f"SECONDARY CATEGORY → {secondary}")
+    print(f"CONFIDENCE SCORES → {scores}\n")
+
+    # Store in state
+    state["selected_template"] = primary
+    state["secondary_template"] = secondary
+    state["category_scores"] = scores
+
+    # -----------------------------------------
+    # STEP 2: Merge questions from templates
+    # -----------------------------------------
+    merged_questions = {}
+
+    # Add primary template questions
+    for field, info in prompt_infos[primary]["questions"].items():
+        merged_questions[field] = {
+            "collected": False,
+            "importance": info["importance"]
+        }
+
+    # Add secondary template questions (if any)
+    if secondary:
+        for field, info in prompt_infos[secondary]["questions"].items():
+            # Only merge critical fields
+            if info["importance"] >= 4:
+                if field not in merged_questions:
+                    merged_questions[field] = {
+                        "collected": False,
+                        "importance": info["importance"]
+                    }
+                else:
+                    merged_questions[field]["importance"] = max(
+                        merged_questions[field]["importance"],
+                        info["importance"]
+                    )
+
+    # -----------------------------------------
+    # STEP 3: Store merged questions in shadow_profile
+    # -----------------------------------------
+    shadow_profile.update(merged_questions)
+    state["shadow_profile"] = shadow_profile
+
+    print("Merged shadow_profile = {")
+    for field, info in shadow_profile.items():
+        print(f"  {field}: collected={info['collected']}, importance={info['importance']}")
+    print("}")
 
 #   print("New shadow_profile = {")
 #   for field, info in shadow_profile.items():
@@ -490,7 +763,7 @@ def call_matcher(state: MatcherState):
 #     print(f"  {field}: collected={collected}, importance={importance}")
 #   print("}")
 
-  return state
+    return state
 
 def call_summarizer(state: SummarizerState):
   state["messages"] = [system_prompt_summarize]  + state["messages"]
@@ -501,19 +774,21 @@ def call_summarizer(state: SummarizerState):
 
 ## To call RAG Agent
 def query_or_respond(state: PlannerState):
+    real_profile_local = state.get("real_profile", {})
     rag_query = (
-      "You are a Retrieval Assistant. Given the user's retirement profile below, prepare up to 3 targeted retrieval "
-  "queries (each 1–2 sentences) that will return the most relevant PDF chunks for building a retirement plan. "
-  "For each retrieval query include: (1) what fact/type of evidence you want (e.g., contribution limits, withdrawal "
-  "rates, tax rules, life expectancy tables), (2) any date or jurisdiction constraints, and (3) why the snippet is needed. "
-  f"User Profile:\n{real_profile}\n\n"
-
-
-  )
-    state["messages"] =  [SystemMessage(rag_query)] + state["messages"]
-    model_planner_with_tools = model_planner.bind_tools([retrieve])
+        "You are a Retrieval Assistant. You MUST call the retrieve tool at least 3 times "
+        "with different queries to gather relevant retirement planning information. "
+        "Do NOT write out the queries as text — call the retrieve tool directly. "
+        "Use the following 3 queries:\n"
+        "1. IRS contribution limits for 401(k), IRA, Roth IRA for current tax year including catch-up amounts and income phase-outs\n"
+        "2. Required Minimum Distribution rules SECURE 2.0 RMD age 73 withdrawal strategies tax-efficient\n"
+        "3. Social Security claiming strategies retirement age benefits optimization\n\n"
+        f"User Profile:\n{real_profile_local}\n\n"
+        "Call retrieve() now with each of these queries."
+    )
+    state["messages"] = [SystemMessage(rag_query)] + state["messages"]
+    model_planner_with_tools = model_planner.bind_tools([retrieve], tool_choice="required")
     response = model_planner_with_tools.invoke(state["messages"])
-    #print(f"Planner response: {response.content}")
     return {"messages": [response]}
 
 # To Call Planner to give final resposnse
@@ -527,10 +802,10 @@ def call_planner(state: PlannerState):
   flattened_profile = {}
   for k, v in user_profile_to_use.items():
       if isinstance(v, dict):
-          # Choose a value to include — often 'value' or 'collected'
           flattened_profile[k] = str(v.get("value", v.get("collected", "unknown")))
       else:
           flattened_profile[k] = str(v)
+
   recent_tool_messages = []
   for message in reversed(state["messages"]):
       if message.type == "tool":
@@ -538,133 +813,74 @@ def call_planner(state: PlannerState):
       else:
           break
   tool_messages = recent_tool_messages[::-1]
-
   docs_content = "\n\n".join(doc.content for doc in tool_messages)
   import json
 
-  structured_json_schema = {
-      "investment_strategy": {
-          "type": "object",
-          "properties": {
-              "asset_allocation": {
-                  "type": "object",
-                  "properties": {
-                      "stocks": {"type": "number"},
-                      "bonds": {"type": "number"},
-                      "cash": {"type": "number"},
-                      "other": {"type": "number"}
-                  },
-                  "required": ["stocks", "bonds", "cash", "other"]
-              },
-              "justification": {"type": "string"}
-          },
-          "required": ["asset_allocation", "justification"]
-      },
-      "savings_plan": {
-          "type": "array",
-          "items": {
-              "type": "object",
-              "properties": {
-                  "year": {"type": "integer"},
-                  "annual_contribution": {"type": "number"},
-                  "expected_growth": {"type": "number"},
-                  "source": {"type": "array", "items": {"type": "string"}}
-              },
-              "required": ["year", "annual_contribution", "expected_growth"]
-          }
-      },
-      "risk_assessment": {
-          "type": "object",
-          "properties": {
-              "inflation": {"type": "string"},
-              "market_volatility": {"type": "string"},
-              "mitigation_strategy": {"type": "string"}
-          },
-          "required": ["inflation", "market_volatility", "mitigation_strategy"]
-      },
-      "milestones": {
-          "type": "array",
-          "items": {
-              "type": "object",
-              "properties": {
-                  "age": {"type": "integer"},
-                  "action": {"type": "string"},
-                  "expected_outcome": {"type": "string"},
-                  "source": {"type": "array", "items": {"type": "string"}}
-              },
-              "required": ["age", "action", "expected_outcome"]
-          }
-      },
-      "citations": {
-          "type": "array",
-          "items": {
-              "type": "object",
-              "properties": {
-                  "fact": {"type": "string"},
-                  "source": {"type": "string"},
-                  "page": {"type": "integer"}
-              },
-              "required": ["fact", "source", "page"]
-          }
-      },
-      "required": [
-          "investment_strategy",
-          "savings_plan",
-          "risk_assessment",
-          "milestones",
-          "citations"
-      ]
-  }
+
   system_message_content = f"""
   You are a Retirement Planning Assistant. Your task is to produce a comprehensive, structured retirement plan
-  for a user with profile {real_profile}, comparable to a professional financial advisor. Use the provided user profile to build a customize plan.
+  for a user with profile {real_profile}, comparable to a professional financial advisor. Use the provided user profile to build a customized plan.
   Use ONLY the retrieved context below. Each fact must cite the source (filename and page).
-  If unknown, write "unknown". Follow this schema strictly in JSON:
+  If unknown, write "unknown".
 
+  Today's Date: {date.today().isoformat()}
 
-  {json.dumps(structured_json_schema)}
+  Your output must use the current year when generating projections, retirement timelines, contribution limits, and all forward-looking estimates.
 
   Retrieved Context:
   {docs_content}
-
 
   Instructions:
   1. Fill all fields with actionable, evidence-based recommendations.
   2. Include citations for all numerical data or regulatory references.
   3. Provide step-by-step advice for retirement savings, investment allocation, and milestones.
-  4. Give the plan in a pretty print format. No JSON
   """
-  state["messages"] =  [SystemMessage(system_message_content)] + state["messages"]
-  response = model_planner.invoke(state["messages"])
+  state["messages"] = [SystemMessage(system_message_content)] + state["messages"]
+
+  # Use Pydantic model with with_structured_output for guaranteed schema enforcement
+  structured_model = model_planner_json.with_structured_output(RetirementPlan)
+  plan: RetirementPlan = structured_model.invoke(state["messages"])
+  # Serialize to JSON string and wrap in AIMessage for graph state consistency
+  response = AIMessage(content=plan.model_dump_json())
   return {"messages": [response]}
+
 
 ## to decide to call the planner agent.
 def route_decision_extractor(state: MasterState) -> str:
   profile_filled = state.get("extractor").get("all_fields_filled")
   profile = state.get("shadow_profile")
   current_template = state.get("matcher").get("selected_template", None)
-  numOfFields = len(profile)
+  is_plan_generated = state.get("is_plan_generated", "CODE FAILED IN route_decision_extractor")
+  is_asking = state.get("extractor").get("extractor_role") == "check_for_negatives"
   totImportance = 0
   totFilledImportance = 0
-  needsCriticalInfo = False
   for field, info in profile.items():
     totImportance += info["importance"]
     totFilledImportance += info["importance"] if info["collected"] else 0
-    needsCriticalInfo = needsCriticalInfo or (info["importance"] == MAXRATING and not info["collected"])
   currentCompleteness = totFilledImportance/totImportance
 
-  print(f"Current completeness: {currentCompleteness}")
-  print(f"Does need critical info: {needsCriticalInfo}")
-
-  if not needsCriticalInfo and (currentCompleteness >= COMPLETENESSRATIO):
+  if currentCompleteness == COMPLETENESSRATIO:
     if not current_template:
       print("\n\nShould Call Matcher\n")
       return "matcher"
 
-    print("\n\nShould Call Planner\n")
-    return "planner"
+    if is_plan_generated:
+      print(state.get("extractor").get("extractor_role"))
+      print(is_asking)
+      if is_asking:
+        print("\n\nShould Call Chatbot, but updating!")
+        state["chatbot"]["chatbot_role"] = "ask_for_updates"
+        return "chatbot"
+      else:
+        print("\n\nShould Call Planner, updating plan\n")
+        state["chatbot"]["chatbot_role"] = "default"
+        return "planner"
+    else:
+      print("\n\nShould Call Planner, first plan being generated\n")
+
+      return "planner"
   else:
-    print("\n\nShould Call Chatbot\n")
+    print("\n\nShould Call Chatbot, no plan yet\n")
     return "chatbot"
 
 def route_decision_summarize(state: MasterState) -> str:
@@ -679,48 +895,88 @@ def route_decision_summarize(state: MasterState) -> str:
 ## RAG Implementation
 
 # ---- Load PDFs from Google Drive folder ----
-pdf_folder = "./"
-pdf_files = glob.glob(f"{pdf_folder}/*.pdf")
+if ENABLE_RAG:
+    print("Enabled RAG: Loading PDF documents from Google Drive folder...")
+    pdf_folder = "./retirement_pdfs"
+    pdf_files = glob.glob(f"{pdf_folder}/*.pdf")
 
-loaded_docs = []
-for file_path in pdf_files:
-    try:
-        loader = PyPDFLoader(file_path)
-        pages = loader.load()   # returns one Document per page
-        print(f"Loaded {file_path} -> {len(pages)} pages")
-        loaded_docs.extend(pages)
-        print(f"Loaded {file_path} -> {len(pages)} pages")
-    except Exception as e:
-        print(f"Failed to load {file_path}: {e}")
+    loaded_docs = []
+    for file_path in pdf_files:
+        try:
+            loader = PyPDFLoader(file_path)
+            pages = loader.load()
+            print(f"Loaded {file_path} -> {len(pages)} pages")
+            loaded_docs.extend(pages)
+        except Exception as e:
+            print(f"Failed to load {file_path}: {e}")
 
-# Split docs into chunks
-splitter = RecursiveCharacterTextSplitter(chunk_size=900, chunk_overlap=150)
-splits = splitter.split_documents(loaded_docs)
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=900,
+        chunk_overlap=150
+    )
 
-# Add to vector store
-_ = vector_store.add_documents(documents=splits)
-print("Added PDF documents to InMemoryVectorStore. Total chunks:", len(splits))
+    splits = splitter.split_documents(loaded_docs)
+
+    _ = vector_store.add_documents(documents=splits)
+
+    print("Added PDF documents to InMemoryVectorStore. Total chunks:", len(splits))
+
+else:
+    print("RAG is disabled. Skipping PDF loading and vector store creation.")
+
+#Rewrite query to be more effective for retrieval
+def rewrite_query(user_query: str, real_profile: dict) -> str:
+    """
+    Rewrite a user retirement question into a precise retrieval query.
+    """
+
+    profile_context = f"""
+    User Profile Context:
+    Age: {real_profile.get("age")}
+    Retirement Age: {real_profile.get("retirement_age")}
+    Salary: {real_profile.get("salary")}
+    Savings: {real_profile.get("savings")}
+    Location: {real_profile.get("location")}
+    """
+
+    messages = [
+        QUERY_REWRITE_SYSTEM,
+        HumanMessage(content=f"""
+        Original User Question:
+        {user_query}
+
+        {profile_context}
+        """)
+    ]
+
+    response = model_query_rewriter.invoke(messages)
+    return response.content.strip()
 
 # Define retriever tool
-@tool(response_format="content_and_artifact")
-def retrieve(query: str):
-    """Retrieve information related to a query from the vector store."""
-    retrieved_docs = vector_store.similarity_search(query, k=3)
+class RetrieveInput(BaseModel):
+    query: str = Field(..., description="Optimized retrieval query")
+
+@tool(
+    args_schema=RetrieveInput,
+)
+def retrieve(query: str) -> str:
+    """Retrieve relevant information from the vector store."""
+    
+    optimized_query = rewrite_query(query, real_profile)
+    retrieved_docs = vector_store.similarity_search(optimized_query, k=5)
+
     formatted_snippets = []
     for doc in retrieved_docs:
         meta = getattr(doc, "metadata", {})
         source = meta.get("source", "Unknown source")
-        print("Doc source:", source)
         page = meta.get("page", "N/A")
+
         formatted_snippets.append(
             f"Source: {os.path.basename(source)}, Page: {page}\n"
-            f"Content:\n{doc.page_content.strip()}"
+            f"{doc.page_content.strip()}"
         )
 
-
-    serialized = "\n\n---\n\n".join(formatted_snippets)
-    return serialized, retrieved_docs
-
+    return "\n\n---\n\n".join(formatted_snippets)
 
 
 
@@ -754,13 +1010,17 @@ extractor_graph.add_edge(START, "extractor")
 extractor_subgraph = extractor_graph.compile()
 
 ## Planner
+def route_after_tools(state: PlannerState):
+    """After tools run, always proceed to call_planner to generate the plan."""
+    return "call_planner"
+
 planner_graph = StateGraph(PlannerState)
 planner_graph.add_node(query_or_respond)
 planner_graph.add_node(tools_node)
 planner_graph.add_node(call_planner)
 planner_graph.set_entry_point("query_or_respond")
 planner_graph.add_conditional_edges(
-    "query_or_respond", tools_condition, {END: END, "tools": "tools"}
+    "query_or_respond", tools_condition, {END: "call_planner", "tools": "tools"}
 )
 planner_graph.add_edge("tools", "call_planner")
 planner_graph.add_edge("call_planner", END)
@@ -843,9 +1103,16 @@ def run_matcher(master_state: MasterState):
 
 def run_planner(master_state: MasterState):
     planner_data = master_state.get("planner", {})
+    planner_data["real_profile"] = master_state.get("real_profile", {})
+    planner_data["shadow_profile"] = master_state.get("shadow_profile", {})
     planner_state = PlannerState(**planner_data)
-    planner_state=planner_subgraph.invoke(planner_state)
+    planner_state = planner_subgraph.invoke(planner_state)
     master_state["planner"] = dict(planner_state)
+    master_state["is_plan_generated"] = True  # persists — tells router a plan exists
+    # Switch extractor to update mode so next turn asks user if they want to change anything
+    extractor_data = master_state.get("extractor", {})
+    extractor_data["extractor_role"] = "check_for_negatives"
+    master_state["extractor"] = extractor_data
     return master_state
 
 def run_summarizer(master_state: MasterState):
@@ -869,35 +1136,35 @@ def run_summarizer(master_state: MasterState):
 
 workflow = StateGraph(MasterState)
 
-workflow.add_node("chatbot", run_chatbot)
-workflow.add_node("extractor", run_extractor)
-workflow.add_node("matcher", run_matcher)
-workflow.add_node("planner", run_planner)
-workflow.add_node("summarizer", run_summarizer)
+workflow.add_node("chatbot_node", run_chatbot)
+workflow.add_node("extractor_node", run_extractor)
+workflow.add_node("matcher_node", run_matcher)
+workflow.add_node("planner_node", run_planner)
+workflow.add_node("summarizer_node", run_summarizer)
 
-workflow.add_edge(START, "extractor")
+workflow.add_edge(START, "extractor_node")
 
 workflow.add_conditional_edges(
-    "extractor",
+    "extractor_node",
     route_decision_extractor,
     {
-        "matcher": "matcher",
-        "planner": "planner",
-        "chatbot": "chatbot",
+        "matcher": "matcher_node",
+        "planner": "planner_node",
+        "chatbot": "chatbot_node",
     },
 )
 
-workflow.add_edge("matcher", "chatbot")
+workflow.add_edge("matcher_node", "chatbot_node")
 
 workflow.add_conditional_edges(
-    "chatbot",
+    "chatbot_node",
     route_decision_summarize,
     {
-        "summarizer": "summarizer",
+        "summarizer": "summarizer_node",
         "__end__": "__end__",
     },
 )
-workflow.add_edge("planner", END)
+workflow.add_edge("planner_node", END)
 
 graph = workflow.compile()
 
@@ -910,7 +1177,8 @@ Use the following guidelines:
 1. Structure the report with clear sections and headings.
 2. Use bullet points and numbered lists for clarity.
 3. Highlight key recommendations and action items.
-4. Ensure the report is easy to read and understand for a non-technical audience.
+4. Mention that plan has been genrated using RAG (Retrieval Augmented Generation) techniques.
+5. Ensure the report is easy to read and understand for a non-technical audience.
 """)
 def call_formatter(raw_json_str: str):
    
@@ -933,30 +1201,64 @@ def call_formatter(raw_json_str: str):
     return response.content
 
 state = None
-initialMessage = 'Hello! I am NestWiseAI. How can I help you today?'
-def start_session(session_id: str):
+initialMessage = 'Hello! I am NestWiseAI. I am here to help you with Retirement!'
+def start_session(session_id: str, real_profile: dict = None) -> str:
+    if real_profile:
+        is_plan_generated = True
+    else:
+        is_plan_generated = False
+    print(f"Starting session {session_id} with real_profile={real_profile} and is_plan_generated={is_plan_generated}")
     """
-    Initialize a new session and store its MasterState in the global sessions dict.
+    Initialize a new session and store its MasterState in the global state.
+    If real_profile or is_plan_generated are passed, update them accordingly.
     """
     global state
+
+    # Default shadow profile template
+    shadow_profile_template = {
+        "goal": {"collected": False, "importance": 5, "status": "missing"},
+        "age": {"collected": False, "importance": 5, "status": "missing"},
+        "salary": {"collected": False, "importance": 5, "status": "missing"},
+        "savings": {"collected": False, "importance": 5, "status": "missing"},
+        "location": {"collected": False, "importance": 4, "status": "missing"},
+    }
+
+    # If real_profile is passed, sync shadow_profile
+    if real_profile:
+        updated_shadow = shadow_profile_template.copy()
+
+        for key, value in real_profile.items():
+            if isinstance(value, dict) and key in updated_shadow:
+                updated_shadow[key]["collected"] = value.get("collected", True)
+                updated_shadow[key]["status"] = value.get("status", "filled")
+                updated_shadow[key]["importance"] = value.get(
+                    "importance",
+                    updated_shadow[key]["importance"]
+                )
+
+        shadow_profile = updated_shadow
+        print(f"Initialized shadow_profile from real_profile: {shadow_profile}")
+    else:
+        shadow_profile = shadow_profile_template
+
     state = MasterState(
         messages=[],
-        chatbot={"messages": [system_prompt_chatbot, assistant_message]},
-        matcher={"need_no_more_fields": False},
-        extractor={"all_fields_filled": False,
-                   "conversation_title":"None"},
-        real_profile={},
-        shadow_profile = {
-        "goal": {"collected": False, "importance": 5},
-        "age": {"collected": False, "importance": 2},
-        "salary": {"collected": False, "importance": 3},
-        "savings": {"collected": False, "importance": 4},
-        "location": {"collected": False, "importance": 5}
+        chatbot={
+            "messages": [system_prompt_chatbot, assistant_message],
+            "chatbot_role": "default"
         },
-        conversation_title="initial"
+        matcher={"need_no_more_fields": False},
+        extractor={
+            "all_fields_filled": False,
+            "conversation_title": "None",
+            "extractor_role": "default"
+        },
+        real_profile=real_profile if real_profile else {},
+        shadow_profile=shadow_profile,
+        conversation_title="initial",
+        is_plan_generated=is_plan_generated
     )
     return session_id
-
 
 # config = {"configurable": {"thread_id": "3"}}
 assistant_message = AIMessage(content="Hello there, I'm NestWise! How can I help you plan for your retirement?")
@@ -975,22 +1277,36 @@ def chat_step(user_message: str, session_id: str):
     state["messages"].append(human_message)
     state = graph.invoke(state)
 
-    # Print the assistant's reply
-    assistant_message = state['chatbot']['messages'][-1]
-    
-    if assistant_message == prev_assistant_message:
-        planner_message = state['planner']['messages'][-1]
-        raw_json = planner_message.content
+    # Check if the planner ran this turn by seeing if the chatbot message changed
+    current_assistant_message = state["chatbot"]["messages"][-1]
+    planner_ran_this_turn = (current_assistant_message == prev_assistant_message)
 
-        # Call the formatter agent
-        response_text = call_formatter(raw_json)
-        
+    if planner_ran_this_turn:
+        # Planner ran — extract the latest AI message from planner messages
+        planner_messages = state.get("planner", {}).get("messages", [])
+        planner_message = None
+        for m in reversed(planner_messages):
+            if hasattr(m, "type") and m.type == "ai" and hasattr(m, "content"):
+                planner_message = m
+                break
+            if isinstance(m, dict) and m.get("type") == "ai" and m.get("content"):
+                planner_message = type("Msg", (), {"content": m["content"]})()
+                break
 
+        if planner_message and planner_message.content:
+            from_planner = True
+            response_text = planner_message.content
+            print("response text: " + response_text)
+        else:
+            # Planner messages empty — fall back to chatbot
+            from_planner = False
+            response_text = current_assistant_message.content
+            prev_assistant_message = current_assistant_message
     else:
-        response_text = assistant_message.content
-        prev_assistant_message = assistant_message
+        from_planner = False
+        response_text = current_assistant_message.content
+        prev_assistant_message = current_assistant_message
 
-    
     ## Pass to the frontend.
     conversation_title = state["conversation_title"]
 
@@ -999,10 +1315,10 @@ def chat_step(user_message: str, session_id: str):
         field: state["real_profile"].get(field, False)
         for field in state["shadow_profile"]
     }
-    #print(profile_data)
 
     return {
-        "response": response_text,
+        "response": response_text, 
         "real_profile": profile_data,
-        "conversation_title": conversation_title
-    } 
+        "conversation_title": conversation_title,
+        "from_planner": from_planner
+    }

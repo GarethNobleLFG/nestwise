@@ -11,7 +11,12 @@ services:
       - NODE_ENV=development
       - HOST=0.0.0.0
       - PORT=3000
+      - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
+      - BROWSER=none
+      - FAST_REFRESH=true
+      - WDS_SOCKET_HOST=localhost 
+      - WDS_SOCKET_PORT=0  
     restart: unless-stopped
     volumes:
       - ./frontend:/app

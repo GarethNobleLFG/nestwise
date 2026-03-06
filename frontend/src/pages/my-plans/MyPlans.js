@@ -7,8 +7,9 @@ import { usePlanHooks } from '../../hooks/plans';
 
 export default function MyPlans() {
     const [animationTriggered, setAnimationTriggered] = useState(false);
-    const [plans, setPlans] = useState([]);          // list of plans
+    const [plans, setPlans] = useState([]);
     const [selectedPlanData, setSelectedPlanData] = useState(null);
+    const [profileData, setProfileData] = useState({}); // Need to set this in the return on get plan hook.
 
     const { getUserPlans, getPlanById } = usePlanHooks();
 
@@ -44,7 +45,7 @@ export default function MyPlans() {
             <div className="flex-1 flex h-screen">
 
                 {/* Plans Index */}
-                <div className="flex-[1.75] p-6">
+                <div className="flex-[1.5] h-full pr-2">
                     <PlansIndex
                         plans={plans}
                         onPlanSelect={handlePlanSelect}
@@ -52,7 +53,7 @@ export default function MyPlans() {
                 </div>
 
                 {/* Plan Area */}
-                <div className="flex-[5.25] p-6">
+                <div className="flex-[6] pl-2 pr-2">
                     <PlanArea
                         planData={selectedPlanData}
                         animationTriggered={animationTriggered}
@@ -60,9 +61,8 @@ export default function MyPlans() {
                 </div>
 
                 {/* Metrics Area */}
-                <div className="flex-[3] p-6">
+                <div className="flex-[2.75] px-6 pl-2 pr-2">
                     <MetricsArea
-                        // metrics = {planData.metrucs}
                         planData={selectedPlanData}
                         animationTriggered={animationTriggered}
                     />

@@ -29,14 +29,14 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
         <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.1 }}
             className="w-full h-full"
         >
             <Card className="h-full bg-white/90 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
                 <CardContent className="p-4 h-full flex flex-col">
                     {/* Header */}
                     <div className="mb-3">
-                        <h3 className="text-base md:text-lg lg:text-xl font-semibold text-gray-800 mb-2">
+                        <h3 className="text-lg md:text-xl lg:text-2xl font-semibold text-gray-800 mb-2">
                             Your Info
                         </h3>
                         <div className="w-full h-0.5 bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full"></div>
@@ -54,7 +54,7 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={animationTriggered ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
                                     transition={{
-                                        duration: 0.6,
+                                        duration: 0.1,
                                         delay: index * 0.1,
                                         ease: "easeOut"
                                     }}
@@ -82,7 +82,7 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                transition={{ duration: 0.5 }}
+                                transition={{ duration: 0.1 }}
                                 className="text-center py-8"
                             >
                                 <div className="text-gray-400 mb-2">
@@ -91,7 +91,7 @@ export default function ProfileDataArea({ animationTriggered, profileData, lastC
                                     </svg>
                                 </div>
                                 <p className="text-xs md:text-sm lg:text-base text-gray-500">
-                                    No data available yet.
+                                    Awaiting data!
                                 </p>
                             </motion.div>
                         )}

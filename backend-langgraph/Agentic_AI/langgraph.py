@@ -577,9 +577,20 @@ def call_extractor(state: ExtractorState):
     """
     state["messages"] = [system_prompt_extract] + [SystemMessage(content=shadow_system_prompt)] + state["messages"]
     print([SystemMessage(content=shadow_system_prompt)])
-    response = model_extractor.invoke(state["messages"])
-    print(f"Extractor response: {response.content}")
-    response_dict = json.loads(response.content)
+    
+    MAX_RETRIES = 3
+    for attempt in range(MAX_RETRIES):
+        try:
+            response = model_extractor.invoke(state["messages"])
+            print(f"Extractor response: {response.content} {attempt}")
+            response_dict = json.loads(response.content)
+            break
+        except json.JSONDecodeError:
+            print(f"Invalid JSON. Attempt {attempt + 1}/{MAX_RETRIES}")
+    else:
+        raise ValueError("Failed to get valid JSON from extractor after multiple attempts.")
+
+    
     shadow_profile = state.get("shadow_profile", {})
     real_profile = state.get("real_profile", {})
     updated_some_fields = False

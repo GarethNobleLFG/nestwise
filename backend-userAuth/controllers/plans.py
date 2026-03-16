@@ -8,39 +8,49 @@ from utils.database import users_collection, plans_collection
 # plans_collection = None
 
 def create_plan(email: str, name: str, description: str, data: dict, profileData: dict):
-    # Find all plans with the same base name for this user
     import re
     base_name = name
-    regex = re.compile(rf'^{re.escape(base_name)}( \(version (\d+)\))?$', re.IGNORECASE)
+    regex = re.compile(
+        rf'^{re.escape(base_name)}( \(version (\d+)\))?$',
+        re.IGNORECASE
+    )
     existing_plans = list(
         plans_collection.find({"user_email": email, "name": regex}, {"name": 1})
     )
-    if existing_plans:
-        version_numbers = [1]
+    # If no plan exists, use base name
+    if not existing_plans:
+        final_name = base_name
+    else:
+        version_numbers = []
+
         for plan in existing_plans:
+            plan_name = plan["name"]
+
             match = re.match(
                 rf'^{re.escape(base_name)} \(version (\d+)\)$',
-                plan["name"],
+                plan_name,
                 re.IGNORECASE
             )
+
             if match:
                 version_numbers.append(int(match.group(1)))
-    new_version = max(version_numbers) + 1
-    print("current versions:", version_numbers, "new version:", new_version)
+            elif plan_name.lower() == base_name.lower():
+                version_numbers.append(1)
 
-    name = f"{base_name} (version {new_version})"
+        new_version = max(version_numbers) + 1 if version_numbers else 2
+        final_name = f"{base_name} (version {new_version})"
 
     plan = {
         "user_email": email,
-        "name": name,
+        "name": final_name,
         "description": description,
         "data": data,
         "profileData": profileData,
         "created_at": datetime.utcnow(),
         "updated_at": datetime.utcnow(),
     }
-    result = plans_collection.insert_one(plan)
-    print(f"Inseted plan: {plan}")
+    plans_collection.insert_one(plan)
+
     return serialize_plan(plan)
 
 def get_user_plans(email: str):

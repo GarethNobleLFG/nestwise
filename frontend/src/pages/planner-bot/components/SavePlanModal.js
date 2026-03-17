@@ -49,7 +49,7 @@ export default function SavePlanModal({
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
                                     transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                                    className="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-lg"
+                                    className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full flex items-center justify-center shadow-lg"
                                 >
                                     <CheckCircleIcon className="h-8 w-8 text-white" />
                                 </motion.div>
@@ -76,7 +76,7 @@ export default function SavePlanModal({
                             >
                                 <Button
                                     onClick={handleGoToPlans}
-                                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+                                    className="w-full bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-white font-medium py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
                                 >
                                     <FolderIcon className="h-5 w-5 mr-2" />
                                     Check it in My Plans

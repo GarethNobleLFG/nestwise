@@ -3,7 +3,7 @@ export const calculateProgress = (planData) => {
         return 0;
     }
 
-    // Extract current age and retirement age from profile data structure
+    // Extract current age and retirement age from profile data structure.
     const currentAge = planData.profileData?.age?.value || 0;
     const retirementAge = planData.profileData?.retirement_age?.value || 65;
 

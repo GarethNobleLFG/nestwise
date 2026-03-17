@@ -12,6 +12,7 @@ import { usePlanHooks } from '../../../hooks/plans';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../components/shared/shadcn/components/ui/tooltip';
 import { typeText } from '../../../utils/textAnimation';
 import SavePlanModal from './SavePlanModal';
+import { useNavigate } from 'react-router-dom';
 
 export default function PlannerArea({ animationTriggered, profileData, lastChatbotResponse, conversationTitle, generatedPlan }) {
     const [plan, setPlanContent] = useState('Your personalized financial plan will appear here once generated...');
@@ -23,6 +24,8 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
 
     const [showSaveModal, setShowSaveModal] = useState(false);
     const [savedPlanId, setSavedPlanId] = useState(null);
+
+    const navigate = useNavigate();
 
     // Update plan content when generatedPlan is provided from backend
     useEffect(() => {
@@ -143,9 +146,8 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
     };
 
     const handleGoToPlans = (planId) => {
-        // Navigate to My Plans page with the saved plan selected
-        // You'll need to implement this navigation based on your routing setup
-        console.log('Navigating to My Plans with plan:', planId);
+        // Navigate to My Plans page with the saved plan ID
+        navigate('/myplans', { state: { selectedPlanId: planId } });
     };
 
     return (
@@ -274,7 +276,7 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                 planId={savedPlanId}
                 onGoToPlans={handleGoToPlans}
             />
-            
+
         </motion.div>
     );
 }

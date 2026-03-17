@@ -11,6 +11,8 @@ import { Button } from '../../../components/shared/shadcn/components/ui/button';
 import { usePlanHooks } from '../../../hooks/plans';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../components/shared/shadcn/components/ui/tooltip';
 import { typeText } from '../../../utils/textAnimation';
+import SavePlanModal from './SavePlanModal';
+import { useNavigate } from 'react-router-dom';
 
 export default function PlannerArea({ animationTriggered, profileData, lastChatbotResponse, conversationTitle, generatedPlan }) {
     const [plan, setPlanContent] = useState('Your personalized financial plan will appear here once generated...');
@@ -19,6 +21,11 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
     const [typedPlan, setTypedPlan] = useState('Your personalized financial plan will appear here once generated...');
     const { savePlan } = usePlanHooks();
     const scrollRef = useRef(null);
+
+    const [showSaveModal, setShowSaveModal] = useState(false);
+    const [savedPlanId, setSavedPlanId] = useState(null);
+
+    const navigate = useNavigate();
 
     // Update plan content when generatedPlan is provided from backend
     useEffect(() => {
@@ -121,17 +128,26 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
         }
 
         try {
-            // const cleanedPlanJSON = rawPlanJSON.replace(/```json|```/g, '').trim();
-            // const parsedPlan = JSON.parse(cleanedPlanJSON);
-
             const name = conversationTitle || "Generated Plan";
             const description = "NestWise generated plan";
 
-            await savePlan(name, profileData, rawPlanJSON, description);
-            alert("Saved!");
-        } catch (e) {
+            const result = await savePlan(name, profileData, rawPlanJSON, description);
+            setSavedPlanId(result.id || name);
+            setShowSaveModal(true);
+        }
+        catch (e) {
             alert("Save failed");
         }
+    };
+
+    const handleCloseModal = () => {
+        setShowSaveModal(false);
+        setSavedPlanId(null);
+    };
+
+    const handleGoToPlans = (planId) => {
+        // Navigate to My Plans page with the saved plan ID
+        navigate('/myplans', { state: { selectedPlanId: planId } });
     };
 
     return (
@@ -252,6 +268,15 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                     </CardContent>
                 </Card>
             </motion.div>
+
+            {/* Save Success Modal */}
+            <SavePlanModal
+                isOpen={showSaveModal}
+                onClose={handleCloseModal}
+                planId={savedPlanId}
+                onGoToPlans={handleGoToPlans}
+            />
+
         </motion.div>
     );
 }

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent } from '../../../components/shared/shadcn/components/ui/card';
 import { cn } from '../../../components/shared/shadcn/lib/utils';
 
-const PlansIndex = ({ plans = [], onPlanSelect }) => {
+const PlansIndex = ({ plans = [], onPlanSelect, selectedPlanId }) => {
     const [selectedPlan, setSelectedPlan] = useState(null);
 
     const handlePlanSelect = (plan) => {
@@ -48,7 +48,7 @@ const PlansIndex = ({ plans = [], onPlanSelect }) => {
                                 onClick={() => handlePlanSelect(plan)}
                                 className={cn(
                                     "rounded-lg p-2 border-l-4 hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer",
-                                    selectedPlan === plan.id
+                                    (selectedPlan === plan.id || selectedPlanId === plan.id)
                                         ? "bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-400"
                                         : "bg-gradient-to-r from-slate-50 to-gray-50 border-yellow-400"
                                 )}
@@ -56,12 +56,12 @@ const PlansIndex = ({ plans = [], onPlanSelect }) => {
                                 <div className="flex items-start space-x-2">
                                     <div className={cn(
                                         "w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0",
-                                        selectedPlan === plan.id ? "bg-blue-500" : "bg-yellow-500"
+                                        (selectedPlan === plan.id || selectedPlanId === plan.id) ? "bg-blue-500" : "bg-yellow-500"
                                     )}></div>
                                     <div className="flex-1 min-w-0">
                                         <p className={cn(
                                             "text-sm md:text-base lg:text-lg font-bold break-words",
-                                            selectedPlan === plan.id ? "text-blue-700" : "text-gray-700"
+                                            (selectedPlan === plan.id || selectedPlanId === plan.id) ? "text-blue-700" : "text-gray-700"
                                         )}>
                                             {plan.name}
                                         </p>

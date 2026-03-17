@@ -4,12 +4,15 @@ import MetricsArea from './components/MetricsArea';
 import PlanArea from './components/plan-area/PlanArea';
 import PlansIndex from './components/PlansIndex';
 import { usePlanHooks } from '../../hooks/plans';
+import { useLocation } from 'react-router-dom';
 
 export default function MyPlans() {
     const [animationTriggered, setAnimationTriggered] = useState(false);
     const [plans, setPlans] = useState([]);
     const [selectedPlanData, setSelectedPlanData] = useState(null);
     const [profileData, setProfileData] = useState({}); // Need to set this in the return on get plan hook.
+
+    const location = useLocation();
 
     const { getUserPlans, getPlanById } = usePlanHooks();
 
@@ -31,6 +34,16 @@ export default function MyPlans() {
         console.log("selected plan profile data: ", fullPlan.profileData);
     };
 
+    // Use effect to load selected plan coming from planner bot.
+    useEffect(() => {
+        if (location.state?.selectedPlanId && plans.length > 0) {
+            const planToSelect = plans.find(p => p.id === location.state.selectedPlanId);
+            if (planToSelect) {
+                handlePlanSelect(planToSelect);
+            }
+        }
+    }, [plans, location.state?.selectedPlanId]);
+
     useEffect(() => {
         document.title = "NestWise - My Plans";
 
@@ -49,6 +62,7 @@ export default function MyPlans() {
                     <PlansIndex
                         plans={plans}
                         onPlanSelect={handlePlanSelect}
+                        selectedPlanId={selectedPlanData?.id}
                     />
                 </div>
 

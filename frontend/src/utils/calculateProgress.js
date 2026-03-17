@@ -7,7 +7,7 @@ export const calculateProgress = (planData) => {
     const currentAge = planData.profileData?.age?.value || 0;
     const retirementAge = planData.profileData?.retirement_age?.value || 65;
 
-    // Use current age as starting point
+    // Use current age as starting point.
     const startingAge = currentAge;
     
     // Calculate progress percentage - assuming 5 years have passed

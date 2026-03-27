@@ -39,7 +39,7 @@ class RiskAssessment(BaseModel):
     mitigation_strategy: str
 
 class Milestone(BaseModel):
-    age: int
+    age: float
     action: str
     expected_outcome: str
     source: List[str]

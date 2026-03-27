@@ -241,7 +241,8 @@ export default function PlannerBot() {
       }
 
       if (!res.ok) {
-        throw new Error(`Server error: ${res.status}`);
+        console.error('Server error:', res.status, await res.text());
+        throw new Error(`Server Unavailable, Please Try Again Later`);
       }
 
       const data = await res.json();

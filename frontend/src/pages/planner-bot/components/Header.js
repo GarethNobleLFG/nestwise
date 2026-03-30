@@ -37,14 +37,20 @@ export default function Header({
                             <div className="font-semibold text-gray-800 flex items-center text-sm md:text-base lg:text-lg">
                                 Plan:
                             </div>
-                            <Button
-                                variant="outline"
-                                onClick={() => setIsModalOpen(true)}
-                                className="bg-white/40 backdrop-blur-sm rounded-2xl shadow-lg border-0 px-4 py-3 font-semibold text-gray-800 hover:bg-white/60 transition-all duration-300 max-w-96 text-sm md:text-base lg:text-lg"
-                            >
-                                <span className="truncate">{headerTitle}</span>
-                                <EditIcon className="h-4 w-4 ml-2 flex-shrink-0" />
-                            </Button>
+                           {/* Button + hint side by side */}
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setIsModalOpen(true)}
+                                    className="bg-white/40 backdrop-blur-sm rounded-2xl shadow-lg border-0 px-4 py-3 font-semibold text-gray-800 hover:bg-white/60 transition-all duration-300 max-w-96 text-sm md:text-base lg:text-lg"
+                                >
+                                    <span className="truncate">{headerTitle}</span>
+                                    <EditIcon className="h-4 w-4 ml-2 flex-shrink-0" />
+                                </Button>
+                                <p className="text-xs text-gray-400 whitespace-nowrap">
+                                    Click <EditIcon sx={{ fontSize: 11, verticalAlign: 'middle', mx: '2px' }} /> to select a plan to update
+                                </p>
+                            </div>
 
                             <div className="flex items-center space-x-3">
                                 <Button

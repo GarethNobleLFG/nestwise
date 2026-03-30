@@ -4,12 +4,36 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import DownloadIcon from '@mui/icons-material/Download';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { downloadPlanUtil } from '../../../../../utils/downloadPlanUtil';
+import * as planHooks from '../../../../../hooks/plans';
 
-export default function PlanIdentifier({ planData, animationTriggered }) {
+export default function PlanIdentifier({
+    planData,
+    animationTriggered,
+    plans,
+    setPlans,
+    setSelectedPlanData
+}) {
+    const { deletePlan } = planHooks.usePlanHooks();
 
     const handleDownload = async () => {
         await downloadPlanUtil(planData);
+    };
+
+    const handleDelete = async () => {
+        if (window.confirm('Are you sure you want to delete this plan? This action cannot be undone.')) {
+            try {
+                await deletePlan(planData.id);
+
+                setPlans(prevPlans => prevPlans.filter(plan => plan.id !== planData.id));
+
+                setSelectedPlanData(null);
+            }
+            catch (err) {
+                console.error('Failed to delete plan: ' + err.message);
+            }
+        }
     };
 
     return (
@@ -79,16 +103,30 @@ export default function PlanIdentifier({ planData, animationTriggered }) {
 
                                 </div>
 
-                                {/* Download Button */}
-                                <motion.button
-                                    onClick={handleDownload}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    className="inline-flex items-center space-x-2 px-3 py-1.5 bg-gradient-to-r from-amber-600 to-yellow-500 text-white text-xs font-medium rounded-md hover:from-amber-700 hover:to-yellow-600 transition-all duration-200 shadow-md hover:shadow-lg self-start"
-                                >
-                                    <DownloadIcon className="w-3 h-3" />
-                                    <span>Download Plan</span>
-                                </motion.button>
+                                {/* Action Buttons */}
+                                <div className="flex items-center space-x-2 self-start">
+                                    {/* Download Button */}
+                                    <motion.button
+                                        onClick={handleDownload}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="inline-flex items-center space-x-2 px-3 py-1.5 bg-gradient-to-r from-amber-600 to-yellow-500 text-white text-xs font-medium rounded-md hover:from-amber-700 hover:to-yellow-600 transition-all duration-200 shadow-md hover:shadow-lg"
+                                    >
+                                        <DownloadIcon className="w-3 h-3" />
+                                        <span>Download Plan</span>
+                                    </motion.button>
+
+                                    {/* Delete Button */}
+                                    <motion.button
+                                        onClick={handleDelete}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="inline-flex items-center space-x-2 px-3 py-1.5 bg-gradient-to-r from-red-600 to-red-500 text-white text-xs font-medium rounded-md hover:from-red-700 hover:to-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
+                                    >
+                                        <DeleteIcon className="w-3 h-3" />
+                                        <span>Delete Plan</span>
+                                    </motion.button>
+                                </div>
                             </div>
                         </motion.div>
                     </div>

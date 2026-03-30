@@ -71,6 +71,9 @@ export default function MyPlans() {
                     <PlanArea
                         planData={selectedPlanData}
                         animationTriggered={animationTriggered}
+                        plans={plans}
+                        setPlans={setPlans}
+                        setSelectedPlanData={setSelectedPlanData}
                     />
                 </div>
 

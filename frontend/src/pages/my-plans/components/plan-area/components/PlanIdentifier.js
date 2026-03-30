@@ -8,7 +8,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { downloadPlanUtil } from '../../../../../utils/downloadPlanUtil';
 import * as planHooks from '../../../../../hooks/plans';
 
-export default function PlanIdentifier({ planData, animationTriggered }) {
+export default function PlanIdentifier({
+    planData,
+    animationTriggered,
+    plans,
+    setPlans,
+    setSelectedPlanData
+}) {
     const { deletePlan } = planHooks.usePlanHooks();
 
     const handleDownload = async () => {
@@ -19,7 +25,11 @@ export default function PlanIdentifier({ planData, animationTriggered }) {
         if (window.confirm('Are you sure you want to delete this plan? This action cannot be undone.')) {
             try {
                 await deletePlan(planData.id);
-            } 
+
+                setPlans(prevPlans => prevPlans.filter(plan => plan.id !== planData.id));
+
+                setSelectedPlanData(null);
+            }
             catch (err) {
                 console.error('Failed to delete plan: ' + err.message);
             }

@@ -9,7 +9,8 @@ export default function Header({
     conversationTitle,
     selectedPlan,
     setSelectedPlan,
-    clearChat
+    clearChat,
+    onPlanSelect, 
 }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -20,6 +21,12 @@ export default function Header({
     else {
         headerTitle = conversationTitle || 'NestWise Agent';
     }
+
+    const handlePlanSelected = (planId) => {
+        setSelectedPlan(planId);
+        setIsModalOpen(false);
+        if (onPlanSelect) onPlanSelect(planId);
+    };
 
     return (
         <>
@@ -59,7 +66,7 @@ export default function Header({
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 selectedPlan={selectedPlan}
-                setSelectedPlan={setSelectedPlan}
+                setSelectedPlan={handlePlanSelected}
             />
         </>
     );

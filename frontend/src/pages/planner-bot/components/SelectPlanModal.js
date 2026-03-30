@@ -3,9 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../../../components/shared/shadcn/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/shared/shadcn/components/ui/card';
 import CloseIcon from '@mui/icons-material/Close';
-import HomeIcon from '@mui/icons-material/Home';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import SavingsIcon from '@mui/icons-material/Savings';
+import DescriptionIcon from '@mui/icons-material/Description';
 import AddIcon from '@mui/icons-material/Add';
 import { usePlanHooks } from '../../../hooks/plans';
 
@@ -121,9 +119,7 @@ export default function SelectPlanModal({
                                                             <div className="flex items-center space-x-4">
                                                                 {/* Plan initial avatar */}
                                                                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-yellow-400 to-yellow-500 flex items-center justify-center shadow-lg shrink-0">
-                                                                    <span className="text-white font-bold text-lg">
-                                                                        {plan.name ? plan.name.charAt(0).toUpperCase() : 'P'}
-                                                                    </span>
+                                                                    <DescriptionIcon className="text-white text-2xl" />
                                                                 </div>
 
                                                                 <div className="flex-1 min-w-0">

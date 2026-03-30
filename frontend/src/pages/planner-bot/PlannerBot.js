@@ -78,6 +78,14 @@ export default function PlannerBot() {
       if (!res.ok) throw new Error('Failed to start session');
       const data = await res.json();
       setSessionId(data.session_id);
+      // If the backend returned a plan, load it into the planner area
+      if (data.plan) {
+        setRawPlanJSON(data.plan.data ?? data.plan);
+        setGeneratedPlan(data.plan.data ?? data.plan);
+        if (data.plan.profileData) setProfileData(data.plan.profileData);
+        console.log('Plan loaded from session start:', data.plan);
+      }
+
     } catch (err) {
       console.error(err);
       await addBotMessage('Error starting session.');

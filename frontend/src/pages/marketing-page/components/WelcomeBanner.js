@@ -91,19 +91,42 @@ export default function WelcomeBanner({ navigate, isLoggedIn }) {
               transition={{ duration: 0.8, delay: 0.6 }}
             >
               <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                className="!flex !flex-col !items-center !justify-center !pt-8 !space-y-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
               >
-                <Button
-                  className="!text-xl !px-10 !py-6 !text-white !font-semibold !shadow-xl !rounded-lg !transition-all !border-none !cursor-pointer"
-                  style={{
-                    background: 'linear-gradient(45deg, #FFD700, #c47c1eff)',
-                  }}
-                  onClick={() => navigate(isLoggedIn ? "/myplans" : "/signup")}
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  {isLoggedIn && userName ? "View My Plans" : "Start Planning Today"}
-                </Button>
+                  <Button
+                    className="!text-xl !px-10 !py-6 !text-white !font-semibold !shadow-xl !rounded-lg !transition-all !border-none !cursor-pointer"
+                    style={{
+                      background: 'linear-gradient(45deg, #FFD700, #c47c1eff)',
+                    }}
+                    onClick={() => navigate(isLoggedIn ? "/myplans" : "/signup")}
+                  >
+                    {isLoggedIn && userName ? "View My Plans" : "Start Planning Today"}
+                  </Button>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button
+                    className="!text-lg !px-8 !py-4 !text-white !font-medium !shadow-lg !rounded-lg !transition-all !border-none !cursor-pointer"
+                    style={{
+                      background: 'linear-gradient(45deg, hsl(var(--gray-300)), hsl(var(--gray-400)))',
+                    }}
+                    onClick={() => navigate(isLoggedIn ? "/plannerbot" : "/signin")}
+                  >
+                    Start Planning
+                  </Button>
+                </motion.div>
               </motion.div>
+              
             </motion.div>
           </motion.div>
 

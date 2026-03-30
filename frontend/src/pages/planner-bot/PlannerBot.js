@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useRef } from 'react';
-import { validateToken } from '../../hooks/validateToken';
+import { validateToken, clearAuthToken } from '../../hooks/validateToken';
 import InputArea from './components/InputArea';
 import MessagesArea from './components/MessagesArea';
 import Header from './components/Header';
@@ -42,8 +42,7 @@ export default function PlannerBot() {
   const startChatSession = React.useCallback(async (planId = null) => {
     const tokenCheck = await validateToken();
     if (!tokenCheck.valid) {
-      alert("Your session has expired. Please log in again.");
-      localStorage.removeItem("token");
+      clearAuthToken();
       return;
     }
  
@@ -72,8 +71,7 @@ export default function PlannerBot() {
       });
  
       if (res.status === 401) {
-        alert("Your session has expired. Please log in again.");
-        localStorage.removeItem("token");
+        clearAuthToken();
         return;
       }
  
@@ -205,9 +203,7 @@ export default function PlannerBot() {
     const tokenCheck = await validateToken();
 
     if (!tokenCheck.valid) {
-      alert("Your session has expired. Please log in again.");
-      localStorage.removeItem("token");
-      window.location.href = "/signin";
+      clearAuthToken();
       return;
     }
     if (!input.trim() || sending) return;
@@ -258,8 +254,7 @@ export default function PlannerBot() {
 
       if (res.status === 401) {
         removeThinkingMessage();
-        alert("Your session has expired. Please log in again.");
-        localStorage.removeItem("token");
+        clearAuthToken();
         return;
       }
 

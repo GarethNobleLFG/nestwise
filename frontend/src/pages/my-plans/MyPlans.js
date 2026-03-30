@@ -19,9 +19,13 @@ export default function MyPlans() {
     // Fetch all plans on mount
     useEffect(() => {
         async function fetchPlans() {
-            // only retruns the name and id of the plans, not the full plan data
-            const userPlans = await getUserPlans();
-            setPlans(userPlans);
+            try {
+                // only returns the name and id of the plans, not the full plan data
+                const userPlans = await getUserPlans();
+                setPlans(userPlans);
+            } catch (err) {
+                console.error('Failed to load plans:', err);
+            }
         }
 
         fetchPlans();

@@ -82,6 +82,7 @@ export default function PlannerBot() {
       if (data.plan) {
         setRawPlanJSON(data.plan.data ?? data.plan);
         setGeneratedPlan(data.plan.data ?? data.plan);
+        setConversationTitle(data.plan.name || 'NestWise Agent');
         if (data.plan.profileData) setProfileData(data.plan.profileData);
         console.log('Plan loaded from session start:', data.plan);
       }

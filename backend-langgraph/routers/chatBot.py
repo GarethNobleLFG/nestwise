@@ -32,6 +32,7 @@ async def start_chat(
     session_id = str(time.time())
     real_profile = None
     plan = None
+    name=None
 
     # ── Fetch plan and extract profileData if plan_id was supplied ────────────
     if request.plan_id:
@@ -44,6 +45,8 @@ async def start_chat(
                 plan_res.raise_for_status()
                 plan = plan_res.json()
                 real_profile = plan.get("profileData")
+                name=plan.get("name", "Unnamed Plan")
+                print(f"Loaded plan {name} ")
                 logger.info(f"Loaded profileData from plan {request.plan_id}: {real_profile}")
         except httpx.HTTPStatusError as exc:
             logger.warning(f"Plan fetch returned {exc.response.status_code} for id {request.plan_id}")
@@ -60,7 +63,7 @@ async def start_chat(
     # ─────────────────────────────────────────────────────────────────────────
 
     try:
-        await run_in_threadpool(start_session, session_id, real_profile=real_profile)
+        await run_in_threadpool(start_session, session_id, real_profile=real_profile, name=name)
     except Exception as exc:
         logger.exception("Failed to start session")
         raise HTTPException(

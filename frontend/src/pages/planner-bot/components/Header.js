@@ -4,13 +4,19 @@ import { Button } from '../../../components/shared/shadcn/components/ui/button';
 import EditIcon from '@mui/icons-material/Edit';
 import ClearIcon from '@mui/icons-material/Clear';
 import SelectPlanModal from './SelectPlanModal';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '../../../components/shared/shadcn/components/ui/tooltip';
 
 export default function Header({
     conversationTitle,
     selectedPlan,
     setSelectedPlan,
     clearChat,
-    onPlanSelect, 
+    onPlanSelect,
 }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -37,14 +43,23 @@ export default function Header({
                             <div className="font-semibold text-gray-800 flex items-center text-sm md:text-base lg:text-lg">
                                 Plan:
                             </div>
-                           {/* Button + hint side by side */}
+                            {/* Button + hint side by side */}
                             <div className="flex items-center gap-2">
                                 <Button
                                     variant="outline"
                                     onClick={() => setIsModalOpen(true)}
-                                    className="bg-white/40 backdrop-blur-sm rounded-2xl shadow-lg border-0 px-4 py-3 font-semibold text-gray-800 hover:bg-white/60 transition-all duration-300 max-w-96 text-sm md:text-base lg:text-lg"
+                                    className="bg-white/40 backdrop-blur-sm rounded-2xl shadow-lg border-0 px-4 py-3 font-semibold text-gray-800 hover:bg-white/60 transition-all duration-300 max-w-48 text-sm md:text-base lg:text-lg"
                                 >
-                                    <span className="truncate">{headerTitle}</span>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span className="truncate">{headerTitle}</span>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>{headerTitle}</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                     <EditIcon className="h-4 w-4 ml-2 flex-shrink-0" />
                                 </Button>
                                 <p className="text-xs text-gray-400 whitespace-nowrap">

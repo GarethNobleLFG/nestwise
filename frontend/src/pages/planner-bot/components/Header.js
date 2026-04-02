@@ -48,7 +48,7 @@ export default function Header({
                                 <Button
                                     variant="outline"
                                     onClick={() => setIsModalOpen(true)}
-                                    className="bg-white/40 backdrop-blur-sm rounded-2xl shadow-lg border-0 px-4 py-3 font-semibold text-gray-800 hover:bg-white/60 transition-all duration-300 max-w-48 text-sm md:text-base lg:text-lg"
+                                    className="bg-white/40 backdrop-blur-sm rounded-2xl shadow-lg border-0 px-4 py-3 font-semibold text-gray-800 hover:bg-white/60 transition-all duration-300 max-w-64 text-sm md:text-base lg:text-lg"
                                 >
                                     <TooltipProvider>
                                         <Tooltip>
@@ -63,7 +63,7 @@ export default function Header({
                                     <EditIcon className="h-4 w-4 ml-2 flex-shrink-0" />
                                 </Button>
                                 <p className="text-xs text-gray-400 whitespace-nowrap">
-                                    Click <EditIcon sx={{ fontSize: 11, verticalAlign: 'middle', mx: '2px' }} /> to select a plan to update
+                                    Click to edit
                                 </p>
                             </div>
 

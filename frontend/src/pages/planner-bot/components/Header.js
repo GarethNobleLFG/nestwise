@@ -41,7 +41,7 @@ export default function Header({
                     <div className="flex items-center space-x-8">
                         <div className="flex items-center space-x-2">
                             <div className="font-semibold text-gray-800 flex items-center text-sm md:text-base lg:text-lg">
-                                Plan:
+                                Selected Plan:
                             </div>
                             {/* Button + hint side by side */}
                             <div className="flex items-center gap-2">
@@ -62,9 +62,6 @@ export default function Header({
                                     </TooltipProvider>
                                     <EditIcon className="h-4 w-4 ml-2 flex-shrink-0" />
                                 </Button>
-                                <p className="text-xs text-gray-400 whitespace-nowrap">
-                                    Click to edit
-                                </p>
                             </div>
 
                             <div className="flex items-center space-x-3">

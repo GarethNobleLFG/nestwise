@@ -139,6 +139,10 @@ SPECIAL RULES:
 - If the user responds with "no", or something suggesting that they are DONE, OR that they do NOT
 want to update any other fields, return a field called 'continue_asking' with a value of False.
 - Examples include: "no", "i'm good", "I'm done", "that's all", etc.
+
+- Otherwise, ALSO extract any field values the user provides, exactly as you would normally.
+  For example, if the user says "my age is 22", extract the age.
+  Always include both the updated fields AND continue_asking in your response.
 ''')
 
 

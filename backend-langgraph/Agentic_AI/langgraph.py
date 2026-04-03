@@ -14,48 +14,24 @@ from langchain_core.tools import tool
 from langgraph.prebuilt import ToolNode, tools_condition, create_react_agent
 from datetime import date
 from pydantic import BaseModel, Field
-from typing import List
-
-# Pydantic models for structured planner output
-class AssetAllocation(BaseModel):
-    stocks: float
-    bonds: float
-    cash: float
-    other: float
-
-class InvestmentStrategy(BaseModel):
-    asset_allocation: AssetAllocation
-    justification: str
-
-class SavingsPlanItem(BaseModel):
-    year: int
-    annual_contribution: float
-    expected_growth: float
-    source: List[str]
-
-class RiskAssessment(BaseModel):
-    inflation: str
-    market_volatility: str
-    mitigation_strategy: str
-
-class Milestone(BaseModel):
-    age: float
-    action: str
-    expected_outcome: str
-    source: List[str]
-
-class Citation(BaseModel):
-    fact: str
-    source: str
-    page: int
-
-class RetirementPlan(BaseModel):
-    investment_strategy: InvestmentStrategy
-    savings_plan: List[SavingsPlanItem]
-    risk_assessment: RiskAssessment
-    milestones: List[Milestone]
-    citations: List[Citation]
-
+from typing import List, Literal
+from models.plan_structure import (
+    AssetAllocation,
+    InvestmentStrategy,
+    SavingsPlanItem,
+    RiskAssessment,
+    Milestone,
+    Citation,
+    RetirementPlan
+)
+from langgraph.graph import MessagesState
+from langgraph.graph import StateGraph, START, END
+from langgraph.checkpoint.memory import MemorySaver
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+from typing import Literal,TypedDict
+from langgraph.graph import MessagesState
+from langgraph.graph import StateGraph, START, END
+from langgraph.checkpoint.memory import MemorySaver
 
 COMPLETENESSRATIO = 1.0
 
@@ -79,7 +55,7 @@ model_query_rewriter = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 embeddings = OpenAIEmbeddings()
 vector_store = InMemoryVectorStore(embeddings)
 
-from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+
 
 ##### CHATBOT PROMPT #####
 system_prompt_chatbot = SystemMessage(content='''
@@ -291,10 +267,7 @@ QUERY_REWRITE_SYSTEM = SystemMessage(content="""
     6. Return ONLY the optimized retrieval query.
     """)
 
-from typing import Literal,TypedDict
-from langgraph.graph import MessagesState
-from langgraph.graph import StateGraph, START, END
-from langgraph.checkpoint.memory import MemorySaver
+
 
 real_profile = {}
 """
@@ -356,10 +329,6 @@ class RouterState(TypedDict):
     result: str
     user_goal: str
 
-from typing import Literal
-from langgraph.graph import MessagesState
-from langgraph.graph import StateGraph, START, END
-from langgraph.checkpoint.memory import MemorySaver
 
 ## To call agent chatbot
 

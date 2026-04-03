@@ -14,16 +14,18 @@ import { typeText } from '../../../utils/textAnimation';
 import SavePlanModal from './SavePlanModal';
 import { useNavigate } from 'react-router-dom';
 
-export default function PlannerArea({ animationTriggered, profileData, lastChatbotResponse, conversationTitle, generatedPlan }) {
+export default function PlannerArea({ animationTriggered, profileData, lastChatbotResponse, conversationTitle, generatedPlan, selectedPlan }) {
     const [plan, setPlanContent] = useState('Your personalized financial plan will appear here once generated...');
     const [rawPlanJSON, setRawPlanJSON] = useState(null); // Keep raw JSON for database
     const [isGenerating, setIsGenerating] = useState(false);
     const [typedPlan, setTypedPlan] = useState('Your personalized financial plan will appear here once generated...');
-    const { savePlan } = usePlanHooks();
+    // plan hooks used in modal; not invoking save here directly
+    const planHooks = usePlanHooks();
     const scrollRef = useRef(null);
 
     const [showSaveModal, setShowSaveModal] = useState(false);
     const [savedPlanId, setSavedPlanId] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
 
     const navigate = useNavigate();
 
@@ -120,23 +122,48 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
         headerTitle = conversationTitle || 'NestWise Agent';
     }
 
-    // Add functionality to save the plan using the `savePlan` hook
+    // Show save/update modal when a generated plan exists
     const handleSavePlan = async () => {
         if (!rawPlanJSON) {
             console.log("No plan JSON");
             return;
         }
 
-        try {
-            const name = conversationTitle || "Generated Plan";
-            const description = "NestWise generated plan";
+        // Open modal to allow update or save-as-new. Pass selectedPlan as existingPlanId.
+        setSavedPlanId(null);
+        setShowSaveModal(true);
+    };
 
-            const result = await savePlan(name, profileData, rawPlanJSON, description);
-            setSavedPlanId(result.id || name);
-            setShowSaveModal(true);
+    const handleSaveNew = async () => {
+        if (!rawPlanJSON) return;
+        setIsSaving(true);
+        try {
+            const name = conversationTitle || 'Generated Plan';
+            const description = 'NestWise generated plan';
+            const res = await planHooks.savePlan(name, profileData || {}, rawPlanJSON, description);
+            setSavedPlanId(res.id || res.name || name);
+        } catch (err) {
+            console.error('Save failed', err);
+            alert('Save failed');
+        } finally {
+            setIsSaving(false);
         }
-        catch (e) {
-            alert("Save failed");
+    };
+
+    const handleUpdateExisting = async () => {
+        if (!rawPlanJSON || !selectedPlan) return;
+        setIsSaving(true);
+        try {
+            const name = conversationTitle || 'Generated Plan';
+            const description = 'NestWise generated plan';
+            // Include profileData when updating so backend stores latest profile
+            const res = await planHooks.updatePlan(selectedPlan, name, rawPlanJSON, description, profileData || {});
+            setSavedPlanId(res.id || selectedPlan);
+        } catch (err) {
+            console.error('Update failed', err);
+            alert('Update failed');
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -269,12 +296,17 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                 </Card>
             </motion.div>
 
-            {/* Save Success Modal */}
+            {/* Save/Update Modal */}
             <SavePlanModal
                 isOpen={showSaveModal}
                 onClose={handleCloseModal}
-                planId={savedPlanId}
+                planId={selectedPlan}
+                // modal delegates actions to parent
                 onGoToPlans={handleGoToPlans}
+                onSaveNew={handleSaveNew}
+                onUpdateExisting={handleUpdateExisting}
+                isLoading={isSaving}
+                savedId={savedPlanId}
             />
 
         </motion.div>

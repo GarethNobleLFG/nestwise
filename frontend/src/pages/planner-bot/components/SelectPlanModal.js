@@ -18,6 +18,25 @@ export default function SelectPlanModal({
     const { getUserPlans, loading, error } = usePlanHooks();
     const [plans, setPlans] = React.useState([]);
 
+    // If an auth/token error happens, trigger the global auth-removed event
+    // so the app's existing sign-in popup (ProtectedRoute) appears.
+    React.useEffect(() => {
+        if (!error) return;
+        try {
+            const msg = typeof error === 'string' ? error.toLowerCase() : '';
+            if (msg.includes('no auth token') || msg.includes('token')) {
+                // dispatch the same event ProtectedRoute listens for
+                try {
+                    window.dispatchEvent(new Event('auth-removed'));
+                } catch (e) {
+                    // ignore
+                }
+            }
+        } catch (e) {
+            // ignore
+        }
+    }, [error]);
+
     React.useEffect(() => {
         if (isOpen) {
             getUserPlans()
@@ -91,7 +110,11 @@ export default function SelectPlanModal({
 
                             {/* Error */}
                             {error && !loading && (
-                                <p className="text-center text-sm text-red-500 py-4">Failed to load plans. Please try again.</p>
+                                <p className="text-center text-sm text-red-500 py-4">
+                                    {typeof error === 'string' && (error.toLowerCase().includes('no auth token') || error.toLowerCase().includes('token'))
+                                        ? 'Please sign in to view your saved plans.'
+                                        : 'Failed to load plans. Please try again.'}
+                                </p>
                             )}
 
                             {/* Empty */}

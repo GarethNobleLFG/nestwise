@@ -4,19 +4,19 @@ import { Button } from '../../../components/shared/shadcn/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/shared/shadcn/components/ui/card';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import FolderIcon from '@mui/icons-material/Folder';
-
 export default function SavePlanModal({
     isOpen,
     onClose,
-    planId,
-    onGoToPlans
+    planId: existingPlanId,
+    onGoToPlans,
+    onSaveNew,
+    onUpdateExisting,
+    isLoading,
+    savedId,
 }) {
 
     const handleGoToPlans = () => {
-        if (onGoToPlans) {
-            onGoToPlans(planId);
-        }
+        if (onGoToPlans) onGoToPlans(savedId || existingPlanId);
         onClose();
     };
 
@@ -41,65 +41,52 @@ export default function SavePlanModal({
                     exit={{ opacity: 0, scale: 0.9, y: 20 }}
                     className="relative z-10 w-full max-w-md mx-4"
                 >
-                    <Card className="bg-white/95 backdrop-blur-xl border-white/30 shadow-2xl">
-                        <CardHeader className="pb-6 pt-8">
-                            <div className="flex flex-col items-center text-center space-y-4">
-                                {/* Success Icon */}
-                                <motion.div
-                                    initial={{ scale: 0 }}
-                                    animate={{ scale: 1 }}
-                                    transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                                    className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full flex items-center justify-center shadow-lg"
-                                >
-                                    <CheckCircleIcon className="h-8 w-8 text-white" />
-                                </motion.div>
+                    {savedId ? (
+                        <Card className="bg-white/95 backdrop-blur-xl border-white/30 shadow-2xl">
+                            <CardContent className="pt-8 pb-8">
+                                <div className="flex flex-col items-center text-center space-y-6">
+                                    <motion.div
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                                        className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full flex items-center justify-center shadow-lg"
+                                    >
+                                        <CheckCircleIcon className="h-8 w-8 text-white" />
+                                    </motion.div>
 
-                                {/* Success Message */}
-                                <motion.div
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.3 }}
-                                >
-                                    <CardTitle className="text-xl md:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                                        Your plan has been saved!
-                                    </CardTitle>
-                                </motion.div>
-                            </div>
-                        </CardHeader>
+                                    <CardTitle className="text-xl md:text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Your plan has been saved!</CardTitle>
 
-                        <CardContent className="space-y-6 pb-8">
-                            {/* Check it in My Plans Button */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.4 }}
-                            >
-                                <Button
-                                    onClick={handleGoToPlans}
-                                    className="w-full bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-white font-medium py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
-                                >
-                                    <FolderIcon className="h-5 w-5 mr-2" />
-                                    Check it in My Plans
-                                </Button>
-                            </motion.div>
+                                    <div className="flex w-full max-w-sm space-x-2">
+                                        <Button onClick={handleGoToPlans} className="flex-1 bg-gradient-to-r from-yellow-400 to-amber-500 text-white font-medium py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl">Go to My Plans</Button>
+                                        <Button variant="outline" onClick={onClose} className="flex-1">Close</Button>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ) : (
+                        <Card className="bg-white/95 backdrop-blur-xl border-white/30 shadow-2xl">
+                            <CardHeader className="pb-4 pt-6">
+                                <div className="flex items-center justify-between">
+                                    <CardTitle className="text-lg md:text-xl lg:text-2xl font-bold">Save Plan</CardTitle>
+                                    <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full">
+                                        <CloseIcon className="h-5 w-5" />
+                                    </Button>
+                                </div>
+                                <p className="text-gray-600 text-sm">Choose to update the existing plan or save as a new plan.</p>
+                            </CardHeader>
 
-                            {/* Close Button */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.5 }}
-                            >
-                                <Button
-                                    variant="outline"
-                                    onClick={onClose}
-                                    className="w-full border-gray-300 hover:border-gray-400 hover:bg-gray-50 font-medium py-3 rounded-lg transition-all duration-300"
-                                >
-                                    <CloseIcon className="h-5 w-5 mr-2" />
-                                    Close
-                                </Button>
-                            </motion.div>
-                        </CardContent>
-                    </Card>
+                            <CardContent className="space-y-4 pb-6">
+                                <div className="flex space-x-2 pt-4">
+                                    <Button onClick={onSaveNew} disabled={isLoading} className="flex-1 bg-gradient-to-r from-yellow-400 to-amber-500 text-white font-medium py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
+                                        {isLoading ? 'Saving...' : 'Save As New'}
+                                    </Button>
+                                    <Button onClick={onUpdateExisting} disabled={isLoading || !existingPlanId} variant={existingPlanId ? 'outline' : 'ghost'} className={`flex-1 ${existingPlanId ? 'border-yellow-400 text-yellow-600' : ''}`}>
+                                        {existingPlanId ? (isLoading ? 'Updating...' : 'Update Existing') : 'No Existing Plan'}
+                                    </Button>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
                 </motion.div>
             </div>
         </AnimatePresence>

@@ -537,6 +537,7 @@ export default function PlannerBot() {
               lastChatbotResponse={getLastChatbotResponse}
               conversationTitle={conversationTitle}
               generatedPlan={generatedPlan}
+              selectedPlan={selectedPlan}
             />
           </div>
         </div>

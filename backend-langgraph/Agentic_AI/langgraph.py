@@ -1289,7 +1289,7 @@ def start_session(session_id: str, real_profile: dict = None,name: str = "Unname
         },
         real_profile=real_profile if real_profile else {},
         shadow_profile=shadow_profile,
-        conversation_title=name if is_plan_generated else "initial",
+        conversation_title=name if is_plan_generated else "New Plan",
         is_plan_generated=is_plan_generated
     )
     return session_id

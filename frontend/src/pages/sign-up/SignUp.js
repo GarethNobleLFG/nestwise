@@ -116,9 +116,15 @@ export default function SignUp(props) {
       setEmailErrorMessage('');
     }
 
-    if (!password.value || password.value.length < 6) {
+    if (
+      !password.value ||
+      password.value.length < 6 ||
+      !/[!@#$%^&*(),.?":{}|<>]/.test(password.value)
+    ) {
       setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
+      setPasswordErrorMessage(
+        'Password must be at least 6 characters long and include at least one special character.'
+      );
       isValid = false;
     } else {
       setPasswordError(false);

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useRef } from 'react';
-import { validateToken } from '../../hooks/validateToken';
+import { validateToken, clearAuthToken } from '../../hooks/validateToken';
 import InputArea from './components/InputArea';
 import MessagesArea from './components/MessagesArea';
 import Header from './components/Header';
@@ -38,45 +38,55 @@ export default function PlannerBot() {
 
 
 
-  const startChatSession = React.useCallback(async () => {
+ // ── Start session — optionally with a plan ID ────────────────────────────
+  const startChatSession = React.useCallback(async (planId = null) => {
     const tokenCheck = await validateToken();
-
     if (!tokenCheck.valid) {
-      alert("Your session has expired. Please log in again.");
-      localStorage.removeItem("token");
+      clearAuthToken();
       return;
     }
-
-    // Check To See If There Is An Existing Chat State.
-    const savedState = loadFromSessionStorage();
-    if (savedState && savedState.sessionId) {
-      console.log('Using existing session from storage');
-      return; // Don't start a new session if we have one
+ 
+    // Only check for existing session when starting normally (no planId)
+    if (!planId) {
+      const savedState = loadFromSessionStorage();
+      if (savedState && savedState.sessionId) {
+        console.log('Using existing session from storage');
+        return;
+      }
     }
-
-
-
-    await addBotMessage('Hello! I am NestWiseAI. How can I help you today?')
+ 
+    await addBotMessage('Hello! I am NestWiseAI. How can I help you today?');
     const token = localStorage.getItem('token');
-
+ 
     try {
+      const body = planId ? { plan_id: planId } : {};
+ 
       const res = await fetch('http://localhost:8000/chatbot/start', {
         method: 'POST',
         headers: {
           "Authorization": `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
+        body: JSON.stringify(body),
       });
-
+ 
       if (res.status === 401) {
-        alert("Your session has expired. Please log in again.");
-        localStorage.removeItem("token");
+        clearAuthToken();
         return;
       }
-
+ 
       if (!res.ok) throw new Error('Failed to start session');
       const data = await res.json();
       setSessionId(data.session_id);
+      // If the backend returned a plan, load it into the planner area
+      if (data.plan) {
+        setRawPlanJSON(data.plan.data ?? data.plan);
+        setGeneratedPlan(data.plan.data ?? data.plan);
+        setConversationTitle(data.plan.name || 'NestWise Agent');
+        if (data.plan.profileData) setProfileData(data.plan.profileData);
+        console.log('Plan loaded from session start:', data.plan);
+      }
+
     } catch (err) {
       console.error(err);
       await addBotMessage('Error starting session.');
@@ -99,7 +109,27 @@ export default function PlannerBot() {
     }
   }, [animationTriggered, startChatSession]);
 
-
+// ── Handle plan selected from modal ──────────────────────────────────────
+  const handlePlanSelect = async (planId) => {
+    // Clear all existing state before starting fresh with the selected plan
+    setMessages([]);
+    setInput('');
+    setSending(false);
+    setSessionId(null);
+    setProfileData({});
+    setConversationTitle('');
+    setGeneratedPlan(null);
+    setRawPlanJSON(null);
+    setPlanAnimationNeeded(false);
+    sessionStorage.removeItem('plannerBotState');
+ 
+   
+ 
+    // Small delay to let state settle before starting new session
+    await new Promise((r) => setTimeout(r, 100));
+    await startChatSession(planId);
+  };
+  // ─────────────────────────────────────────────────────────────────────────
 
 
 
@@ -182,9 +212,7 @@ export default function PlannerBot() {
     const tokenCheck = await validateToken();
 
     if (!tokenCheck.valid) {
-      alert("Your session has expired. Please log in again.");
-      localStorage.removeItem("token");
-      window.location.href = "/signin";
+      clearAuthToken();
       return;
     }
     if (!input.trim() || sending) return;
@@ -235,13 +263,13 @@ export default function PlannerBot() {
 
       if (res.status === 401) {
         removeThinkingMessage();
-        alert("Your session has expired. Please log in again.");
-        localStorage.removeItem("token");
+        clearAuthToken();
         return;
       }
 
       if (!res.ok) {
-        throw new Error(`Server error: ${res.status}`);
+        console.error('Server error:', res.status, await res.text());
+        throw new Error(`Server Unavailable, Please Try Again Later`);
       }
 
       const data = await res.json();
@@ -479,6 +507,7 @@ export default function PlannerBot() {
               selectedPlan={selectedPlan}
               setSelectedPlan={setSelectedPlan}
               clearChat={clearChat}
+              onPlanSelect={handlePlanSelect}
             />
 
             {/* Messages Area */}
@@ -508,6 +537,7 @@ export default function PlannerBot() {
               lastChatbotResponse={getLastChatbotResponse}
               conversationTitle={conversationTitle}
               generatedPlan={generatedPlan}
+              selectedPlan={selectedPlan}
             />
           </div>
         </div>

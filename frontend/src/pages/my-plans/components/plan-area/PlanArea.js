@@ -6,7 +6,7 @@ import { markdownHandler } from '../../../../utils/markdownHandler';
 import PlanIdentifier from './components/PlanIdentifier';
 import { formatPlanFromJSON } from '../../../../utils/planFormatter';
 
-export default function PlanArea({ planData, animationTriggered }) {
+export default function PlanArea({ planData, animationTriggered, plans, setPlans, setSelectedPlanData }) {
 
     const planContent = planData?.data ? formatPlanFromJSON(planData.data) : null;
     return (
@@ -22,6 +22,9 @@ export default function PlanArea({ planData, animationTriggered }) {
                     <PlanIdentifier
                         planData={planData}
                         animationTriggered={animationTriggered}
+                        plans={plans}
+                        setPlans={setPlans}
+                        setSelectedPlanData={setSelectedPlanData}
                     />
                 </div>
 

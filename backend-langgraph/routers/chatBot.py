@@ -1,5 +1,6 @@
 # routers/chatBot.py
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Body, Header
+import httpx
 from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel
 import time
@@ -11,20 +12,58 @@ from auth import verify_access_token
 from Agentic_AI.langgraph import chat_step, start_session
 
 #import models
-from models.chat import StartResponse, AnswerRequest, AnswerResponse, ProfileUpdateRequest
+from models.chat import StartResponse, AnswerRequest, AnswerResponse, ProfileUpdateRequest, StartRequest
 
 logger = logging.getLogger(__name__)
 chatRouter = APIRouter()
 
 # --- Start a new session ---
 @chatRouter.post("/start", response_model=StartResponse)
-async def start_chat(user_email: str = Depends(verify_access_token), real_profile: Optional[dict] = None) -> StartResponse:
+async def start_chat(
+    request: StartRequest = Body(default=StartRequest()),
+    user_email: str = Depends(verify_access_token),
+    authorization: str = Header(default=None),
+) -> StartResponse:
     """
     Start a new chat session and return a unique session_id.
+    If plan_id is provided, fetch the plan, pass its profileData into the session,
+    and return the full plan object to the frontend.
     """
-    session_id = str(time.time())  # simple timestamp-based session id
+    session_id = str(time.time())
+    real_profile = None
+    plan = None
+    name=None
+
+    # ── Fetch plan and extract profileData if plan_id was supplied ────────────
+    if request.plan_id:
+        try:
+            async with httpx.AsyncClient() as client:
+                plan_res = await client.get(
+                    f"http://nestwise-backend-userauth:7001/plans/{request.plan_id}",
+                    headers={"Authorization": authorization},
+                )
+                plan_res.raise_for_status()
+                plan = plan_res.json()
+                real_profile = plan.get("profileData")
+                name=plan.get("name", "Unnamed Plan")
+                print(f"Loaded plan {name} ")
+                logger.info(f"Loaded profileData from plan {request.plan_id}: {real_profile}")
+        except httpx.HTTPStatusError as exc:
+            logger.warning(f"Plan fetch returned {exc.response.status_code} for id {request.plan_id}")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Plan {request.plan_id} not found",
+            ) from exc
+        except Exception as exc:
+            logger.exception(f"Failed to fetch plan {request.plan_id}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to fetch plan data",
+            ) from exc
+    # ─────────────────────────────────────────────────────────────────────────
+
     try:
-        await run_in_threadpool(start_session, session_id, real_profile=real_profile)
+        await run_in_threadpool(start_session, session_id, real_profile=real_profile, name=name)
     except Exception as exc:
         logger.exception("Failed to start session")
         raise HTTPException(
@@ -32,8 +71,7 @@ async def start_chat(user_email: str = Depends(verify_access_token), real_profil
             detail="Failed to start session",
         ) from exc
 
-
-    return StartResponse(session_id=session_id)
+    return StartResponse(session_id=session_id, plan=plan)
 
 
 # --- Send a message and get a response ---

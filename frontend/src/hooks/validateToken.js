@@ -19,9 +19,19 @@ export async function validateToken() {
 }
 
 export const getAuthToken = () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        throw new Error('No authentication token found');
+    return localStorage.getItem('token');
+};
+
+export const clearAuthToken = () => {
+    try {
+        localStorage.removeItem('token');
+    } catch (e) {
+        // ignore
     }
-    return token;
+    // Notify the app that auth was removed so UI can react (same-tab)
+    try {
+        window.dispatchEvent(new Event('auth-removed'));
+    } catch (e) {
+        // ignore
+    }
 };

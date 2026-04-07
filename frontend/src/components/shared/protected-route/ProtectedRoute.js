@@ -43,8 +43,21 @@ export default function ProtectedRoute({ children }) {
 
         // Check if token is vaild once.
         checkAuth();
-        const interval = setInterval(checkAuth, 2000); // Repeat check.
-        return () => clearInterval(interval);
+        // Listen for auth removal events dispatched by app code
+        const onAuthRemoved = () => setShow(true);
+        const onStorage = (e) => {
+            if (e.key === 'token') {
+                setShow(!checkTokenValidity(localStorage.getItem('token')));
+            }
+        };
+
+        window.addEventListener('auth-removed', onAuthRemoved);
+        window.addEventListener('storage', onStorage);
+
+        return () => {
+            window.removeEventListener('auth-removed', onAuthRemoved);
+            window.removeEventListener('storage', onStorage);
+        };
     }, []);
 
 

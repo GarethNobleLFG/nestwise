@@ -39,7 +39,7 @@ class RiskAssessment(BaseModel):
     mitigation_strategy: str
 
 class Milestone(BaseModel):
-    age: int
+    age: float
     action: str
     expected_outcome: str
     source: List[str]
@@ -139,6 +139,10 @@ SPECIAL RULES:
 - If the user responds with "no", or something suggesting that they are DONE, OR that they do NOT
 want to update any other fields, return a field called 'continue_asking' with a value of False.
 - Examples include: "no", "i'm good", "I'm done", "that's all", etc.
+
+- Otherwise, ALSO extract any field values the user provides, exactly as you would normally.
+  For example, if the user says "my age is 22", extract the age.
+  Always include both the updated fields AND continue_asking in your response.
 ''')
 
 
@@ -577,9 +581,20 @@ def call_extractor(state: ExtractorState):
     """
     state["messages"] = [system_prompt_extract] + [SystemMessage(content=shadow_system_prompt)] + state["messages"]
     print([SystemMessage(content=shadow_system_prompt)])
-    response = model_extractor.invoke(state["messages"])
-    print(f"Extractor response: {response.content}")
-    response_dict = json.loads(response.content)
+    
+    MAX_RETRIES = 3
+    for attempt in range(MAX_RETRIES):
+        try:
+            response = model_extractor.invoke(state["messages"])
+            print(f"Extractor response: {response.content} {attempt}")
+            response_dict = json.loads(response.content)
+            break
+        except json.JSONDecodeError:
+            print(f"Invalid JSON. Attempt {attempt + 1}/{MAX_RETRIES}")
+    else:
+        raise ValueError("Failed to get valid JSON from extractor after multiple attempts.")
+
+    
     shadow_profile = state.get("shadow_profile", {})
     real_profile = state.get("real_profile", {})
     updated_some_fields = False
@@ -1055,6 +1070,11 @@ def run_extractor(master_state: MasterState):
   shadow_profile = master_state.get("shadow_profile", {})
   real_profile = master_state.get("real_profile", {})
   extractor_data["shadow_profile"] = shadow_profile
+  extractor_data["real_profile"] = real_profile
+  # ✅ Seed conversation_title from master so extractor doesn't reset it
+  existing_title = master_state.get("conversation_title", "None")
+  if existing_title and existing_title not in ("None", "initial"):
+    extractor_data["conversation_title"] = existing_title
   extractor_state = ExtractorState(**extractor_data)
   chatbot_state = ChatbotState(**chatbot_data)
 
@@ -1078,7 +1098,10 @@ def run_extractor(master_state: MasterState):
   #print(master_state["extractor"].keys())
   master_state["real_profile"] = extractor_state.get("real_profile", {})
   master_state["shadow_profile"] = extractor_state.get("shadow_profile", {})
-  master_state["conversation_title"] = extractor_state.get("conversation_title")
+  # ✅ Only update conversation_title if extractor produced a real new one
+  new_title = extractor_state.get("conversation_title")
+  if new_title and new_title not in ("None", "initial"):
+    master_state["conversation_title"] = new_title
   #print(master_state["conversation_title"])
   return master_state
 
@@ -1202,19 +1225,12 @@ def call_formatter(raw_json_str: str):
 
 state = None
 initialMessage = 'Hello! I am NestWiseAI. I am here to help you with Retirement!'
-def start_session(session_id: str, real_profile: dict = None) -> str:
-    if real_profile:
-        is_plan_generated = True
-    else:
-        is_plan_generated = False
-    print(f"Starting session {session_id} with real_profile={real_profile} and is_plan_generated={is_plan_generated}")
-    """
-    Initialize a new session and store its MasterState in the global state.
-    If real_profile or is_plan_generated are passed, update them accordingly.
-    """
+def start_session(session_id: str, real_profile: dict = None,name: str = "Unnamed Plan") -> str:
     global state
 
-    # Default shadow profile template
+    is_plan_generated = bool(real_profile)
+    print(f"Starting session {session_id} with real_profile={real_profile} and is_plan_generated={is_plan_generated}")
+
     shadow_profile_template = {
         "goal": {"collected": False, "importance": 5, "status": "missing"},
         "age": {"collected": False, "importance": 5, "status": "missing"},
@@ -1223,23 +1239,41 @@ def start_session(session_id: str, real_profile: dict = None) -> str:
         "location": {"collected": False, "importance": 4, "status": "missing"},
     }
 
-    # If real_profile is passed, sync shadow_profile
     if real_profile:
-        updated_shadow = shadow_profile_template.copy()
+        for key in shadow_profile_template:
+            value = real_profile.get(key)
+            if value is not None:
+                shadow_profile_template[key]["collected"] = True
+                shadow_profile_template[key]["status"] = "completed"
 
-        for key, value in real_profile.items():
-            if isinstance(value, dict) and key in updated_shadow:
-                updated_shadow[key]["collected"] = value.get("collected", True)
-                updated_shadow[key]["status"] = value.get("status", "filled")
-                updated_shadow[key]["importance"] = value.get(
-                    "importance",
-                    updated_shadow[key]["importance"]
-                )
+        shadow_profile = shadow_profile_template
 
-        shadow_profile = updated_shadow
-        print(f"Initialized shadow_profile from real_profile: {shadow_profile}")
+        matched_template = None
+        best_overlap = 0
+        for template_name, template_info in prompt_infos.items():
+            overlap = sum(
+                1 for field in template_info["questions"]
+                if field in real_profile
+            )
+            if overlap > best_overlap:
+                best_overlap = overlap
+                matched_template = template_name
+
+        if matched_template and best_overlap > 0:
+            for field, info in prompt_infos[matched_template]["questions"].items():
+                is_collected = field in real_profile and real_profile[field] is not None
+                shadow_profile[field] = {
+                    "collected": is_collected,
+                    "importance": info["importance"],
+                    "status": "completed" if is_collected else "missing"
+                }
+
+        matcher_state = {"selected_template": matched_template} if matched_template else {"need_no_more_fields": False}
+        print(f"Restored matcher template: {matched_template}, shadow_profile: {shadow_profile}")
+
     else:
         shadow_profile = shadow_profile_template
+        matcher_state = {"need_no_more_fields": False}
 
     state = MasterState(
         messages=[],
@@ -1247,15 +1281,15 @@ def start_session(session_id: str, real_profile: dict = None) -> str:
             "messages": [system_prompt_chatbot, assistant_message],
             "chatbot_role": "default"
         },
-        matcher={"need_no_more_fields": False},
+        matcher=matcher_state,
         extractor={
             "all_fields_filled": False,
             "conversation_title": "None",
-            "extractor_role": "default"
+            "extractor_role": "default" if not is_plan_generated else "check_for_negatives"
         },
         real_profile=real_profile if real_profile else {},
         shadow_profile=shadow_profile,
-        conversation_title="initial",
+        conversation_title=name if is_plan_generated else "New Plan",
         is_plan_generated=is_plan_generated
     )
     return session_id
@@ -1274,10 +1308,25 @@ def chat_step(user_message: str, session_id: str):
     global prev_assistant_message
 
     # Run the graph
+    #print the real profile before graph invocation for debugging   
+    print("real_profile before graph invocation:", state.get("real_profile", {}))
     state["messages"].append(human_message)
-    state = graph.invoke(state)
+    delta = graph.invoke(state)
+    for key, value in delta.items():
+        if key == "messages":
+            continue  # already appended before invoke, skip to avoid duplication
+        elif key == "real_profile" and not value:
+            continue  # ✅ never overwrite a populated real_profile with {}
+        elif key == "conversation_title" and (not value or value == "None" or value == "initial"):
+            continue  # ✅ never overwrite a real title with a placeholder
+        elif isinstance(value, dict) and isinstance(state.get(key), dict):
+            state[key] = {**state[key], **value}  # shallow-merge dicts
+        else:
+            state[key] = value
+    print("real_profile after graph invocation:", state.get("real_profile", {}))
+    print("conversation_title:", state.get("conversation_title", "None"))
 
-    # Check if the planner ran this turn by seeing if the chatbot message changed
+        # Check if the planner ran this turn by seeing if the chatbot message changed
     current_assistant_message = state["chatbot"]["messages"][-1]
     planner_ran_this_turn = (current_assistant_message == prev_assistant_message)
 

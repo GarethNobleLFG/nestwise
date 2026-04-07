@@ -48,10 +48,11 @@ export const usePlanHooks = () => {
   const getPlanById = async(id) =>
     request(`http://localhost:7001/plans/${id}`);
 
-  const updatePlan = (id, name, data, description) =>
+  // Update plan fields.
+  const updatePlan = (id, name, data, description, profileData) =>
     request(`http://localhost:7001/plans/${id}`, {
       method: "PUT",
-      body: JSON.stringify({ name, description, data }),
+      body: JSON.stringify({ name, description, data, profileData }),
     });
 
   const deletePlan = (id) =>

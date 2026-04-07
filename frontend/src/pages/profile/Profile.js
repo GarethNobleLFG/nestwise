@@ -20,6 +20,7 @@ import Card from '@mui/material/Card';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { clearAuthToken } from '../../hooks/validateToken';
 import Grow from '@mui/material/Grow';
 
 export default function Profile() {
@@ -272,7 +273,7 @@ export default function Profile() {
                             <Button
                                 variant="outlined"
                                 onClick={() => {
-                                    localStorage.removeItem('token');
+                                    clearAuthToken();
                                     navigate('/signin');
                                 }}
                                 sx={{

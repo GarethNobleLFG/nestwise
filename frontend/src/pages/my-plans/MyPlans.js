@@ -4,6 +4,7 @@ import MetricsArea from './components/MetricsArea';
 import PlanArea from './components/plan-area/PlanArea';
 import PlansIndex from './components/PlansIndex';
 import { usePlanHooks } from '../../hooks/plans';
+import { useLocation } from 'react-router-dom';
 
 export default function MyPlans() {
     const [animationTriggered, setAnimationTriggered] = useState(false);
@@ -11,14 +12,20 @@ export default function MyPlans() {
     const [selectedPlanData, setSelectedPlanData] = useState(null);
     const [profileData, setProfileData] = useState({}); // Need to set this in the return on get plan hook.
 
+    const location = useLocation();
+
     const { getUserPlans, getPlanById } = usePlanHooks();
 
     // Fetch all plans on mount
     useEffect(() => {
         async function fetchPlans() {
-            // only retruns the name and id of the plans, not the full plan data
-            const userPlans = await getUserPlans();
-            setPlans(userPlans);
+            try {
+                // only returns the name and id of the plans, not the full plan data
+                const userPlans = await getUserPlans();
+                setPlans(userPlans);
+            } catch (err) {
+                console.error('Failed to load plans:', err);
+            }
         }
 
         fetchPlans();
@@ -30,6 +37,16 @@ export default function MyPlans() {
         setSelectedPlanData(fullPlan);
         console.log("selected plan profile data: ", fullPlan.profileData);
     };
+
+    // Use effect to load selected plan coming from planner bot.
+    useEffect(() => {
+        if (location.state?.selectedPlanId && plans.length > 0) {
+            const planToSelect = plans.find(p => p.id === location.state.selectedPlanId);
+            if (planToSelect) {
+                handlePlanSelect(planToSelect);
+            }
+        }
+    }, [plans, location.state?.selectedPlanId]);
 
     useEffect(() => {
         document.title = "NestWise - My Plans";
@@ -49,6 +66,7 @@ export default function MyPlans() {
                     <PlansIndex
                         plans={plans}
                         onPlanSelect={handlePlanSelect}
+                        selectedPlanId={selectedPlanData?.id}
                     />
                 </div>
 
@@ -57,6 +75,9 @@ export default function MyPlans() {
                     <PlanArea
                         planData={selectedPlanData}
                         animationTriggered={animationTriggered}
+                        plans={plans}
+                        setPlans={setPlans}
+                        setSelectedPlanData={setSelectedPlanData}
                     />
                 </div>
 

@@ -15,6 +15,7 @@ import ColorModeIconDropdown from '../../../layouts/ColorModeIconDropdown';
 import Sitemark from './SitemarkIcon';
 import { useNavigate } from 'react-router-dom';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { clearAuthToken } from '../../../hooks/validateToken';
 import { useEffect } from 'react';
 
 
@@ -107,7 +108,7 @@ export default function AppBarComponent() {
 
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    clearAuthToken();
     navigate('/signin');
   };
 

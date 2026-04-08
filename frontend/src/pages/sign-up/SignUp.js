@@ -77,6 +77,7 @@ export default function SignUp(props) {
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [nameError, setNameError] = React.useState(false);
   const [nameErrorMessage, setNameErrorMessage] = React.useState('');
+  const API_BASE_URL = process.env.REACT_APP_USER_AUTH_URL;
 
 
 
@@ -162,7 +163,8 @@ export default function SignUp(props) {
     };
 
     try {
-      const response = await fetch('http://localhost:7001/userauth/signup', {
+      console.log(API_BASE_URL);
+      const response = await fetch(`${API_BASE_URL}/userauth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

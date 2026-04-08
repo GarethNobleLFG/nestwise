@@ -6,6 +6,7 @@ export const usePlanHooks = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const API_BASE_URL = process.env.REACT_APP_USER_AUTH_URL || "http://localhost:7001";
   const request = async (url, options = {}) => {
     setLoading(true);
     setError(null);
@@ -37,26 +38,26 @@ export const usePlanHooks = () => {
   };
 
   const savePlan = (name, profileData, data, description) =>
-    request("http://localhost:7001/plans", {
+    request(`${API_BASE_URL}/plans/`, {
       method: "POST",
       body: JSON.stringify({ name, profileData, description, data }),
     });
 
   const getUserPlans = async () =>
-    request("http://localhost:7001/plans");
+    request(`${API_BASE_URL}/plans/`);
 
   const getPlanById = async(id) =>
-    request(`http://localhost:7001/plans/${id}`);
+    request(`${API_BASE_URL}/plans/${id}/`);
 
   // Update plan fields.
   const updatePlan = (id, name, data, description, profileData) =>
-    request(`http://localhost:7001/plans/${id}`, {
+    request(`${API_BASE_URL}/plans/${id}/`, {
       method: "PUT",
       body: JSON.stringify({ name, description, data, profileData }),
     });
 
   const deletePlan = (id) =>
-    request(`http://localhost:7001/plans/${id}`, {
+    request(`${API_BASE_URL}/plans/${id}/`, {
       method: "DELETE",
     });
 

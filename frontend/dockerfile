@@ -1,4 +1,17 @@
-# frontend/Dockerfile.dev
+# # frontend/Dockerfile.dev
+# FROM node:20-alpine
+
+# WORKDIR /app
+
+# COPY package*.json ./
+# RUN npm install
+
+# COPY . .
+
+# EXPOSE 3000
+
+# CMD ["npm", "start"]
+
 FROM node:20-alpine
 
 WORKDIR /app
@@ -8,6 +21,19 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 3000
+ARG REACT_APP_USER_AUTH_URL
+ENV REACT_APP_USER_AUTH_URL=$REACT_APP_USER_AUTH_URL
 
-CMD ["npm", "start"]
+ARG REACT_APP_LANGRAPH_URL
+ENV REACT_APP_LANGRAPH_URL=$REACT_APP_LANGRAPH_URL
+
+
+RUN npm run build
+
+RUN npm install -g serve
+
+ENV PORT=8080
+
+EXPOSE 8080
+
+CMD ["sh", "-c", "serve -s build -l $PORT"]

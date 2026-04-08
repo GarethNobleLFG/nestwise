@@ -2,7 +2,7 @@ export async function validateToken() {
     const token = localStorage.getItem("token");
     if (!token) return { valid: false };
 
-    const API_BASE_URL = process.env.REACT_APP_USER_AUTH_URL || "http://localhost:7001";
+    const API_BASE_URL = process.env.REACT_APP_USER_AUTH_URL;
     try {
         const res = await fetch(`${API_BASE_URL}/userauth/validateToken`, {
             method: "POST",

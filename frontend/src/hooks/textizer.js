@@ -6,7 +6,7 @@ export const textizer = async (profileData, lastChatbotResponse, formattedData, 
     
     setIsFormatting(true);
 
-    const API_BASE_URL = process.env.REACT_APP_LANGRAPH_URL || "http://localhost:8000";
+    const API_BASE_URL = process.env.REACT_APP_LANGRAPH_URL;
     try {
         const response = await fetch(`${API_BASE_URL}/textizer/`, {
             method: 'POST',

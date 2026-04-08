@@ -78,7 +78,7 @@ export default function SignIn(props) {
   const handleClickOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const API_BASE_URL = process.env.REACT_APP_USER_AUTH_URL || "http://localhost:7001";
+  const API_BASE_URL = process.env.REACT_APP_USER_AUTH_URL;
 
   // Animation state
   const [checked, setChecked] = React.useState(false);

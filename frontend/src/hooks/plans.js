@@ -6,7 +6,7 @@ export const usePlanHooks = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const API_BASE_URL = process.env.REACT_APP_USER_AUTH_URL || "http://localhost:7001";
+  const API_BASE_URL = process.env.REACT_APP_USER_AUTH_URL;
   const request = async (url, options = {}) => {
     setLoading(true);
     setError(null);

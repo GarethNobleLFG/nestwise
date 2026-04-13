@@ -269,7 +269,7 @@ export default function PlannerBot() {
 
       if (!res.ok) {
         console.error('Server error:', res.status, await res.text());
-        throw new Error(`Server Unavailable, Please Try Again Later`);
+        throw new Error(`Something went wrong. Create a new chat and try again. If the issue persists, contact support.`);
       }
 
       const data = await res.json();

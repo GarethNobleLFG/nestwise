@@ -15,6 +15,9 @@ from langgraph.prebuilt import ToolNode, tools_condition, create_react_agent
 from datetime import date
 from pydantic import BaseModel, Field
 from typing import List
+import copy 
+import time
+import threading
 
 # Pydantic models for structured planner output
 class AssetAllocation(BaseModel):
@@ -296,7 +299,7 @@ from langgraph.graph import MessagesState
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
 
-real_profile = {}
+# real_profile = {}
 """
 shadow_profile = {
     "goal" : False,
@@ -339,6 +342,7 @@ class PlannerState(MessagesState):
 
 # Master state for final graph
 class MasterState(MessagesState):
+  session_id: str 
   chatbot: dict
   extractor: dict
   summarizer: dict
@@ -788,7 +792,11 @@ def call_summarizer(state: SummarizerState):
   return {"summary": response.content}
 
 ## To call RAG Agent
-def query_or_respond(state: PlannerState):
+def query_or_respond(state: PlannerState, retrieve_tool=None):
+    retrieve_tool = retrieve_tool or retrieve  # fallback
+    model_planner_with_tools = model_planner.bind_tools(
+        [retrieve_tool], tool_choice="required"
+    )
     real_profile_local = state.get("real_profile", {})
     rag_query = (
         "You are a Retrieval Assistant. You MUST call the retrieve tool at least 3 times "
@@ -802,7 +810,6 @@ def query_or_respond(state: PlannerState):
         "Call retrieve() now with each of these queries."
     )
     state["messages"] = [SystemMessage(rag_query)] + state["messages"]
-    model_planner_with_tools = model_planner.bind_tools([retrieve], tool_choice="required")
     response = model_planner_with_tools.invoke(state["messages"])
     return {"messages": [response]}
 
@@ -971,34 +978,30 @@ def rewrite_query(user_query: str, real_profile: dict) -> str:
 class RetrieveInput(BaseModel):
     query: str = Field(..., description="Optimized retrieval query")
 
-@tool(
-    args_schema=RetrieveInput,
-)
-def retrieve(query: str) -> str:
-    """Retrieve relevant information from the vector store."""
-    
-    optimized_query = rewrite_query(query, real_profile)
-    retrieved_docs = vector_store.similarity_search(optimized_query, k=5)
-
-    formatted_snippets = []
-    for doc in retrieved_docs:
-        meta = getattr(doc, "metadata", {})
-        source = meta.get("source", "Unknown source")
-        page = meta.get("page", "N/A")
-
-        formatted_snippets.append(
-            f"Source: {os.path.basename(source)}, Page: {page}\n"
-            f"{doc.page_content.strip()}"
-        )
-
-    return "\n\n---\n\n".join(formatted_snippets)
+def make_retrieve_tool(session_real_profile: dict):
+    @tool(args_schema=RetrieveInput)
+    def retrieve(query: str) -> str:
+        """Retrieve relevant information from the vector store."""
+        optimized_query = rewrite_query(query, session_real_profile)
+        retrieved_docs = vector_store.similarity_search(optimized_query, k=5)
+        formatted_snippets = []
+        for doc in retrieved_docs:
+            meta = getattr(doc, "metadata", {})
+            source = meta.get("source", "Unknown source")
+            page = meta.get("page", "N/A")
+            formatted_snippets.append(
+                f"Source: {os.path.basename(source)}, Page: {page}\n"
+                f"{doc.page_content.strip()}"
+            )
+        return "\n\n---\n\n".join(formatted_snippets)
+    return retrieve
 
 
 
 ## Graph for RAG
 
 memory = MemorySaver()
-tools_node = ToolNode([retrieve])
+
 # Chatbot (persistent)
 chatbot_graph = StateGraph(ChatbotState)
 chatbot_graph.add_node("chatbot", call_chatbot)
@@ -1029,6 +1032,7 @@ def route_after_tools(state: PlannerState):
     """After tools run, always proceed to call_planner to generate the plan."""
     return "call_planner"
 
+"""
 planner_graph = StateGraph(PlannerState)
 planner_graph.add_node(query_or_respond)
 planner_graph.add_node(tools_node)
@@ -1040,6 +1044,7 @@ planner_graph.add_conditional_edges(
 planner_graph.add_edge("tools", "call_planner")
 planner_graph.add_edge("call_planner", END)
 planner_subgraph = planner_graph.compile(checkpointer=memory)
+"""
 
 ### Functions to run individual graphs
 
@@ -1058,7 +1063,8 @@ def run_chatbot(master_state: MasterState):
   else:
     chatbot_state["messages"] = last_human
 
-  chatbot_state = chatbot_subgraph.invoke(chatbot_state)
+  config = {"configurable": {"thread_id": master_state.get("session_id", "default")}}
+  chatbot_state = chatbot_subgraph.invoke(chatbot_state, config=config)
 
   master_state["chatbot"] = dict(chatbot_state)
   master_state["shadow_profile"] = chatbot_state.get("shadow_profile", {})
@@ -1092,7 +1098,9 @@ def run_extractor(master_state: MasterState):
   # Combine for the extractor's current processing
   extractor_state["messages"] = [HumanMessage(content=last_chatbot.content)] + last_human
 
-  extractor_state = extractor_subgraph.invoke(extractor_state)
+  
+  config = {"configurable": {"thread_id": master_state.get("session_id", "default")}}
+  extractor_state = extractor_subgraph.invoke(extractor_state, config=config)
 
   master_state["extractor"] = dict(extractor_state)
   #print(master_state["extractor"].keys())
@@ -1117,7 +1125,8 @@ def run_matcher(master_state: MasterState):
   matcher_state["messages"] = []
 
   # Run the matcher subgraph
-  matcher_state = matcher_subgraph.invoke(matcher_state)
+  config = {"configurable": {"thread_id": master_state.get("session_id", "default")}}
+  matcher_state = matcher_subgraph.invoke(matcher_state, config=config)
 
   # Save updated matcher state back into master
   master_state["matcher"] = dict(matcher_state)
@@ -1129,7 +1138,26 @@ def run_planner(master_state: MasterState):
     planner_data["real_profile"] = master_state.get("real_profile", {})
     planner_data["shadow_profile"] = master_state.get("shadow_profile", {})
     planner_state = PlannerState(**planner_data)
-    planner_state = planner_subgraph.invoke(planner_state)
+
+    # Build session-scoped tool and planner graph
+    session_retrieve = make_retrieve_tool(planner_data["real_profile"])
+    session_tools_node = ToolNode([session_retrieve])
+
+    session_planner_graph = StateGraph(PlannerState)
+    session_planner_graph.add_node("query_or_respond", 
+        lambda s: query_or_respond(s, session_retrieve))  # pass tool in
+    session_planner_graph.add_node("tools", session_tools_node)
+    session_planner_graph.add_node("call_planner", call_planner)
+    session_planner_graph.set_entry_point("query_or_respond")
+    session_planner_graph.add_conditional_edges(
+        "query_or_respond", tools_condition, {END: "call_planner", "tools": "tools"}
+    )
+    session_planner_graph.add_edge("tools", "call_planner")
+    session_planner_graph.add_edge("call_planner", END)
+    session_planner_subgraph = session_planner_graph.compile()
+
+    # Run the planner subgraph
+    planner_state = session_planner_subgraph.invoke(planner_state)
     master_state["planner"] = dict(planner_state)
     master_state["is_plan_generated"] = True  # persists — tells router a plan exists
     # Switch extractor to update mode so next turn asks user if they want to change anything
@@ -1151,7 +1179,8 @@ def run_summarizer(master_state: MasterState):
   summarizer_state["messages"] = [HumanMessage("Last Summary:" + summarizer_state.get("summary", "None"))] + chatbot_messages
 
   # Run the summarizer subgraph
-  summarizer_state["summary"] = summarizer_subgraph.invoke(summarizer_state)["summary"]
+  config = {"configurable": {"thread_id": master_state.get("session_id", "default")}}
+  summarizer_state["summary"] = summarizer_subgraph.invoke(summarizer_state, config=config)["summary"]
   chatbot_state["messages"] = [system_prompt_chatbot] + [HumanMessage("Summary:" + summarizer_state["summary"])] + chatbot_messages[-1:]
   master_state["summarizer"] = dict(summarizer_state)
   master_state["chatbot"] = dict(chatbot_state)
@@ -1223,21 +1252,58 @@ def call_formatter(raw_json_str: str):
     response = model_formatter.invoke(messages)
     return response.content
 
-state = None
-initialMessage = 'Hello! I am NestWiseAI. I am here to help you with Retirement!'
+
+sessions: dict[str, MasterState] = {}  # session_id → MasterState
+session_last_active: dict[str, float] = {} 
+SESSION_TTL_SECONDS = 30 * 60  # 30 minutes
+
+# ── Touch timestamp on every access
+def _touch_session(session_id: str) -> None:
+    """Update the last-active timestamp for a session."""
+    session_last_active[session_id] = time.time()
+
+# ── Cleanup expired sessions ────────────────────────────────────────────────────
+def cleanup_inactive_sessions() -> None:
+    """Remove sessions that have been inactive for SESSION_TTL_SECONDS."""
+    now = time.time()
+    expired = [
+        sid for sid, last_active in session_last_active.items()
+        if now - last_active > SESSION_TTL_SECONDS
+    ]
+    for sid in expired:
+        sessions.pop(sid, None)
+        session_last_active.pop(sid, None)
+        print(f"[cleanup] Removed inactive session: {sid}")
+    if expired:
+        print(f"[cleanup] Removed {len(expired)} inactive session(s).")
+
+# ── Background cleanup thread ───────────────────────────────────────────────────
+def _start_cleanup_thread(interval_seconds: int = 60) -> None:
+    """Run cleanup_inactive_sessions every `interval_seconds` in a daemon thread."""
+    def _loop():
+        while True:
+            time.sleep(interval_seconds)
+            cleanup_inactive_sessions()
+
+    thread = threading.Thread(target=_loop, daemon=True)
+    thread.start()
+    print(f"[cleanup] Background cleanup thread started (interval={interval_seconds}s, TTL={SESSION_TTL_SECONDS}s)")
+
+
+_start_cleanup_thread()
+assistant_message = AIMessage(content="Hello there, I'm NestWise! How can I help you plan for your retirement?")
 def start_session(session_id: str, real_profile: dict = None,name: str = "Unnamed Plan") -> str:
-    global state
 
     is_plan_generated = bool(real_profile)
     print(f"Starting session {session_id} with real_profile={real_profile} and is_plan_generated={is_plan_generated}")
 
-    shadow_profile_template = {
+    shadow_profile_template = copy.deepcopy({
         "goal": {"collected": False, "importance": 5, "status": "missing"},
         "age": {"collected": False, "importance": 5, "status": "missing"},
         "salary": {"collected": False, "importance": 5, "status": "missing"},
         "savings": {"collected": False, "importance": 5, "status": "missing"},
         "location": {"collected": False, "importance": 4, "status": "missing"},
-    }
+    })
 
     if real_profile:
         for key in shadow_profile_template:
@@ -1275,7 +1341,8 @@ def start_session(session_id: str, real_profile: dict = None,name: str = "Unname
         shadow_profile = shadow_profile_template
         matcher_state = {"need_no_more_fields": False}
 
-    state = MasterState(
+    sessions[session_id] = MasterState(
+        session_id=session_id,
         messages=[],
         chatbot={
             "messages": [system_prompt_chatbot, assistant_message],
@@ -1292,25 +1359,26 @@ def start_session(session_id: str, real_profile: dict = None,name: str = "Unname
         conversation_title=name if is_plan_generated else "New Plan",
         is_plan_generated=is_plan_generated
     )
+    _touch_session(session_id)  
     return session_id
 
 # config = {"configurable": {"thread_id": "3"}}
-assistant_message = AIMessage(content="Hello there, I'm NestWise! How can I help you plan for your retirement?")
-prev_assistant_message = None
 
 def chat_step(user_message: str, session_id: str):
-    if user_message:
-        human_message = HumanMessage(content=user_message)
-    else:
-        human_message = None
     
-    global state
-    global prev_assistant_message
+    state = sessions.get(session_id)
+    if state is None:
+        raise ValueError(f"No session found for session_id={session_id}")
+    _touch_session(session_id) 
+    prev_assistant_message = state.get("_prev_assistant_message")
+
+    if user_message:
+        state["messages"].append(HumanMessage(content=user_message))
 
     # Run the graph
     #print the real profile before graph invocation for debugging   
     print("real_profile before graph invocation:", state.get("real_profile", {}))
-    state["messages"].append(human_message)
+    #state["messages"].append(human_message)
     delta = graph.invoke(state)
     for key, value in delta.items():
         if key == "messages":
@@ -1350,14 +1418,16 @@ def chat_step(user_message: str, session_id: str):
             # Planner messages empty — fall back to chatbot
             from_planner = False
             response_text = current_assistant_message.content
-            prev_assistant_message = current_assistant_message
+            state["_prev_assistant_message"] = current_assistant_message
     else:
         from_planner = False
         response_text = current_assistant_message.content
-        prev_assistant_message = current_assistant_message
+        state["_prev_assistant_message"] = current_assistant_message
 
     ## Pass to the frontend.
     conversation_title = state["conversation_title"]
+
+    sessions[session_id] = state
 
     # Always include the latest real_profile
     profile_data = {

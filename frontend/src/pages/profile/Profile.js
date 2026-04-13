@@ -23,6 +23,8 @@ import { useEffect } from 'react';
 import { clearAuthToken } from '../../hooks/validateToken';
 import Grow from '@mui/material/Grow';
 
+const API_BASE_URL = process.env.REACT_APP_USER_AUTH_URL;
+
 export default function Profile() {
     const [editMode, setEditMode] = useState({ name: false, email: false });
     const [edited, setEdited] = useState(false);
@@ -138,7 +140,7 @@ export default function Profile() {
 
 
         try {
-            const response = await fetch('http://localhost:7001/userauth/updateUser', {
+            const response = await fetch(`${API_BASE_URL}/userauth/updateUser`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

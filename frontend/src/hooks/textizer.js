@@ -3,11 +3,12 @@ export const textizer = async (profileData, lastChatbotResponse, formattedData, 
     if (!profileData || Object.keys(profileData).length === 0) {
         return;
     }
-
+    
     setIsFormatting(true);
 
+    const API_BASE_URL = process.env.REACT_APP_LANGRAPH_URL;
     try {
-        const response = await fetch('http://localhost:8000/textizer/', {
+        const response = await fetch(`${API_BASE_URL}/textizer/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

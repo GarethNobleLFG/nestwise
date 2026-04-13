@@ -16,7 +16,7 @@ pwd_hasher = PasswordHasher()
 
 SECRET_KEY = os.getenv("AUTH_JWT_SECRET")
 ALGORITHM = os.getenv("AUTH_JWT_ALGORITHM")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("AUTH_JWT_EXPIRE_MINUTES"))
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("AUTH_JWT_EXPIRE_MINUTES", 60))
 
 
 def get_password_hash(password: str) -> str:

@@ -20,7 +20,7 @@ export default function PlannerBot() {
   const [generatedPlan, setGeneratedPlan] = useState(null); // Store plan from backend (formatted text)
   const [rawPlanJSON, setRawPlanJSON] = useState(null); // Store raw JSON for database
   const [planAnimationNeeded, setPlanAnimationNeeded] = useState(false); // For animations related to if plan was recieved.
-
+  const API_BASE_URL = process.env.REACT_APP_LANGRAPH_URL || "http://localhost:8000"; 
 
 
   const safeMessages = Array.isArray(messages) ? messages : [];
@@ -61,7 +61,7 @@ export default function PlannerBot() {
     try {
       const body = planId ? { plan_id: planId } : {};
  
-      const res = await fetch('http://localhost:8000/chatbot/start', {
+      const res = await fetch(`${API_BASE_URL}/chatbot/start`, {
         method: 'POST',
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -249,7 +249,7 @@ export default function PlannerBot() {
     try {
       if (!sessionId) throw new Error('Session not started');
 
-      const res = await fetch('http://localhost:8000/chatbot/answer', {
+      const res = await fetch(`${API_BASE_URL}/chatbot/answer`, {
         method: 'POST',
         headers: {
           "Authorization": `Bearer ${token}`,

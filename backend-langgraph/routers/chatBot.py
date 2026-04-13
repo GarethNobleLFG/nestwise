@@ -7,6 +7,7 @@ import time
 import logging
 from typing import Optional
 from auth import verify_access_token
+import os
 
 # Import your langgraph functions and shared sessions
 from Agentic_AI.langgraph import chat_step, start_session

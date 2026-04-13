@@ -17,6 +17,8 @@ from models.chat import StartResponse, AnswerRequest, AnswerResponse, ProfileUpd
 logger = logging.getLogger(__name__)
 chatRouter = APIRouter()
 
+API_BASE_URL = os.getenv("USER_AUTH_URL")
+
 # --- Start a new session ---
 @chatRouter.post("/start", response_model=StartResponse)
 async def start_chat(
@@ -39,7 +41,7 @@ async def start_chat(
         try:
             async with httpx.AsyncClient() as client:
                 plan_res = await client.get(
-                    f"http://nestwise-backend-userauth:7001/plans/{request.plan_id}",
+                    f"{API_BASE_URL}/plans/{request.plan_id}",
                     headers={"Authorization": authorization},
                 )
                 plan_res.raise_for_status()

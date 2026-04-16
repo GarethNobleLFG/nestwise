@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import DescriptionIcon from '@mui/icons-material/Description';
 import PersonIcon from '@mui/icons-material/Person';
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
 
 export default function NavBar({ page }) {
     const navigate = useNavigate();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     // Check if user is logged in
     const checkTokenValidity = (token) => {
@@ -34,6 +37,15 @@ export default function NavBar({ page }) {
 
     const userName = getUserName(token);
 
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+
+    const handleNavigation = (path) => {
+        navigate(path);
+        setIsMenuOpen(false); // Close menu after navigation
+    };
+
     return (
         <motion.nav
             className="!fixed !top-0 !left-0 !right-0 !w-full !z-50 !bg-white/10 !backdrop-blur-sm"
@@ -41,19 +53,19 @@ export default function NavBar({ page }) {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}
         >
-            <div className="!w-full !px-8">
-                <div className="!flex !justify-between !items-center !h-20">
-                    {/* Logo - matching Hero.js colors */}
+            <div className="!w-full !px-4 sm:!px-8">
+                <div className="!flex !justify-between !items-center !h-16 sm:!h-20">
+                    {/* Logo - responsive sizing */}
                     <motion.button
-                        onClick={() => navigate('/')}
-                        className="!flex !items-center !space-x-3 group !no-underline !bg-transparent !border-none !cursor-pointer"
+                        onClick={() => handleNavigation('/')}
+                        className="!flex !items-center !space-x-2 sm:!space-x-3 group !no-underline !bg-transparent !border-none !cursor-pointer"
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.3, delay: 0.2 }}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
-                        <span className="!font-bold !text-gray-900 !tracking-wide !text-3xl">
+                        <span className="!font-bold !text-gray-900 !tracking-wide !text-2xl sm:!text-3xl">
                             <motion.span
                                 style={{ color: '#FFD700' }}
                                 initial={{ opacity: 0 }}
@@ -73,14 +85,14 @@ export default function NavBar({ page }) {
                         </span>
                     </motion.button>
 
-                    {/* Action Buttons */}
+                    {/* Desktop Navigation - hidden on mobile */}
                     <motion.div
-                        className="!flex !items-center !space-x-5"
+                        className="!hidden md:!flex !items-center !space-x-5"
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.4, delay: 0.3 }}
                     >
-                        {/* Planner Bot Button */}
+                        {/* Planner Bot Button - Desktop */}
                         <motion.button
                             onClick={() => navigate('/plannerbot')}
                             className="!flex !items-center !space-x-2 !font-medium !text-gray-700 hover:!text-gray-900 !transition-colors !rounded-full hover:!bg-yellow-50 !border-none !cursor-pointer !px-5 !py-3 !text-base"
@@ -99,7 +111,7 @@ export default function NavBar({ page }) {
                             <span>Planner Bot</span>
                         </motion.button>
 
-                        {/* Plans Button */}
+                        {/* Plans Button - Desktop */}
                         <motion.button
                             onClick={() => navigate('/myplans')}
                             className="!flex !items-center !space-x-2 !font-medium !text-gray-700 hover:!text-gray-900 !transition-colors !rounded-full hover:!bg-yellow-50 !border-none !cursor-pointer !px-5 !py-3 !text-base"
@@ -118,7 +130,7 @@ export default function NavBar({ page }) {
                             <span>My Plans</span>
                         </motion.button>
 
-                        {/* User Authentication */}
+                        {/* User Authentication - Desktop */}
                         {isLoggedIn ? (
                             <motion.button
                                 onClick={() => navigate('/profile')}
@@ -184,8 +196,103 @@ export default function NavBar({ page }) {
                             </motion.button>
                         )}
                     </motion.div>
+
+                    {/* Mobile Hamburger Button */}
+                    <motion.button
+                        onClick={toggleMenu}
+                        className="!flex md:!hidden !items-center !justify-center !w-10 !h-10 !text-gray-700 hover:!text-gray-900 !transition-colors !rounded-lg hover:!bg-yellow-50 !border-none !cursor-pointer"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: 0.2 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <motion.div
+                            animate={{ rotate: isMenuOpen ? 180 : 0 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            {isMenuOpen ? <CloseIcon className="!w-6 !h-6" /> : <MenuIcon className="!w-6 !h-6" />}
+                        </motion.div>
+                    </motion.button>
                 </div>
             </div>
+
+            {/* Mobile Menu Dropdown */}
+            <AnimatePresence>
+                {isMenuOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="md:!hidden !bg-white/95 !backdrop-blur-sm !border-t !border-gray-200"
+                    >
+                        <div className="!px-4 !py-4 !space-y-3">
+                            {/* Mobile Planner Bot Button */}
+                            <motion.button
+                                onClick={() => handleNavigation('/plannerbot')}
+                                className="!w-full !flex !items-center !space-x-3 !font-medium !text-gray-700 hover:!text-gray-900 !transition-colors !rounded-lg hover:!bg-yellow-50 !border-none !cursor-pointer !px-4 !py-3 !text-left"
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.3, delay: 0.1 }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                <SmartToyIcon className="!w-5 !h-5" />
+                                <span className="!text-base">Planner Bot</span>
+                            </motion.button>
+
+                            {/* Mobile Plans Button */}
+                            <motion.button
+                                onClick={() => handleNavigation('/myplans')}
+                                className="!w-full !flex !items-center !space-x-3 !font-medium !text-gray-700 hover:!text-gray-900 !transition-colors !rounded-lg hover:!bg-yellow-50 !border-none !cursor-pointer !px-4 !py-3 !text-left"
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.3, delay: 0.2 }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                <DescriptionIcon className="!w-5 !h-5" />
+                                <span className="!text-base">My Plans</span>
+                            </motion.button>
+
+                            {/* Mobile User Authentication */}
+                            {isLoggedIn ? (
+                                <motion.button
+                                    onClick={() => handleNavigation('/profile')}
+                                    className="!w-full !flex !items-center !space-x-3 !font-medium !transition-colors !rounded-lg !border-2 !cursor-pointer !px-4 !py-3 !text-left"
+                                    style={{
+                                        color: 'white',
+                                        backgroundColor: '#c47c1eff',
+                                        borderColor: 'hsl(var(--brand-400))'
+                                    }}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ duration: 0.3, delay: 0.3 }}
+                                    whileTap={{ scale: 0.98 }}
+                                >
+                                    <PersonIcon className="!w-5 !h-5" style={{ color: 'white' }} />
+                                    <span className="!text-base">{userName || 'Profile'}</span>
+                                </motion.button>
+                            ) : (
+                                <motion.button
+                                    onClick={() => handleNavigation('/signin')}
+                                    className="!w-full !flex !items-center !space-x-3 !font-medium !transition-colors !rounded-lg !border-2 !cursor-pointer !px-4 !py-3 !text-left"
+                                    style={{
+                                        color: 'white',
+                                        backgroundColor: '#c47c1eff',
+                                        borderColor: 'hsl(var(--brand-400))'
+                                    }}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ duration: 0.3, delay: 0.3 }}
+                                    whileTap={{ scale: 0.98 }}
+                                >
+                                    <PersonIcon className="!w-5 !h-5" style={{ color: 'white' }} />
+                                    <span className="!text-base">Sign in</span>
+                                </motion.button>
+                            )}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </motion.nav>
     );
 }

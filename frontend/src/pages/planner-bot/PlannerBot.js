@@ -523,7 +523,7 @@ export default function PlannerBot() {
               </motion.div>
             </motion.button>
 
-            {/* Header */}
+            {/* Header. */}
             <div className="flex-shrink-0 pt-8 md:pt-0">
               <Header
                 conversationTitle={conversationTitle}
@@ -540,7 +540,7 @@ export default function PlannerBot() {
             </div>
 
             {/* Input Area */}
-            <div className="flex-shrink-0 pb-4 px-2 md:pb-3 md:px-0">
+            <div className="flex-shrink-0 pb-7 px-2 md:pb-3 md:px-0">
               <InputArea
                 input={input}
                 setInput={setInput}

@@ -53,7 +53,12 @@ export default function Header({
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <span className="truncate">{headerTitle}</span>
+                                                <span className="truncate">
+                                                    <span className="hidden md:inline">{headerTitle}</span>
+                                                    <span className="md:hidden">
+                                                        {headerTitle.length > 8 ? headerTitle.substring(0, 8) + '...' : headerTitle}
+                                                    </span>
+                                                </span>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p>{headerTitle}</p>

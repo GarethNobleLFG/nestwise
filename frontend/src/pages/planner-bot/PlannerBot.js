@@ -5,7 +5,7 @@ import InputArea from './components/InputArea';
 import MessagesArea from './components/MessagesArea';
 import Header from './components/Header';
 import PlannerArea from './components/PlannerArea';
-
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function PlannerBot() {
   const [messages, setMessages] = useState([]);
@@ -20,7 +20,8 @@ export default function PlannerBot() {
   const [generatedPlan, setGeneratedPlan] = useState(null); // Store plan from backend (formatted text)
   const [rawPlanJSON, setRawPlanJSON] = useState(null); // Store raw JSON for database
   const [planAnimationNeeded, setPlanAnimationNeeded] = useState(false); // For animations related to if plan was recieved.
-  const API_BASE_URL = process.env.REACT_APP_LANGRAPH_URL || "http://localhost:8000"; 
+  const API_BASE_URL = process.env.REACT_APP_LANGRAPH_URL || "http://localhost:8000";
+  const [isMobilePlannerOpen, setIsMobilePlannerOpen] = useState(false);
 
 
   const safeMessages = Array.isArray(messages) ? messages : [];
@@ -38,14 +39,14 @@ export default function PlannerBot() {
 
 
 
- // ── Start session — optionally with a plan ID ────────────────────────────
+  // ── Start session — optionally with a plan ID ────────────────────────────
   const startChatSession = React.useCallback(async (planId = null) => {
     const tokenCheck = await validateToken();
     if (!tokenCheck.valid) {
       clearAuthToken();
       return;
     }
- 
+
     // Only check for existing session when starting normally (no planId)
     if (!planId) {
       const savedState = loadFromSessionStorage();
@@ -54,13 +55,13 @@ export default function PlannerBot() {
         return;
       }
     }
- 
+
     await addBotMessage('Hello! I am NestWiseAI. How can I help you today?');
     const token = localStorage.getItem('token');
- 
+
     try {
       const body = planId ? { plan_id: planId } : {};
- 
+
       const res = await fetch(`${API_BASE_URL}/chatbot/start`, {
         method: 'POST',
         headers: {
@@ -69,12 +70,12 @@ export default function PlannerBot() {
         },
         body: JSON.stringify(body),
       });
- 
+
       if (res.status === 401) {
         clearAuthToken();
         return;
       }
- 
+
       if (!res.ok) throw new Error('Failed to start session');
       const data = await res.json();
       setSessionId(data.session_id);
@@ -109,7 +110,7 @@ export default function PlannerBot() {
     }
   }, [animationTriggered, startChatSession]);
 
-// ── Handle plan selected from modal ──────────────────────────────────────
+  // ── Handle plan selected from modal ──────────────────────────────────────
   const handlePlanSelect = async (planId) => {
     // Clear all existing state before starting fresh with the selected plan
     setMessages([]);
@@ -122,9 +123,9 @@ export default function PlannerBot() {
     setRawPlanJSON(null);
     setPlanAnimationNeeded(false);
     sessionStorage.removeItem('plannerBotState');
- 
-   
- 
+
+
+
     // Small delay to let state settle before starting new session
     await new Promise((r) => setTimeout(r, 100));
     await startChatSession(planId);
@@ -494,21 +495,44 @@ export default function PlannerBot() {
   // Check To See If There Are Chats Happening, Meaining The Plan Should Be Saved.
   //const isChatActive = safeMessages.length > 1 || sending;
 
-
   return (
     <div className="h-screen flex overflow-hidden pt-6">
       <div className="flex-1 flex">
-        {/* Left side - takes half */}
-        <div className="flex-1 flex flex-col pl-1 pr-8 h-full -mr-20">
+        {/* Left side - takes full width on mobile, half on desktop */}
+        <div className="flex-1 md:flex-1 flex flex-col pl-1 pr-4 md:pr-8 h-full md:-mr-20">
           <div className="w-full flex flex-col h-full min-h-0">
+            {/* Mobile Hamburger Button for Planner - Fixed Position */}
+            <motion.button
+              onClick={() => setIsMobilePlannerOpen(!isMobilePlannerOpen)}
+              className="md:hidden fixed top-4 right-4 flex items-center justify-center w-12 h-12 text-white transition-all duration-300 rounded-lg z-[60] border border-yellow-300 bg-gradient-to-br from-yellow-300 to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 shadow-lg"
+              whileTap={{ scale: 0.95 }}
+            >
+              <motion.div
+                animate={{ rotate: isMobilePlannerOpen ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {isMobilePlannerOpen ? (
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                )}
+              </motion.div>
+            </motion.button>
+
             {/* Header */}
-            <Header
-              conversationTitle={conversationTitle}
-              selectedPlan={selectedPlan}
-              setSelectedPlan={setSelectedPlan}
-              clearChat={clearChat}
-              onPlanSelect={handlePlanSelect}
-            />
+            <div className="md:mt-0 mt-16">
+              <Header
+                conversationTitle={conversationTitle}
+                selectedPlan={selectedPlan}
+                setSelectedPlan={setSelectedPlan}
+                clearChat={clearChat}
+                onPlanSelect={handlePlanSelect}
+              />
+            </div>
 
             {/* Messages Area */}
             <div className="flex-1 min-h-0">
@@ -516,7 +540,7 @@ export default function PlannerBot() {
             </div>
 
             {/* Input Area */}
-            <div className="mb-3">
+            <div className="mb-12 md:mb-3">
               <InputArea
                 input={input}
                 setInput={setInput}
@@ -528,8 +552,8 @@ export default function PlannerBot() {
           </div>
         </div>
 
-        {/* Right side - takes half */}
-        <div className="flex-1 flex flex-col px-8 h-full">
+        {/* Desktop Right side - hidden on mobile */}
+        <div className="hidden md:flex md:flex-1 flex-col px-8 h-full">
           <div className="w-[47vw] flex flex-col h-full min-h-0">
             <PlannerArea
               animationTriggered={animationTriggered}
@@ -541,6 +565,59 @@ export default function PlannerBot() {
             />
           </div>
         </div>
+
+        {/* Mobile Planner Overlay */}
+        <AnimatePresence>
+          {isMobilePlannerOpen && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="md:hidden fixed inset-0 bg-black/50 z-40"
+                onClick={() => setIsMobilePlannerOpen(false)}
+              />
+
+              {/* Mobile Planner Panel */}
+              <motion.div
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                className="md:hidden fixed inset-y-0 right-0 w-full max-w-md z-50 bg-white shadow-2xl"
+              >
+                <div className="h-full flex flex-col p-4">
+                  {/* Mobile Planner Header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-800">Plan Details</h3>
+                    <button
+                      onClick={() => setIsMobilePlannerOpen(false)}
+                      className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Mobile Planner Content */}
+                  <div className="flex-1 overflow-hidden">
+                    <PlannerArea
+                      animationTriggered={animationTriggered}
+                      profileData={profileData}
+                      lastChatbotResponse={getLastChatbotResponse}
+                      conversationTitle={conversationTitle}
+                      generatedPlan={generatedPlan}
+                      selectedPlan={selectedPlan}
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
 
         {/* Disclaimer */}
         <div className="absolute bottom-1 left-0 right-0 flex justify-center pt-1">

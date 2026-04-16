@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '../../../components/shared/shadcn/components/ui/card';
 import { cn } from '../../../components/shared/shadcn/lib/utils';
 
 const PlansIndex = ({ plans = [], onPlanSelect, selectedPlanId }) => {
     const [selectedPlan, setSelectedPlan] = useState(null);
+    const navigate = useNavigate();
 
     const handlePlanSelect = (plan) => {
         setSelectedPlan(plan.id);
@@ -81,6 +83,7 @@ const PlansIndex = ({ plans = [], onPlanSelect, selectedPlanId }) => {
                             }}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
+                            onClick={() => navigate('/plannerbot')}
                             className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg p-2 border-l-4 border-dashed border-gray-400 hover:shadow-md transition-shadow duration-200 overflow-hidden cursor-pointer"
                         >
                             <div className="flex items-start space-x-2">

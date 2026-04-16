@@ -524,7 +524,7 @@ export default function PlannerBot() {
             </motion.button>
 
             {/* Header. */}
-            <div className="flex-shrink-0 pt-8 md:pt-0">
+            <div className="flex-shrink-0 pt-8 md:pt-0 pr-5 md:pl-0">
               <Header
                 conversationTitle={conversationTitle}
                 selectedPlan={selectedPlan}

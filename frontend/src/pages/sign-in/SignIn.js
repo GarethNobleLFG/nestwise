@@ -307,6 +307,7 @@ export default function SignIn(props) {
                   gap: 2
                 }}>
                   <Divider sx={{ mb: 1 }}>or</Divider>
+                  {/*
                   <Button
                     fullWidth
                     variant="outlined"
@@ -323,6 +324,7 @@ export default function SignIn(props) {
                   >
                     Sign in with Facebook
                   </Button>
+                  */}
                   <Typography sx={{ textAlign: 'center', mt: 1 }}>
                     Don&apos;t have an account?{' '}
                     <Link component="button" onClick={() => navigate('/signup')} variant="body2">

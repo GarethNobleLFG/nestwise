@@ -1,4 +1,5 @@
-import React, { useState, useNavigate } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '../../../components/shared/shadcn/components/ui/card';
 import { cn } from '../../../components/shared/shadcn/lib/utils';

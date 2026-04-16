@@ -504,7 +504,7 @@ export default function PlannerBot() {
             {/* Mobile Hamburger Button for Planner - Fixed Position */}
             <motion.button
               onClick={() => setIsMobilePlannerOpen(!isMobilePlannerOpen)}
-              className="md:hidden fixed top-4 right-4 flex items-center justify-center w-12 h-12 text-white transition-all duration-300 rounded-lg z-[60] border border-amber-400 bg-gradient-to-br from-yellow-400 to-amber-600 hover:from-yellow-500 hover:to-amber-700 shadow-lg"
+              className="md:hidden fixed top-4 right-4 flex items-center justify-center w-12 h-12 text-white transition-all duration-300 rounded-lg z-[60] border border-yellow-300 bg-gradient-to-br from-yellow-300 to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 shadow-lg"
               whileTap={{ scale: 0.95 }}
             >
               <motion.div

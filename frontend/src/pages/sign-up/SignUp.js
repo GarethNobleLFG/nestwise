@@ -336,6 +336,7 @@ export default function SignUp(props) {
                 <Divider sx={{ mb: 1 }}>
                   <Typography sx={{ color: 'text.secondary' }}>or</Typography>
                 </Divider>
+                {/*
                 <Button
                   fullWidth
                   variant="outlined"
@@ -352,6 +353,7 @@ export default function SignUp(props) {
                 >
                   Sign up with Facebook
                 </Button>
+                */}
                 <Typography sx={{ textAlign: 'center', mt: 1 }}>
                   Already have an account?{' '}
                   <Link

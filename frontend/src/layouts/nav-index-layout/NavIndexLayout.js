@@ -9,7 +9,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import SettingsIcon from '@mui/icons-material/Settings';
 import HomeIcon from '@mui/icons-material/Home';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
 export default function NavIndexLayout({ activeView, children }) {
     const navigate = useNavigate();
@@ -163,12 +163,12 @@ export default function NavIndexLayout({ activeView, children }) {
                 {/* Mobile Pull-up Arrow Button */}
                 <motion.button
                     onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
-                    className="md:hidden fixed bottom-2 left-1/2 transform -translate-x-1/2 flex items-center justify-center w-12 h-8 text-white transition-all duration-300 rounded-t-lg z-50 border border-yellow-300 bg-gradient-to-br from-yellow-300 to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 shadow-lg"
+                    className="md:hidden fixed left-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-8 h-12 text-white transition-all duration-300 rounded-r-lg z-50 border border-yellow-300 bg-gradient-to-br from-yellow-300 to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 shadow-lg"
                     whileTap={{ scale: 0.95 }}
-                    animate={{ rotate: isMobileNavOpen ? 180 : 0 }}
+                    animate={{ rotate: isMobileNavOpen ? 90 : -90 }}
                     transition={{ duration: 0.3 }}
                 >
-                    <KeyboardArrowUpIcon className="w-6 h-6" />
+                    <ArrowRightIcon className="w-6 h-6" />
                 </motion.button>
 
                 {/* Mobile Bottom Navigation with All Buttons */}

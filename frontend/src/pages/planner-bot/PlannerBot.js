@@ -6,6 +6,7 @@ import MessagesArea from './components/MessagesArea';
 import Header from './components/Header';
 import PlannerArea from './components/PlannerArea';
 import { motion, AnimatePresence } from 'framer-motion';
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 
 export default function PlannerBot() {
   const [messages, setMessages] = useState([]);
@@ -504,23 +505,12 @@ export default function PlannerBot() {
             {/* Mobile Arrow Pull-out Button for Planner - Middle Right */}
             <motion.button
               onClick={() => setIsMobilePlannerOpen(!isMobilePlannerOpen)}
-              className="md:hidden fixed top-1/2 right-0 -translate-y-1/2 flex items-center justify-center w-10 h-16 text-white transition-all duration-300 rounded-l-lg z-[60] border-l border-t border-b border-yellow-300 bg-gradient-to-br from-yellow-300 to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 shadow-lg"
+              className="md:hidden fixed right-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-8 h-12 text-white transition-all duration-300 rounded-l-lg z-50 border border-yellow-300 bg-gradient-to-br from-yellow-300 to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 shadow-lg"
               whileTap={{ scale: 0.95 }}
+              animate={{ rotate: isMobilePlannerOpen ? -90 : 90 }}
+              transition={{ duration: 0.3 }}
             >
-              <motion.div
-                animate={{ rotate: isMobilePlannerOpen ? 180 : 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {isMobilePlannerOpen ? (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                ) : (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                )}
-              </motion.div>
+              <ArrowLeftIcon className="w-6 h-6" />
             </motion.button>
 
             {/* Header. */}

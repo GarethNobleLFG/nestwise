@@ -23,8 +23,8 @@ export default function MessagesArea({ safeMessages, planAnimationNeeded }) {
     };
 
     return (
-        <div ref={scrollAreaRef} className="flex-1 overflow-y-auto px-8 py-4 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]" style={{ height: 'calc(100vh - 200px)' }}>
-            <div className="max-w-4xl mx-auto space-y-4 min-h-full">
+        <div ref={scrollAreaRef} className="flex-1 overflow-y-auto px-4 md:px-8 py-2 md:py-4 min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <div className="max-w-sm md:max-w-4xl mx-auto space-y-2 md:space-y-4 min-h-full">
                 {safeMessages.map((message, index) => {
                     const prevMessage = safeMessages[index - 1];
                     const needsDivider = prevMessage && prevMessage.role !== message.role;
@@ -56,8 +56,8 @@ export default function MessagesArea({ safeMessages, planAnimationNeeded }) {
                                     className={cn(
                                         "transition-all duration-300",
                                         message.role === 'user'
-                                            ? "max-w-lg p-3 rounded-2xl shadow-lg backdrop-blur-xl border bg-gradient-to-br from-yellow-400/90 to-amber-500/90 text-white border-yellow-300/30 hover:shadow-xl hover:scale-[1.01]"
-                                            : "max-w-3xl text-gray-800"
+                                            ? "max-w-xs md:max-w-lg p-3 rounded-2xl shadow-lg backdrop-blur-xl border bg-gradient-to-br from-yellow-400/90 to-amber-500/90 text-white border-yellow-300/30 hover:shadow-xl hover:scale-[1.01]"
+                                            : "max-w-sm md:max-w-3xl text-gray-800"
                                     )}
                                 >
                                     {message.isThinking ? (

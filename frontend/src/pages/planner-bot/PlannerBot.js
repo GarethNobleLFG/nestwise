@@ -497,11 +497,11 @@ export default function PlannerBot() {
   //const isChatActive = safeMessages.length > 1 || sending;
 
   return (
-    <div className="h-screen flex overflow-hidden pt-6">
+    <div className="h-screen flex overflow-hidden pt-0 md:pt-6">
       <div className="flex-1 flex">
         {/* Left side - takes full width on mobile, half on desktop */}
-        <div className="flex-1 md:flex-1 flex flex-col pl-1 pr-4 md:pr-8 h-full md:-mr-20">
-          <div className="w-full flex flex-col h-full min-h-0 max-h-screen pb-safe">
+        <div className="flex-1 flex md:justify-start h-full md:-mr-20 overflow-hidden">
+          <div className="w-full md:max-w-none flex flex-col h-full min-h-0 overflow-hidden">
             {/* Mobile Arrow Pull-out Button for Planner - Middle Right */}
             <motion.button
               onClick={() => setIsMobilePlannerOpen(!isMobilePlannerOpen)}
@@ -514,7 +514,7 @@ export default function PlannerBot() {
             </motion.button>
 
             {/* Header. */}
-            <div className="flex-shrink-0 pt-8 md:pt-0 pr-5 pl-4 md:pl-0">
+            <div className="flex-shrink-0 pt-4 md:pt-0 md:pr-5 md:pl-0">
               <Header
                 conversationTitle={conversationTitle}
                 selectedPlan={selectedPlan}
@@ -525,12 +525,12 @@ export default function PlannerBot() {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 min-h-0 overflow-hidden pl-4 md:pl-0">
+            <div className="flex-1 min-h-0 overflow-hidden md:pl-0">
               <MessagesArea safeMessages={safeMessages} planAnimationNeeded={planAnimationNeeded} />
             </div>
 
             {/* Input Area */}
-            <div className="flex-shrink-0 pb-7 px-2 md:pb-3 md:px-0 pr-5 pl-4 md:pl-0">
+            <div className="flex-shrink-0 pb-0 md:pb-3 md:px-0 md:pr-5 md:pl-0">
               <InputArea
                 input={input}
                 setInput={setInput}
@@ -610,7 +610,7 @@ export default function PlannerBot() {
         </AnimatePresence>
 
         {/* Disclaimer */}
-        <div className="absolute bottom-1 left-0 right-0 flex justify-center pt-1">
+        <div className="hidden md:flex absolute bottom-1 left-0 right-0 justify-center pt-1">
           <p className="text-xs text-gray-600 text-center font-medium">
             NestWise Agent can make mistakes. Always verify important financial information.
           </p>

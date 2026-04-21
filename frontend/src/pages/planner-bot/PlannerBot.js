@@ -513,7 +513,7 @@ export default function PlannerBot() {
           </motion.button>
 
           {/* Header. */}
-          <div className="flex-shrink-0 md:pt-0 md:pr-5 md:pl-0">
+          <div className="flex-shrink-0">
             <Header
               conversationTitle={conversationTitle}
               selectedPlan={selectedPlan}
@@ -524,12 +524,12 @@ export default function PlannerBot() {
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 min-h-0 overflow-hidden md:pl-0">
+          <div className="flex-1 min-h-0 overflow-hidden">
             <MessagesArea safeMessages={safeMessages} planAnimationNeeded={planAnimationNeeded} />
           </div>
 
           {/* Input Area */}
-          <div className="flex-shrink-0 pb-0 md:pb-3 md:px-0 md:pl-0">
+          <div className="flex-shrink-0 md:mb-3">
             <InputArea
               input={input}
               setInput={setInput}

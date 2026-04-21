@@ -13,7 +13,7 @@ export default function InputArea({
 }) {
   return (
     <motion.div
-      className="px-6 md:px-8 py-3 md:py-4 mb-[env(keyboard-inset-height,0)]"
+      className="px-6 md:px-8 py-3 md:py-4 mb-[env(keyboard-inset-height,0) md:mb-3]"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}

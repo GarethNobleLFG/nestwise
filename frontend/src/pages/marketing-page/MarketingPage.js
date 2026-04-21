@@ -75,7 +75,7 @@ export default function MarketingPage() {
 
         {/* How It Works Section */}
         <motion.section
-          className="!bg-white !w-[100vw] !flex !justify-center !items-center"
+          className="!bg-white !w-[98vw] !flex !justify-center !items-center"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

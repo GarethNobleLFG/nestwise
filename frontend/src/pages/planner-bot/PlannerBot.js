@@ -497,7 +497,7 @@ export default function PlannerBot() {
   //const isChatActive = safeMessages.length > 1 || sending;
 
   return (
-    <div className="h-[100vh] flex overflow-hidden pt-0 md:pt-6">
+    <div className="h-[100vh] flex overflow-hidden">
       {/* Left side - takes full width on mobile, half on desktop */}
       <div className="flex-1 flex md:justify-start h-full md:-mr-20 overflow-hidden">
         <div className="md:w-[35vw] md:max-w-none flex flex-col h-full min-h-0 overflow-hidden">
@@ -513,7 +513,7 @@ export default function PlannerBot() {
           </motion.button>
 
           {/* Header. */}
-          <div className="flex-shrink-0 pt-4 md:pt-0 md:pr-5 md:pl-0">
+          <div className="flex-shrink-0 md:pt-0 md:pr-5 md:pl-0">
             <Header
               conversationTitle={conversationTitle}
               selectedPlan={selectedPlan}

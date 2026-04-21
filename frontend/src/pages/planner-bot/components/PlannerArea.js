@@ -182,8 +182,8 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="w-full"
-            style={{ height: 'calc(100vh - 53px)' }}
+            className="w-full md:pt-6"
+            style={{ height: 'calc(100vh - 29px)' }}
         >
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}

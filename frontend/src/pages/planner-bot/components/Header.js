@@ -36,7 +36,7 @@ export default function Header({
 
     return (
         <>
-            <div className="px-4 md:px-8">
+            <div className="px-4 md:px-8 pt-1 md:pt-6">
                 <div className="max-w-sm md:max-w-4xl mx-auto flex flex-col items-start space-y-2 md:space-y-4">
                     <div className="flex items-center space-x-4 md:space-x-8">
                         <div className="flex items-center space-x-2">

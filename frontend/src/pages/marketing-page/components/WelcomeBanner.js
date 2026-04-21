@@ -126,14 +126,14 @@ export default function WelcomeBanner({ navigate, isLoggedIn }) {
                   </Button>
                 </motion.div>
               </motion.div>
-              
+
             </motion.div>
           </motion.div>
 
           {/* Writing Animation Component - Only show for non-logged in users */}
           {!isLoggedIn && (
             <motion.div
-              className="!w-full"
+              className="!w-[30vw] md:!w-full !max-w-lg md:!max-w-none !mx-auto"
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.8 }}

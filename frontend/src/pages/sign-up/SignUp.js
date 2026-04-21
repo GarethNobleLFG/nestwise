@@ -22,8 +22,8 @@ export default function SignUp() {
     document.title = "NestWise - Sign Up";
   }, []);
 
-  const handleValidation = () => {
-    const { isValid, errors } = validateInputs(['name', 'email', 'password'], {
+  const handleValidation = (formData) => {
+    const { isValid, errors } = validateInputs(formData, ['name', 'email', 'password'], {
       requireSpecialChar: true
     });
 
@@ -39,10 +39,10 @@ export default function SignUp() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!handleValidation()) return;
+    const formData = new FormData(event.currentTarget);
+    if (!handleValidation(formData)) return;
 
     setIsLoading(true);
-    const formData = new FormData(event.currentTarget);
     const userData = {
       name: formData.get('name'),
       email: formData.get('email'),

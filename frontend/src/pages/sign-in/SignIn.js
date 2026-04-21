@@ -25,8 +25,9 @@ export default function SignIn() {
     document.title = "NestWise - Sign In";
   }, []);
 
-  const handleValidation = () => {
-    const { isValid, errors } = validateInputs(['email', 'password']);
+
+  const handleValidation = (formData) => {
+    const { isValid, errors } = validateInputs(formData, ['email', 'password']);
 
     setEmailError(errors.email?.hasError || false);
     setEmailErrorMessage(errors.email?.message || '');
@@ -38,10 +39,10 @@ export default function SignIn() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!handleValidation()) return;
+    const formData = new FormData(event.currentTarget);
+    if (!handleValidation(formData)) return;
 
     setIsLoading(true);
-    const formData = new FormData(event.currentTarget);
     const userData = {
       name: 'NestWise User',
       email: formData.get('email'),

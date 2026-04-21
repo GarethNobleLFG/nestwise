@@ -48,15 +48,15 @@ export default function Header({
                                 <Button
                                     variant="outline"
                                     onClick={() => setIsModalOpen(true)}
-                                    className="bg-white/40 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-lg border-0 px-3 md:px-4 py-2 md:py-3 font-semibold text-gray-800 hover:bg-white/60 transition-all duration-300 max-w-48 md:max-w-64 text-xs md:text-base lg:text-lg"
+                                    className="bg-white/40 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-lg border-0 px-3 md:px-4 py-2 md:py-3 font-semibold text-gray-800 hover:bg-white/60 transition-all duration-300 w-32 md:w-40 text-xs md:text-base lg:text-lg"
                                 >
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <span className="truncate">
+                                                <span className="truncate min-w-0 flex-1">
                                                     <span className="hidden md:inline">{headerTitle}</span>
                                                     <span className="md:hidden">
-                                                        {headerTitle.length > 8 ? headerTitle.substring(0, 8) + '...' : headerTitle}
+                                                        {headerTitle.length > 6 ? headerTitle.substring(0, 6) + '...' : headerTitle}
                                                     </span>
                                                 </span>
                                             </TooltipTrigger>

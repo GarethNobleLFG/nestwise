@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import ForgotPassword from './components/ForgotPassword';
 import Sitemark from './components/SitemarkIcon';
+import { validateInputs } from '../../utils/formValidation';
 
 export default function SignIn() {
   const [emailError, setEmailError] = React.useState(false);
@@ -24,35 +25,20 @@ export default function SignIn() {
     document.title = "NestWise - Sign In";
   }, []);
 
-  const validateInputs = () => {
-    const email = document.getElementById('email');
-    const password = document.getElementById('password');
-    let isValid = true;
+  const handleValidation = () => {
+    const { isValid, errors } = validateInputs(['email', 'password']);
 
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true);
-      setEmailErrorMessage('Please enter a valid email address.');
-      isValid = false;
-    } else {
-      setEmailError(false);
-      setEmailErrorMessage('');
-    }
-
-    if (!password.value || password.value.length < 6) {
-      setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
-      isValid = false;
-    } else {
-      setPasswordError(false);
-      setPasswordErrorMessage('');
-    }
+    setEmailError(errors.email?.hasError || false);
+    setEmailErrorMessage(errors.email?.message || '');
+    setPasswordError(errors.password?.hasError || false);
+    setPasswordErrorMessage(errors.password?.message || '');
 
     return isValid;
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!validateInputs()) return;
+    if (!handleValidation()) return;
 
     setIsLoading(true);
     const formData = new FormData(event.currentTarget);
@@ -96,7 +82,7 @@ export default function SignIn() {
 
   return (
     <div className="!min-h-screen !bg-gradient-to-br !from-slate-50 !to-gray-100 !flex !items-center !justify-center !p-4">
-      
+
       {/* Success Overlay */}
       <AnimatePresence>
         {isSuccess && (
@@ -112,7 +98,7 @@ export default function SignIn() {
               className="!bg-white !rounded-2xl !p-8 !text-center !shadow-2xl"
             >
               <div className="!w-16 !h-16 !mx-auto !mb-4 !border-4 !border-t-transparent !rounded-full !animate-spin"
-                   style={{ borderColor: '#FFD700 transparent transparent transparent' }}></div>
+                style={{ borderColor: '#FFD700 transparent transparent transparent' }}></div>
               <h3 className="!text-xl !font-bold !text-gray-900 !mb-2">Logging you in</h3>
               <p className="!text-gray-600">Redirecting to home page...</p>
             </motion.div>
@@ -127,13 +113,13 @@ export default function SignIn() {
         transition={{ duration: 0.6 }}
         className="!w-full !max-w-md lg:!max-w-4xl !bg-white !rounded-2xl !shadow-2xl !overflow-hidden"
       >
-        
+
         {/* Desktop Layout */}
         <div className="!hidden lg:!flex !min-h-[80vh]">
           {/* Left Panel - Form */}
           <div className="!w-1/2 !p-8 xl:!p-12 !flex !flex-col !justify-center">
             <div className="!max-w-sm !mx-auto !w-full">
-              
+
               {/* Header */}
               <div className="!mb-8">
                 <Sitemark />
@@ -155,10 +141,9 @@ export default function SignIn() {
                     autoComplete="email"
                     required
                     placeholder="your@email.com"
-                    className={`!w-full !px-4 !py-3 !border !rounded-xl !text-gray-900 !placeholder-gray-500 !transition-colors !duration-200 focus:!outline-none focus:!ring-2 focus:!border-transparent ${
-                      emailError ? '!border-red-500 focus:!ring-red-500' : '!border-gray-300 focus:!ring-yellow-500'
-                    }`}
-                    style={{ 
+                    className={`!w-full !px-4 !py-3 !border !rounded-xl !text-gray-900 !placeholder-gray-500 !transition-colors !duration-200 focus:!outline-none focus:!ring-2 focus:!border-transparent ${emailError ? '!border-red-500 focus:!ring-red-500' : '!border-gray-300 focus:!ring-yellow-500'
+                      }`}
+                    style={{
                       '--tw-ring-color': emailError ? 'rgb(239 68 68)' : '#FFD700'
                     }}
                   />
@@ -176,10 +161,9 @@ export default function SignIn() {
                     autoComplete="current-password"
                     required
                     placeholder="••••••••"
-                    className={`!w-full !px-4 !py-3 !border !rounded-xl !text-gray-900 !placeholder-gray-500 !transition-colors !duration-200 focus:!outline-none focus:!ring-2 focus:!border-transparent ${
-                      passwordError ? '!border-red-500 focus:!ring-red-500' : '!border-gray-300 focus:!ring-yellow-500'
-                    }`}
-                    style={{ 
+                    className={`!w-full !px-4 !py-3 !border !rounded-xl !text-gray-900 !placeholder-gray-500 !transition-colors !duration-200 focus:!outline-none focus:!ring-2 focus:!border-transparent ${passwordError ? '!border-red-500 focus:!ring-red-500' : '!border-gray-300 focus:!ring-yellow-500'
+                      }`}
+                    style={{
                       '--tw-ring-color': passwordError ? 'rgb(239 68 68)' : '#FFD700'
                     }}
                   />
@@ -193,7 +177,7 @@ export default function SignIn() {
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
                       className="!w-4 !h-4 !border-gray-300 !rounded focus:!ring-2"
-                      style={{ 
+                      style={{
                         accentColor: '#FFD700',
                         '--tw-ring-color': '#FFD700'
                       }}
@@ -255,14 +239,14 @@ export default function SignIn() {
 
           {/* Right Panel - Branding */}
           <div className="!w-1/2 !p-8 xl:!p-12 !flex !flex-col !justify-center !items-center !text-white !relative !overflow-hidden"
-               style={{
-                 background: 'linear-gradient(145deg, #FFD700 0%, #FFA500 50%, #c47c1eff 100%)'
-               }}>
-            
+            style={{
+              background: 'linear-gradient(145deg, #FFD700 0%, #FFA500 50%, #c47c1eff 100%)'
+            }}>
+
             {/* Floating background elements */}
             <div className="!absolute !top-10 !right-10 !w-6 !h-6 !bg-white !bg-opacity-20 !rounded-full !animate-pulse"></div>
             <div className="!absolute !bottom-20 !left-10 !w-4 !h-4 !bg-white !bg-opacity-30 !rounded-full !animate-bounce"></div>
-            
+
             <div className="!text-center !relative !z-10">
               <h2 className="!text-4xl !font-bold !mb-6">Start Your Financial Journey</h2>
               <p className="!text-xl !text-white !text-opacity-90 !leading-relaxed !mb-8">
@@ -288,7 +272,7 @@ export default function SignIn() {
 
         {/* Mobile Layout */}
         <div className="!block lg:!hidden !p-6 !min-h-[90vh] !flex !flex-col !justify-center">
-          
+
           {/* Header */}
           <div className="!mb-8 !text-center">
             <div className="!flex !justify-center !mb-6">
@@ -311,10 +295,9 @@ export default function SignIn() {
                 autoComplete="email"
                 required
                 placeholder="your@email.com"
-                className={`!w-full !px-4 !py-3 !border !rounded-xl !text-gray-900 !placeholder-gray-500 !text-base !transition-colors !duration-200 focus:!outline-none focus:!ring-2 focus:!border-transparent ${
-                  emailError ? '!border-red-500 focus:!ring-red-500' : '!border-gray-300 focus:!ring-yellow-500'
-                }`}
-                style={{ 
+                className={`!w-full !px-4 !py-3 !border !rounded-xl !text-gray-900 !placeholder-gray-500 !text-base !transition-colors !duration-200 focus:!outline-none focus:!ring-2 focus:!border-transparent ${emailError ? '!border-red-500 focus:!ring-red-500' : '!border-gray-300 focus:!ring-yellow-500'
+                  }`}
+                style={{
                   '--tw-ring-color': emailError ? 'rgb(239 68 68)' : '#FFD700'
                 }}
               />
@@ -332,10 +315,9 @@ export default function SignIn() {
                 autoComplete="current-password"
                 required
                 placeholder="••••••••"
-                className={`!w-full !px-4 !py-3 !border !rounded-xl !text-gray-900 !placeholder-gray-500 !text-base !transition-colors !duration-200 focus:!outline-none focus:!ring-2 focus:!border-transparent ${
-                  passwordError ? '!border-red-500 focus:!ring-red-500' : '!border-gray-300 focus:!ring-yellow-500'
-                }`}
-                style={{ 
+                className={`!w-full !px-4 !py-3 !border !rounded-xl !text-gray-900 !placeholder-gray-500 !text-base !transition-colors !duration-200 focus:!outline-none focus:!ring-2 focus:!border-transparent ${passwordError ? '!border-red-500 focus:!ring-red-500' : '!border-gray-300 focus:!ring-yellow-500'
+                  }`}
+                style={{
                   '--tw-ring-color': passwordError ? 'rgb(239 68 68)' : '#FFD700'
                 }}
               />
@@ -349,7 +331,7 @@ export default function SignIn() {
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="!w-4 !h-4 !border-gray-300 !rounded focus:!ring-2"
-                  style={{ 
+                  style={{
                     accentColor: '#FFD700',
                     '--tw-ring-color': '#FFD700'
                   }}

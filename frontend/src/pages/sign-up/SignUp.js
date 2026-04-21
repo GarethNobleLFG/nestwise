@@ -1,111 +1,30 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import CssBaseline from '@mui/material/CssBaseline';
-import Divider from '@mui/material/Divider';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormLabel from '@mui/material/FormLabel';
-import FormControl from '@mui/material/FormControl';
-import Link from '@mui/material/Link';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import Stack from '@mui/material/Stack';
-import MuiCard from '@mui/material/Card';
-import { styled } from '@mui/material/styles';
-import AppTheme from '../../layouts/AppTheme';
-import ColorModeSelect from '../../layouts/ColorModeSelect';
-import { GoogleIcon, FacebookIcon, SitemarkIcon } from './components/CustomIcons';
-import Sitemark from './components/SitemarkIcon';
-import Fade from '@mui/material/Fade';
-import Slide from '@mui/material/Slide';
-import Zoom from '@mui/material/Zoom';
 import { useNavigate } from 'react-router-dom';
-import CircularProgress from '@mui/material/CircularProgress';
-import Backdrop from '@mui/material/Backdrop';
+import { motion, AnimatePresence } from 'framer-motion';
+import Sitemark from './components/SitemarkIcon';
 
-const Card = styled(MuiCard)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignSelf: 'center',
-  width: '100%',
-  padding: theme.spacing(4),
-  gap: theme.spacing(2),
-  margin: 'auto',
-  boxShadow:
-    'hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px',
-  [theme.breakpoints.up('sm')]: {
-    width: '1000px',
-  },
-  ...theme.applyStyles('dark', {
-    boxShadow:
-      'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
-  }),
-}));
-
-const SignUpContainer = styled(Stack)(({ theme }) => ({
-  height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
-  minHeight: '100%',
-  padding: theme.spacing(2),
-  [theme.breakpoints.up('sm')]: {
-    padding: theme.spacing(4),
-  },
-  '&::before': {
-    content: '""',
-    display: 'block',
-    position: 'absolute',
-    zIndex: -1,
-    inset: 0,
-    backgroundImage:
-      'radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))',
-    backgroundRepeat: 'no-repeat',
-    ...theme.applyStyles('dark', {
-      backgroundImage:
-        'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
-    }),
-  },
-}));
-
-export default function SignUp(props) {
-  const navigate = useNavigate();
-
-
-
+export default function SignUp() {
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [nameError, setNameError] = React.useState(false);
   const [nameErrorMessage, setNameErrorMessage] = React.useState('');
-  const API_BASE_URL = process.env.REACT_APP_USER_AUTH_URL;
-
-
-
-  // Animation state
-  const [checked, setChecked] = React.useState(false);
-
-  // Loading and success states
   const [isLoading, setIsLoading] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
+  const [allowEmails, setAllowEmails] = React.useState(false);
+  const navigate = useNavigate();
 
+  const API_BASE_URL = process.env.REACT_APP_USER_AUTH_URL;
 
-
-  // Trigger animations when component mounts
   React.useEffect(() => {
-    document.title = "NestWise - Signup";
-
-    setChecked(true);
+    document.title = "NestWise - Sign Up";
   }, []);
-
-
-
-
 
   const validateInputs = () => {
     const email = document.getElementById('email');
     const password = document.getElementById('password');
     const name = document.getElementById('name');
-
     let isValid = true;
 
     if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
@@ -117,15 +36,9 @@ export default function SignUp(props) {
       setEmailErrorMessage('');
     }
 
-    if (
-      !password.value ||
-      password.value.length < 6 ||
-      !/[!@#$%^&*(),.?":{}|<>]/.test(password.value)
-    ) {
+    if (!password.value || password.value.length < 6 || !/[!@#$%^&*(),.?":{}|<>]/.test(password.value)) {
       setPasswordError(true);
-      setPasswordErrorMessage(
-        'Password must be at least 6 characters long and include at least one special character.'
-      );
+      setPasswordErrorMessage('Password must be at least 6 characters long and include at least one special character.');
       isValid = false;
     } else {
       setPasswordError(false);
@@ -144,17 +57,11 @@ export default function SignUp(props) {
     return isValid;
   };
 
-
-
-
-
   const handleSubmit = async (event) => {
-    event.preventDefault(); // always prevent default at start
+    event.preventDefault();
+    if (!validateInputs()) return;
 
-    if (!validateInputs()) {
-      return; // Stop if validation fails
-    }
-
+    setIsLoading(true);
     const formData = new FormData(event.currentTarget);
     const userData = {
       name: formData.get('name'),
@@ -163,7 +70,6 @@ export default function SignUp(props) {
     };
 
     try {
-      console.log(API_BASE_URL);
       const response = await fetch(`${API_BASE_URL}/userauth/signup`, {
         method: 'POST',
         headers: {
@@ -180,12 +86,6 @@ export default function SignUp(props) {
       const result = await response.json();
       console.log('Sign up successful:', result);
 
-
-
-
-
-      // ----------HANDLING OF SUCCESSFUL SIGN-UP----------
-
       setIsLoading(false);
       setIsSuccess(true);
 
@@ -193,183 +93,352 @@ export default function SignUp(props) {
         navigate('/signin');
       }, 1500);
 
-
     } catch (error) {
+      setIsLoading(false);
       console.error('Error during sign up:', error.message);
-      alert(`Sign up failed: ${error.message}`); // Show error to user
+      alert(`Sign up failed: ${error.message}`);
     }
   };
 
-
-
-
   return (
-    <AppTheme {...props}>
-      <CssBaseline enableColorScheme />
-      <SignUpContainer direction="column" justifyContent="space-between">
-
-        {/* Success Overlay */}
-        <Backdrop
-          sx={{
-            color: '#c47c1eff',
-            zIndex: (theme) => theme.zIndex.modal + 1,
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0
-          }}
-          open={isSuccess}
-        >
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-            <CircularProgress color="inherit" size={60} />
-            <Typography variant="h6">Account Created Successfully!</Typography>
-            <Typography variant="body1">Redirecting To Sign-In...</Typography>
-          </Box>
-        </Backdrop>
-
-        <Fade in={checked} timeout={800}>
-          <Card variant="outlined" sx={{
-            alignItems: 'flex-start',
-            maxWidth: '1000px',
-            minHeight: 'auto',
-            height: 'auto',
-            overflow: 'visible'
-          }}>
-
-            <Sitemark />
-
-            <Divider sx={{
-              backgroundColor: '#828282ff',
-              height: '1px',
-              border: 'none',
-              opacity: 0.5,
-              my: 0.1,
-              width: '100%',
-              borderRadius: '5px'
-            }} />
-
-            <Typography
-              component="h1"
-              variant="h4"
-              sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+    <div className="!min-h-screen !bg-gradient-to-br !from-slate-50 !to-gray-100 !flex !items-center !justify-center !p-4">
+      
+      {/* Success Overlay */}
+      <AnimatePresence>
+        {isSuccess && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="!fixed !inset-0 !bg-black !bg-opacity-50 !flex !items-center !justify-center !z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="!bg-white !rounded-2xl !p-8 !text-center !shadow-2xl"
             >
-              Sign Up
-            </Typography>
+              <div className="!w-16 !h-16 !mx-auto !mb-4 !border-4 !border-t-transparent !rounded-full !animate-spin"
+                   style={{ borderColor: '#FFD700 transparent transparent transparent' }}></div>
+              <h3 className="!text-xl !font-bold !text-gray-900 !mb-2">Account Created Successfully!</h3>
+              <p className="!text-gray-600">Redirecting to Sign In...</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-            {/* Main content layout with form on left, social on right */}
-            <Box sx={{ display: 'flex', gap: 4, width: '100%', alignItems: 'flex-start' }}>
-              {/* Left side - Main sign up form */}
-              <Box sx={{ flex: 1, minWidth: '300px' }}>
-                <Box
-                  component="form"
-                  onSubmit={handleSubmit}
-                  sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
-                >
-                  <FormControl>
-                    <FormLabel htmlFor="name">Full name</FormLabel>
-                    <TextField
-                      autoComplete="name"
-                      name="name"
-                      required
-                      fullWidth
-                      id="name"
-                      placeholder="Jon Snow"
-                      error={nameError}
-                      helperText={nameErrorMessage}
-                      color={nameError ? 'error' : 'primary'}
-                    />
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel htmlFor="email">Email</FormLabel>
-                    <TextField
-                      required
-                      fullWidth
-                      id="email"
-                      placeholder="your@email.com"
-                      name="email"
-                      autoComplete="email"
-                      variant="outlined"
-                      error={emailError}
-                      helperText={emailErrorMessage}
-                      color={emailError ? 'error' : 'primary'}
-                    />
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel htmlFor="password">Password</FormLabel>
-                    <TextField
-                      required
-                      fullWidth
-                      name="password"
-                      placeholder="••••••"
-                      type="password"
-                      id="password"
-                      autoComplete="new-password"
-                      variant="outlined"
-                      error={passwordError}
-                      helperText={passwordErrorMessage}
-                      color={passwordError ? 'error' : 'primary'}
-                    />
-                  </FormControl>
-                  <FormControlLabel
-                    control={<Checkbox value="allowExtraEmails" color="primary" />}
-                    label="I want to receive updates via email."
+      {/* Main Sign Up Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="!w-full !max-w-md lg:!max-w-5xl !bg-white !rounded-2xl !shadow-2xl !overflow-hidden"
+      >
+        
+        {/* Desktop Layout */}
+        <div className="!hidden lg:!flex !min-h-[85vh]">
+          {/* Left Panel - Form */}
+          <div className="!w-1/2 !p-8 xl:!p-12 !flex !flex-col !justify-center">
+            <div className="!max-w-sm !mx-auto !w-full">
+              
+              {/* Header */}
+              <div className="!mb-8">
+                <Sitemark />
+                <div className="!w-full !h-px !bg-gray-200 !my-6"></div>
+                <h1 className="!text-3xl !font-bold !text-gray-900 !mb-2">Create your account</h1>
+                <p className="!text-gray-600">Start your financial journey with NestWise</p>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="!space-y-5">
+                <div>
+                  <label htmlFor="name" className="!block !text-sm !font-medium !text-gray-700 !mb-2">
+                    Full name
+                  </label>
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    autoComplete="name"
+                    required
+                    placeholder="Jon Snow"
+                    className={`!w-full !px-4 !py-3 !border !rounded-xl !text-gray-900 !placeholder-gray-500 !transition-colors !duration-200 focus:!outline-none focus:!ring-2 focus:!border-transparent ${
+                      nameError ? '!border-red-500 focus:!ring-red-500' : '!border-gray-300 focus:!ring-yellow-500'
+                    }`}
+                    style={{ 
+                      '--tw-ring-color': nameError ? 'rgb(239 68 68)' : '#FFD700'
+                    }}
                   />
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                  >
-                    Sign up
-                  </Button>
-                </Box>
-              </Box>
+                  {nameError && <p className="!mt-2 !text-sm !text-red-600">{nameErrorMessage}</p>}
+                </div>
 
-              {/* Right side - social signup and signin */}
-              <Box sx={{
-                flex: 1,
-                minWidth: '250px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2
-              }}>
-                <Divider sx={{ mb: 1 }}>
-                  <Typography sx={{ color: 'text.secondary' }}>or</Typography>
-                </Divider>
-                {/*
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  onClick={() => alert('Sign up with Google')}
-                  startIcon={<GoogleIcon />}
+                <div>
+                  <label htmlFor="email" className="!block !text-sm !font-medium !text-gray-700 !mb-2">
+                    Email address
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    placeholder="your@email.com"
+                    className={`!w-full !px-4 !py-3 !border !rounded-xl !text-gray-900 !placeholder-gray-500 !transition-colors !duration-200 focus:!outline-none focus:!ring-2 focus:!border-transparent ${
+                      emailError ? '!border-red-500 focus:!ring-red-500' : '!border-gray-300 focus:!ring-yellow-500'
+                    }`}
+                    style={{ 
+                      '--tw-ring-color': emailError ? 'rgb(239 68 68)' : '#FFD700'
+                    }}
+                  />
+                  {emailError && <p className="!mt-2 !text-sm !text-red-600">{emailErrorMessage}</p>}
+                </div>
+
+                <div>
+                  <label htmlFor="password" className="!block !text-sm !font-medium !text-gray-700 !mb-2">
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    placeholder="••••••••"
+                    className={`!w-full !px-4 !py-3 !border !rounded-xl !text-gray-900 !placeholder-gray-500 !transition-colors !duration-200 focus:!outline-none focus:!ring-2 focus:!border-transparent ${
+                      passwordError ? '!border-red-500 focus:!ring-red-500' : '!border-gray-300 focus:!ring-yellow-500'
+                    }`}
+                    style={{ 
+                      '--tw-ring-color': passwordError ? 'rgb(239 68 68)' : '#FFD700'
+                    }}
+                  />
+                  {passwordError && <p className="!mt-2 !text-sm !text-red-600">{passwordErrorMessage}</p>}
+                  <p className="!mt-1 !text-xs !text-gray-500">Must include at least one special character</p>
+                </div>
+
+                <div className="!flex !items-start">
+                  <input
+                    type="checkbox"
+                    checked={allowEmails}
+                    onChange={(e) => setAllowEmails(e.target.checked)}
+                    className="!w-4 !h-4 !mt-1 !border-gray-300 !rounded focus:!ring-2"
+                    style={{ 
+                      accentColor: '#FFD700',
+                      '--tw-ring-color': '#FFD700'
+                    }}
+                  />
+                  <span className="!ml-2 !text-sm !text-gray-700">I want to receive updates via email</span>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="!w-full !py-3 !px-4 !text-white !font-medium !rounded-xl !transition-all !duration-200 !disabled:opacity-50 !disabled:cursor-not-allowed !shadow-lg hover:!shadow-xl"
+                  style={{
+                    background: 'linear-gradient(135deg, #FFD700 0%, #c47c1eff 100%)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isLoading) {
+                      e.target.style.background = 'linear-gradient(135deg, #FFA500 0%, #8B4513 100%)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isLoading) {
+                      e.target.style.background = 'linear-gradient(135deg, #FFD700 0%, #c47c1eff 100%)';
+                    }
+                  }}
                 >
-                  Sign up with Google
-                </Button>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  onClick={() => alert('Sign up with Facebook')}
-                  startIcon={<FacebookIcon />}
-                >
-                  Sign up with Facebook
-                </Button>
-                */}
-                <Typography sx={{ textAlign: 'center', mt: 1 }}>
+                  {isLoading ? 'Creating account...' : 'Sign up'}
+                </button>
+              </form>
+
+              {/* Footer */}
+              <div className="!mt-8 !text-center">
+                <p className="!text-sm !text-gray-600">
                   Already have an account?{' '}
-                  <Link
-                    component="button"
-                    variant="body2"
-                    sx={{ alignSelf: 'center' }}
+                  <button
                     onClick={() => navigate('/signin')}
+                    className="!font-medium !transition-colors !duration-200"
+                    style={{ color: '#c47c1eff' }}
+                    onMouseEnter={(e) => e.target.style.color = '#FFD700'}
+                    onMouseLeave={(e) => e.target.style.color = '#c47c1eff'}
                   >
                     Sign in
-                  </Link>
-                </Typography>
-              </Box>
-            </Box>
-          </Card>
-        </Fade>
-      </SignUpContainer>
-    </AppTheme>
+                  </button>
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+          {/* Right Panel - Branding */}
+          <div className="!w-1/2 !p-8 xl:!p-12 !flex !flex-col !justify-center !items-center !text-white !relative !overflow-hidden"
+               style={{
+                 background: 'linear-gradient(145deg, #FFD700 0%, #FFA500 50%, #c47c1eff 100%)'
+               }}>
+            
+            {/* Floating background elements */}
+            <div className="!absolute !top-10 !right-10 !w-6 !h-6 !bg-white !bg-opacity-20 !rounded-full !animate-pulse"></div>
+            <div className="!absolute !bottom-20 !left-10 !w-4 !h-4 !bg-white !bg-opacity-30 !rounded-full !animate-bounce"></div>
+            <div className="!absolute !top-1/3 !left-8 !w-3 !h-3 !bg-white !bg-opacity-25 !rounded-full !animate-ping"></div>
+            
+            <div className="!text-center !relative !z-10">
+              <h2 className="!text-4xl !font-bold !mb-6">Join NestWise Today</h2>
+              <p className="!text-xl !text-white !text-opacity-90 !leading-relaxed !mb-8">
+                Take control of your financial future with personalized retirement planning powered by AI.
+              </p>
+              <div className="!space-y-4">
+                <div className="!flex !items-center !justify-center !space-x-3">
+                  <div className="!w-2 !h-2 !bg-white !rounded-full"></div>
+                  <span className="!text-white !text-opacity-90">Free to get started</span>
+                </div>
+                <div className="!flex !items-center !justify-center !space-x-3">
+                  <div className="!w-2 !h-2 !bg-white !rounded-full"></div>
+                  <span className="!text-white !text-opacity-90">Secure & private data</span>
+                </div>
+                <div className="!flex !items-center !justify-center !space-x-3">
+                  <div className="!w-2 !h-2 !bg-white !rounded-full"></div>
+                  <span className="!text-white !text-opacity-90">Expert guidance & insights</span>
+                </div>
+                <div className="!flex !items-center !justify-center !space-x-3">
+                  <div className="!w-2 !h-2 !bg-white !rounded-full"></div>
+                  <span className="!text-white !text-opacity-90">Download your plans as PDFs</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Layout */}
+        <div className="!block lg:!hidden !p-6 !min-h-[95vh] !flex !flex-col !justify-center">
+          
+          {/* Header */}
+          <div className="!mb-8 !text-center">
+            <div className="!flex !justify-center !mb-6">
+              <Sitemark />
+            </div>
+            <h1 className="!text-2xl sm:!text-3xl !font-bold !text-gray-900 !mb-2">Create your account</h1>
+            <p className="!text-gray-600">Start your financial journey today</p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="!space-y-4">
+            <div>
+              <label htmlFor="mobile-name" className="!block !text-sm !font-medium !text-gray-700 !mb-2">
+                Full name
+              </label>
+              <input
+                id="mobile-name"
+                name="name"
+                type="text"
+                autoComplete="name"
+                required
+                placeholder="Jon Snow"
+                className={`!w-full !px-4 !py-3 !border !rounded-xl !text-gray-900 !placeholder-gray-500 !text-base !transition-colors !duration-200 focus:!outline-none focus:!ring-2 focus:!border-transparent ${
+                  nameError ? '!border-red-500 focus:!ring-red-500' : '!border-gray-300 focus:!ring-yellow-500'
+                }`}
+                style={{ 
+                  '--tw-ring-color': nameError ? 'rgb(239 68 68)' : '#FFD700'
+                }}
+              />
+              {nameError && <p className="!mt-2 !text-sm !text-red-600">{nameErrorMessage}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="mobile-email" className="!block !text-sm !font-medium !text-gray-700 !mb-2">
+                Email address
+              </label>
+              <input
+                id="mobile-email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                placeholder="your@email.com"
+                className={`!w-full !px-4 !py-3 !border !rounded-xl !text-gray-900 !placeholder-gray-500 !text-base !transition-colors !duration-200 focus:!outline-none focus:!ring-2 focus:!border-transparent ${
+                  emailError ? '!border-red-500 focus:!ring-red-500' : '!border-gray-300 focus:!ring-yellow-500'
+                }`}
+                style={{ 
+                  '--tw-ring-color': emailError ? 'rgb(239 68 68)' : '#FFD700'
+                }}
+              />
+              {emailError && <p className="!mt-2 !text-sm !text-red-600">{emailErrorMessage}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="mobile-password" className="!block !text-sm !font-medium !text-gray-700 !mb-2">
+                Password
+              </label>
+              <input
+                id="mobile-password"
+                name="password"
+                type="password"
+                autoComplete="new-password"
+                required
+                placeholder="••••••••"
+                className={`!w-full !px-4 !py-3 !border !rounded-xl !text-gray-900 !placeholder-gray-500 !text-base !transition-colors !duration-200 focus:!outline-none focus:!ring-2 focus:!border-transparent ${
+                  passwordError ? '!border-red-500 focus:!ring-red-500' : '!border-gray-300 focus:!ring-yellow-500'
+                }`}
+                style={{ 
+                  '--tw-ring-color': passwordError ? 'rgb(239 68 68)' : '#FFD700'
+                }}
+              />
+              {passwordError && <p className="!mt-2 !text-sm !text-red-600">{passwordErrorMessage}</p>}
+              <p className="!mt-1 !text-xs !text-gray-500">Must include at least one special character</p>
+            </div>
+
+            <div className="!flex !items-start !pt-2">
+              <input
+                type="checkbox"
+                checked={allowEmails}
+                onChange={(e) => setAllowEmails(e.target.checked)}
+                className="!w-4 !h-4 !mt-1 !border-gray-300 !rounded focus:!ring-2"
+                style={{ 
+                  accentColor: '#FFD700',
+                  '--tw-ring-color': '#FFD700'
+                }}
+              />
+              <span className="!ml-2 !text-sm !text-gray-700">I want to receive updates via email</span>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="!w-full !py-4 !px-4 !text-white !font-medium !rounded-xl !text-base !transition-all !duration-200 !disabled:opacity-50 !disabled:cursor-not-allowed !shadow-lg hover:!shadow-xl !mt-6"
+              style={{
+                background: 'linear-gradient(135deg, #FFD700 0%, #c47c1eff 100%)'
+              }}
+              onMouseEnter={(e) => {
+                if (!isLoading) {
+                  e.target.style.background = 'linear-gradient(135deg, #FFA500 0%, #8B4513 100%)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isLoading) {
+                  e.target.style.background = 'linear-gradient(135deg, #FFD700 0%, #c47c1eff 100%)';
+                }
+              }}
+            >
+              {isLoading ? 'Creating account...' : 'Sign up'}
+            </button>
+          </form>
+
+          {/* Footer */}
+          <div className="!mt-8 !text-center">
+            <p className="!text-sm !text-gray-600">
+              Already have an account?{' '}
+              <button
+                onClick={() => navigate('/signin')}
+                className="!font-medium !transition-colors !duration-200"
+                style={{ color: '#c47c1eff' }}
+                onMouseEnter={(e) => e.target.style.color = '#FFD700'}
+                onMouseLeave={(e) => e.target.style.color = '#c47c1eff'}
+              >
+                Sign in
+              </button>
+            </p>
+          </div>
+
+        </div>
+      </motion.div>
+    </div>
   );
 }

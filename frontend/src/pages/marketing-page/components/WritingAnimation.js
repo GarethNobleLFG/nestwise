@@ -42,7 +42,7 @@ export default function WritingAnimation() {
     <div className="!flex !flex-col !items-center !justify-center !py-16">
       {/* Enhanced Graph Container */}
       <motion.div
-        className="!relative !w-[32rem] !h-80 !rounded-2xl !shadow-2xl !p-8 !border-0 !overflow-hidden"
+        className="!relative !w-[90vw] md:!w-[32rem] !h-80 !rounded-2xl !shadow-2xl !p-8 !border-0 !overflow-hidden"
         style={{
           background: 'linear-gradient(145deg, #ffffff 0%, #f8f9ff 50%, #fff5e6 100%)',
           border: '1px solid rgba(255, 215, 0, 0.2)'

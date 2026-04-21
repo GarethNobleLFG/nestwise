@@ -36,9 +36,9 @@ export default function Header({
 
     return (
         <>
-            <div className="px-8">
-                <div className="max-w-4xl mx-auto flex flex-col items-start space-y-4">
-                    <div className="flex items-center space-x-8">
+            <div className="px-4 md:px-8">
+                <div className="max-w-sm md:max-w-4xl mx-auto flex flex-col items-start space-y-2 md:space-y-4">
+                    <div className="flex items-center space-x-4 md:space-x-8">
                         <div className="flex items-center space-x-2">
                             <div className="font-semibold text-gray-800 flex items-center text-sm md:text-base lg:text-lg">
                                 Selected Plan:
@@ -48,15 +48,15 @@ export default function Header({
                                 <Button
                                     variant="outline"
                                     onClick={() => setIsModalOpen(true)}
-                                    className="bg-white/40 backdrop-blur-sm rounded-2xl shadow-lg border-0 px-4 py-3 font-semibold text-gray-800 hover:bg-white/60 transition-all duration-300 max-w-64 text-sm md:text-base lg:text-lg"
+                                    className="bg-white/40 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-lg border-0 px-3 md:px-4 py-2 md:py-3 font-semibold text-gray-800 hover:bg-white/60 transition-all duration-300 w-32 md:w-40 text-xs md:text-base lg:text-lg"
                                 >
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <span className="truncate">
+                                                <span className="truncate min-w-0 flex-1">
                                                     <span className="hidden md:inline">{headerTitle}</span>
                                                     <span className="md:hidden">
-                                                        {headerTitle.length > 8 ? headerTitle.substring(0, 8) + '...' : headerTitle}
+                                                        {headerTitle.length > 6 ? headerTitle.substring(0, 6) + '...' : headerTitle}
                                                     </span>
                                                 </span>
                                             </TooltipTrigger>
@@ -74,7 +74,7 @@ export default function Header({
                                     variant="ghost"
                                     size="sm"
                                     onClick={clearChat}
-                                    className="bg-white/40 backdrop-blur-sm hover:bg-red-50/80 border-0 rounded-2xl shadow-lg transition-all duration-300 px-4 py-3 text-xs md:text-sm lg:text-base"
+                                    className="bg-white/40 backdrop-blur-sm hover:bg-red-50/80 border-0 rounded-xl md:rounded-2xl shadow-lg transition-all duration-300 px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm lg:text-base"
                                 >
                                     <ClearIcon className="h-4 w-4 mr-2" />
                                     <span>Clear Chat</span>

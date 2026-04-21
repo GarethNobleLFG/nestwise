@@ -6,6 +6,7 @@ import MessagesArea from './components/MessagesArea';
 import Header from './components/Header';
 import PlannerArea from './components/PlannerArea';
 import { motion, AnimatePresence } from 'framer-motion';
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 
 export default function PlannerBot() {
   const [messages, setMessages] = useState([]);
@@ -496,135 +497,122 @@ export default function PlannerBot() {
   //const isChatActive = safeMessages.length > 1 || sending;
 
   return (
-    <div className="h-screen flex overflow-hidden pt-6">
-      <div className="flex-1 flex">
-        {/* Left side - takes full width on mobile, half on desktop */}
-        <div className="flex-1 md:flex-1 flex flex-col pl-1 pr-4 md:pr-8 h-full md:-mr-20">
-          <div className="w-full flex flex-col h-full min-h-0 max-h-screen pb-safe">
-            {/* Mobile Arrow Pull-out Button for Planner - Middle Right */}
-            <motion.button
-              onClick={() => setIsMobilePlannerOpen(!isMobilePlannerOpen)}
-              className="md:hidden fixed top-1/2 right-0 -translate-y-1/2 flex items-center justify-center w-10 h-16 text-white transition-all duration-300 rounded-l-lg z-[60] border-l border-t border-b border-yellow-300 bg-gradient-to-br from-yellow-300 to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 shadow-lg"
-              whileTap={{ scale: 0.95 }}
-            >
-              <motion.div
-                animate={{ rotate: isMobilePlannerOpen ? 180 : 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {isMobilePlannerOpen ? (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                ) : (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                )}
-              </motion.div>
-            </motion.button>
+    <div className="h-screen flex overflow-hidden pt-0 md:pt-6">
+      {/* Left side - takes full width on mobile, half on desktop */}
+      <div className="flex-1 flex md:justify-start h-full md:-mr-20 overflow-hidden">
+        <div className="md:w-[35vw] md:max-w-none flex flex-col h-full min-h-0 overflow-hidden">
+          {/* Mobile Arrow Pull-out Button for Planner - Middle Right */}
+          <motion.button
+            onClick={() => setIsMobilePlannerOpen(!isMobilePlannerOpen)}
+            className="md:hidden fixed right-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-8 h-12 text-white transition-all duration-300 rounded-l-lg z-50 border border-yellow-300 bg-gradient-to-br from-yellow-300 to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 shadow-lg"
+            whileTap={{ scale: 0.95 }}
+            animate={{ rotate: isMobilePlannerOpen ? -90 : 90 }}
+            transition={{ duration: 0.3 }}
+          >
+            <ArrowLeftIcon className="w-6 h-6" />
+          </motion.button>
 
-            {/* Header. */}
-            <div className="flex-shrink-0 pt-8 md:pt-0 pr-5 pl-4 md:pl-0">
-              <Header
-                conversationTitle={conversationTitle}
-                selectedPlan={selectedPlan}
-                setSelectedPlan={setSelectedPlan}
-                clearChat={clearChat}
-                onPlanSelect={handlePlanSelect}
-              />
-            </div>
-
-            {/* Messages Area */}
-            <div className="flex-1 min-h-0 overflow-hidden pl-4 md:pl-0">
-              <MessagesArea safeMessages={safeMessages} planAnimationNeeded={planAnimationNeeded} />
-            </div>
-
-            {/* Input Area */}
-            <div className="flex-shrink-0 pb-7 px-2 md:pb-3 md:px-0 pr-5 pl-4 md:pl-0">
-              <InputArea
-                input={input}
-                setInput={setInput}
-                handleSend={handleSend}
-                handleFileUpload={handleFileUpload}
-                sending={sending}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Desktop Right side - hidden on mobile */}
-        <div className="hidden md:flex md:flex-1 flex-col px-8 h-full">
-          <div className="w-[47vw] flex flex-col h-full min-h-0">
-            <PlannerArea
-              animationTriggered={animationTriggered}
-              profileData={profileData}
-              lastChatbotResponse={getLastChatbotResponse}
+          {/* Header. */}
+          <div className="flex-shrink-0 pt-4 md:pt-0 md:pr-5 md:pl-0">
+            <Header
               conversationTitle={conversationTitle}
-              generatedPlan={generatedPlan}
               selectedPlan={selectedPlan}
+              setSelectedPlan={setSelectedPlan}
+              clearChat={clearChat}
+              onPlanSelect={handlePlanSelect}
+            />
+          </div>
+
+          {/* Messages Area */}
+          <div className="flex-1 min-h-0 overflow-hidden md:pl-0">
+            <MessagesArea safeMessages={safeMessages} planAnimationNeeded={planAnimationNeeded} />
+          </div>
+
+          {/* Input Area */}
+          <div className="flex-shrink-0 pb-0 md:pb-3 md:px-0 md:pr-5 md:pl-0">
+            <InputArea
+              input={input}
+              setInput={setInput}
+              handleSend={handleSend}
+              handleFileUpload={handleFileUpload}
+              sending={sending}
             />
           </div>
         </div>
+      </div>
 
-        {/* Mobile Planner Overlay */}
-        <AnimatePresence>
-          {isMobilePlannerOpen && (
-            <>
-              {/* Backdrop */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="md:hidden fixed inset-0 bg-black/50 z-40"
-                onClick={() => setIsMobilePlannerOpen(false)}
-              />
-
-              {/* Mobile Planner Panel */}
-              <motion.div
-                initial={{ x: '100%' }}
-                animate={{ x: 0 }}
-                exit={{ x: '100%' }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-                className="md:hidden fixed inset-y-0 right-0 w-full max-w-md z-50 bg-white shadow-2xl"
-              >
-                <div className="h-full flex flex-col p-4">
-                  {/* Mobile Planner Header */}
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-800">Plan Details</h3>
-                    <button
-                      onClick={() => setIsMobilePlannerOpen(false)}
-                      className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  {/* Mobile Planner Content */}
-                  <div className="flex-1 overflow-hidden">
-                    <PlannerArea
-                      animationTriggered={animationTriggered}
-                      profileData={profileData}
-                      lastChatbotResponse={getLastChatbotResponse}
-                      conversationTitle={conversationTitle}
-                      generatedPlan={generatedPlan}
-                      selectedPlan={selectedPlan}
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
-
-        {/* Disclaimer */}
-        <div className="absolute bottom-1 left-0 right-0 flex justify-center pt-1">
-          <p className="text-xs text-gray-600 text-center font-medium">
-            NestWise Agent can make mistakes. Always verify important financial information.
-          </p>
+      {/* Desktop Right side - hidden on mobile */}
+      <div className="hidden md:flex md:flex-1 md:ml-10 flex-col px-8 h-full">
+        <div className="md:w-[53.5vw] flex flex-col h-full min-h-0">
+          <PlannerArea
+            animationTriggered={animationTriggered}
+            profileData={profileData}
+            lastChatbotResponse={getLastChatbotResponse}
+            conversationTitle={conversationTitle}
+            generatedPlan={generatedPlan}
+            selectedPlan={selectedPlan}
+          />
         </div>
+      </div>
+
+      {/* Mobile Planner Overlay */}
+      <AnimatePresence>
+        {isMobilePlannerOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="md:hidden fixed inset-0 bg-black/50 z-40"
+              onClick={() => setIsMobilePlannerOpen(false)}
+            />
+
+            {/* Mobile Planner Panel */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              className="md:hidden fixed inset-y-0 right-0 w-full max-w-md z-50 bg-white shadow-2xl"
+            >
+              <div className="h-full flex flex-col p-4">
+                {/* Mobile Planner Header */}
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-800">Plan Details</h3>
+                  <button
+                    onClick={() => setIsMobilePlannerOpen(false)}
+                    className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Mobile Planner Content */}
+                <div className="flex-1 overflow-hidden">
+                  <PlannerArea
+                    animationTriggered={animationTriggered}
+                    profileData={profileData}
+                    lastChatbotResponse={getLastChatbotResponse}
+                    conversationTitle={conversationTitle}
+                    generatedPlan={generatedPlan}
+                    selectedPlan={selectedPlan}
+                  />
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Disclaimer */}
+      <div className="hidden md:flex absolute bottom-1 left-0 right-0 justify-center pt-1">
+        <p className="text-xs text-gray-600 text-center font-medium">
+          NestWise Agent can make mistakes. Always verify important financial information.
+        </p>
       </div>
     </div>
   );

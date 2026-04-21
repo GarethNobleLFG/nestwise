@@ -269,7 +269,7 @@ export default function NavIndexLayout({ activeView, children }) {
                 {/* Main Content Area - Responsive margins */}
                 <div className="flex-1 ml-0 md:ml-40 flex flex-col items-center md:items-start">
                     {/* Content container with mobile padding */}
-                    <div className="flex-1 pt-6 md:pt-0 pb-0 md:pb-0">
+                    <div className="flex-1 md:pt-0 pb-0 md:pb-0">
                         {children}
                     </div>
                 </div>

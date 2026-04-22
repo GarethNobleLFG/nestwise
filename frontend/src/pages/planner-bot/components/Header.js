@@ -36,13 +36,12 @@ export default function Header({
 
     return (
         <>
-            <div className="px-4 md:px-8 pt-3 md:pt-6">
-                {/* Changed to row layout with justify-between for better mobile spacing */}
+            <div className="pl-16 pr-4 md:px-8 pt-3 md:pt-6">
                 <div className="max-w-4xl mx-auto flex flex-row items-center justify-between w-full">
 
                     {/* Left Side: Plan Label & Button */}
                     <div className="flex items-center gap-2 md:gap-3">
-                        <div className="font-semibold text-gray-800 hidden xs:block text-sm md:text-base lg:text-lg shrink-0">
+                        <div className="font-semibold text-gray-800 hidden xs:block text-lg md:text-sm shrink-0">
                             <span className="md:hidden">Plan:</span>
                             <span className="hidden md:inline">Selected Plan:</span>
                         </div>
@@ -50,7 +49,7 @@ export default function Header({
                         <Button
                             variant="outline"
                             onClick={() => setIsModalOpen(true)}
-                            className="bg-white/40 backdrop-blur-sm rounded-xl md:rounded-2xl shadow-sm border-0 px-3 md:px-4 py-2 font-semibold text-gray-800 hover:bg-white/60 transition-all duration-300 w-auto max-w-[140px] sm:max-w-[200px] md:max-w-xs text-xs md:text-base"
+                            className="bg-white/40 backdrop-blur-sm rounded-xl shadow-sm border-0 px-3 md:px-4 py-2 font-semibold text-gray-800 hover:bg-white/60 transition-all duration-300 w-auto max-w-[200px] sm:max-w-[260px] md:max-w-xs text-lg md:text-sm"
                         >
                             <TooltipProvider>
                                 <Tooltip>
@@ -64,7 +63,7 @@ export default function Header({
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
-                            <EditIcon className="h-3.5 w-3.5 md:h-4 md:w-4 ml-1.5 md:ml-2 flex-shrink-0" />
+                            <EditIcon className="h-5 w-5 md:h-4 md:w-4 ml-1.5 md:ml-2 flex-shrink-0" />
                         </Button>
                     </div>
 
@@ -73,10 +72,10 @@ export default function Header({
                         variant="ghost"
                         size="sm"
                         onClick={clearChat}
-                        className="bg-white/40 backdrop-blur-sm hover:bg-red-50/80 border-0 rounded-xl md:rounded-2xl shadow-sm transition-all duration-300 px-2 md:px-4 py-2 text-gray-700"
+                        className="bg-white/40 backdrop-blur-sm hover:bg-red-50/80 border-0 rounded-xl shadow-sm transition-all duration-300 px-3 py-2 text-gray-700"
                     >
-                        <ClearIcon className="h-4 w-4 md:mr-2" />
-                        <span className="hidden sm:inline text-xs md:text-sm font-medium">Clear Chat</span>
+                        <ClearIcon className="h-5 w-5 md:h-4 md:w-4 md:mr-2" />
+                        <span className="hidden sm:inline text-lg md:text-sm font-medium">Clear Chat</span>
                     </Button>
                 </div>
             </div>

@@ -9,7 +9,8 @@ import PersonIcon from '@mui/icons-material/Person';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import SettingsIcon from '@mui/icons-material/Settings';
 import HomeIcon from '@mui/icons-material/Home';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
 
 export default function NavIndexLayout({ activeView, children }) {
     const navigate = useNavigate();
@@ -145,52 +146,66 @@ export default function NavIndexLayout({ activeView, children }) {
                 </div>
             </motion.nav>
 
-            {/* Mobile Pull-up Arrow Button */}
+            {/* Mobile Menu Button - Top Left */}
             <motion.button
                 onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
-                className="md:hidden fixed left-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-8 h-12 text-white transition-all duration-300 rounded-r-lg z-50 border border-yellow-300 bg-gradient-to-br from-yellow-300 to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 shadow-lg"
+                className="md:hidden fixed top-[20px] left-4 z-50 flex items-center justify-center w-10 h-10 text-amber-700 bg-white/80 backdrop-blur-md rounded-xl border border-amber-200/50 shadow-sm hover:bg-white transition-all duration-300"
                 whileTap={{ scale: 0.95 }}
-                animate={{ rotate: isMobileNavOpen ? 90 : -90 }}
-                transition={{ duration: 0.3 }}
             >
-                <ArrowRightIcon className="w-6 h-6" />
+                {isMobileNavOpen ? (
+                    <CloseIcon className="w-6 h-6" />
+                ) : (
+                    <MenuIcon className="w-6 h-6" />
+                )}
             </motion.button>
 
-            {/* Mobile Side Navigation */}
+            {/* Mobile Side Navigation & Backdrop */}
             <AnimatePresence>
                 {isMobileNavOpen && (
-                    <motion.div
-                        className="md:hidden fixed inset-y-0 left-0 w-64 z-40 border-r border-white/20"
-                        style={{
-                            background: 'linear-gradient(to bottom right, rgba(250, 204, 21, 0.95), rgba(245, 158, 11, 0.95))',
-                            backdropFilter: 'blur(8px)'
-                        }}
-                        initial={{ x: '-100%' }}
-                        animate={{ x: 0 }}
-                        exit={{ x: '-100%' }}
-                        transition={{ duration: 0.3, ease: 'easeInOut' }}
-                    >
-                        <div className="flex flex-col gap-2 p-4 pt-16">
-                            <motion.button onClick={() => { navigate('/'); setIsMobileNavOpen(false); }} className="flex items-center justify-start px-4 py-3 rounded-lg backdrop-blur-sm border-0 cursor-pointer transition-all duration-300 text-white bg-white/10 hover:bg-white/20" whileTap={{ scale: 0.95 }}>
-                                <HomeIcon className="w-5 h-5 mr-3" /><span className="text-sm font-medium">Home</span>
-                            </motion.button>
-                            <motion.button onClick={() => { navigate('/plannerbot'); setIsMobileNavOpen(false); }} className={`flex items-center justify-start px-4 py-3 rounded-lg backdrop-blur-sm border-0 cursor-pointer transition-all duration-300 text-white ${activeView === 'planner' ? 'bg-white/30' : 'bg-white/10 hover:bg-white/20'}`} whileTap={{ scale: 0.95 }}>
-                                <SmartToyIcon className="w-5 h-5 mr-3" /><span className="text-sm font-medium">Chat Bot</span>
-                            </motion.button>
-                            <motion.button onClick={() => { navigate('/myplans'); setIsMobileNavOpen(false); }} className={`flex items-center justify-start px-4 py-3 rounded-lg backdrop-blur-sm border-0 cursor-pointer transition-all duration-300 text-white ${activeView === 'myplans' ? 'bg-white/30' : 'bg-white/10 hover:bg-white/20'}`} whileTap={{ scale: 0.95 }}>
-                                <DescriptionIcon className="w-5 h-5 mr-3" /><span className="text-sm font-medium">My Plans</span>
-                            </motion.button>
-                            <motion.button onClick={() => { navigate('/profile'); setIsMobileNavOpen(false); }} className="flex items-center justify-start px-4 py-3 rounded-lg backdrop-blur-sm border-0 cursor-pointer transition-all duration-300 text-white" style={{ backgroundColor: 'rgba(196, 124, 30, 0.8)' }} whileTap={{ scale: 0.95 }}>
-                                <PersonIcon className="w-5 h-5 mr-3" /><span className="text-sm font-medium">Profile</span>
-                            </motion.button>
-                            <motion.button onClick={() => { navigate('/support'); setIsMobileNavOpen(false); }} className="flex items-center justify-start px-4 py-3 rounded-lg backdrop-blur-sm border-0 cursor-pointer transition-all duration-300 text-white bg-white/10 hover:bg-white/20" whileTap={{ scale: 0.95 }}>
-                                <HelpOutlineIcon className="w-5 h-5 mr-3" /><span className="text-sm font-medium">Support</span>
-                            </motion.button>
-                            <motion.button onClick={() => { navigate('/settings'); setIsMobileNavOpen(false); }} className="flex items-center justify-start px-4 py-3 rounded-lg backdrop-blur-sm border-0 cursor-pointer transition-all duration-300 text-white bg-white/10 hover:bg-white/20" whileTap={{ scale: 0.95 }}>
-                                <SettingsIcon className="w-5 h-5 mr-3" /><span className="text-sm font-medium">Settings</span>
-                            </motion.button>
-                        </div>
-                    </motion.div>
+                    <>
+                        {/* Dark backdrop you can tap to close */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="md:hidden fixed inset-0 bg-black/40 z-30"
+                            onClick={() => setIsMobileNavOpen(false)}
+                        />
+
+                        <motion.div
+                            className="md:hidden fixed inset-y-0 left-0 w-64 z-40 border-r border-white/20"
+                            style={{
+                                background: 'linear-gradient(to bottom right, rgba(250, 204, 21, 0.95), rgba(245, 158, 11, 0.95))',
+                                backdropFilter: 'blur(8px)'
+                            }}
+                            initial={{ x: '-100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '-100%' }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        >
+                            <div className="flex flex-col gap-2 p-4 pt-20">
+                                <motion.button onClick={() => { navigate('/'); setIsMobileNavOpen(false); }} className="flex items-center justify-start px-4 py-3 rounded-lg backdrop-blur-sm border-0 cursor-pointer transition-all duration-300 text-white bg-white/10 hover:bg-white/20" whileTap={{ scale: 0.95 }}>
+                                    <HomeIcon className="w-5 h-5 mr-3" /><span className="text-sm font-medium">Home</span>
+                                </motion.button>
+                                <motion.button onClick={() => { navigate('/plannerbot'); setIsMobileNavOpen(false); }} className={`flex items-center justify-start px-4 py-3 rounded-lg backdrop-blur-sm border-0 cursor-pointer transition-all duration-300 text-white ${activeView === 'planner' ? 'bg-white/30' : 'bg-white/10 hover:bg-white/20'}`} whileTap={{ scale: 0.95 }}>
+                                    <SmartToyIcon className="w-5 h-5 mr-3" /><span className="text-sm font-medium">Chat Bot</span>
+                                </motion.button>
+                                <motion.button onClick={() => { navigate('/myplans'); setIsMobileNavOpen(false); }} className={`flex items-center justify-start px-4 py-3 rounded-lg backdrop-blur-sm border-0 cursor-pointer transition-all duration-300 text-white ${activeView === 'myplans' ? 'bg-white/30' : 'bg-white/10 hover:bg-white/20'}`} whileTap={{ scale: 0.95 }}>
+                                    <DescriptionIcon className="w-5 h-5 mr-3" /><span className="text-sm font-medium">My Plans</span>
+                                </motion.button>
+                                <motion.button onClick={() => { navigate('/profile'); setIsMobileNavOpen(false); }} className="flex items-center justify-start px-4 py-3 rounded-lg backdrop-blur-sm border-0 cursor-pointer transition-all duration-300 text-white" style={{ backgroundColor: 'rgba(196, 124, 30, 0.8)' }} whileTap={{ scale: 0.95 }}>
+                                    <PersonIcon className="w-5 h-5 mr-3" /><span className="text-sm font-medium">Profile</span>
+                                </motion.button>
+                                <motion.button onClick={() => { navigate('/support'); setIsMobileNavOpen(false); }} className="flex items-center justify-start px-4 py-3 rounded-lg backdrop-blur-sm border-0 cursor-pointer transition-all duration-300 text-white bg-white/10 hover:bg-white/20" whileTap={{ scale: 0.95 }}>
+                                    <HelpOutlineIcon className="w-5 h-5 mr-3" /><span className="text-sm font-medium">Support</span>
+                                </motion.button>
+                                <motion.button onClick={() => { navigate('/settings'); setIsMobileNavOpen(false); }} className="flex items-center justify-start px-4 py-3 rounded-lg backdrop-blur-sm border-0 cursor-pointer transition-all duration-300 text-white bg-white/10 hover:bg-white/20" whileTap={{ scale: 0.95 }}>
+                                    <SettingsIcon className="w-5 h-5 mr-3" /><span className="text-sm font-medium">Settings</span>
+                                </motion.button>
+                            </div>
+                        </motion.div>
+                    </>
                 )}
             </AnimatePresence>
 

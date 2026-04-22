@@ -10,6 +10,8 @@ import SavePlanModal from './SavePlanModal';
 import PlanEditor from './PlanEditor';
 import { useNavigate } from 'react-router-dom';
 
+const animatedPlanCache = new Set(); // Cache for determining if user plan generated.
+
 export default function PlannerArea({ animationTriggered, profileData, lastChatbotResponse, conversationTitle, generatedPlan, selectedPlan }) {
     const [plan, setPlanContent] = useState('Your personalized financial plan will appear here once generated...');
     const [rawPlanJSON, setRawPlanJSON] = useState(null); // Keep raw JSON for database
@@ -77,7 +79,12 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
     // Use effect for typing animation.
     useEffect(() => {
         if (plan && plan !== 'Your personalized financial plan will appear here once generated...') {
-            // Reset typed content and start typing animation
+            if (animatedPlanCache.has(plan)) {
+                setTypedPlan(plan);
+                return;
+            }
+
+            animatedPlanCache.add(plan);
             setTypedPlan('');
 
             typeText(plan, (partialText) => {
@@ -199,8 +206,8 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                                 <button
                                     onClick={() => setMobileActiveView('profile')}
                                     className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${mobileActiveView === 'profile'
-                                            ? 'bg-white text-gray-900 shadow-sm'
-                                            : 'text-gray-600 hover:text-gray-900'
+                                        ? 'bg-white text-gray-900 shadow-sm'
+                                        : 'text-gray-600 hover:text-gray-900'
                                         }`}
                                 >
                                     Profile
@@ -208,8 +215,8 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
                                 <button
                                     onClick={() => setMobileActiveView('plan')}
                                     className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${mobileActiveView === 'plan'
-                                            ? 'bg-white text-gray-900 shadow-sm'
-                                            : 'text-gray-600 hover:text-gray-900'
+                                        ? 'bg-white text-gray-900 shadow-sm'
+                                        : 'text-gray-600 hover:text-gray-900'
                                         }`}
                                 >
                                     Plan

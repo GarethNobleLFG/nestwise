@@ -19,7 +19,7 @@ export default function InputArea({
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
       <motion.div
-        className="max-w-sm md:max-w-3xl w-full"
+        className="max-w-sm md:max-w-3xl w-full mx-auto"
         initial={{ scale: 0.95 }}
         animate={{ scale: 1 }}
         transition={{ duration: 0.3, delay: 0.2 }}
@@ -47,9 +47,9 @@ export default function InputArea({
                 variant="ghost"
                 size="icon"
                 onClick={() => document.getElementById('file-upload')?.click()}
-                className="bg-white/50 backdrop-blur-sm hover:bg-white/70 rounded-lg md:rounded-xl shadow-sm transition-all duration-300 hover:scale-105 w-9 h-9 md:w-10 md:h-10 flex-shrink-0"
+                className="bg-white/50 backdrop-blur-sm hover:bg-white/70 rounded-lg md:rounded-xl shadow-sm transition-all duration-300 hover:scale-105 w-10 h-10 md:w-9 md:h-9 flex-shrink-0"
               >
-                <AddIcon className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                <AddIcon className="h-4 w-4 md:h-4 md:w-4" />
               </Button>
             </motion.div>
 
@@ -71,7 +71,7 @@ export default function InputArea({
                 }
               }}
               placeholder="Ask about your planning..."
-              className="flex-1 resize-none border-0 bg-transparent p-1.5 md:p-2 focus:outline-none max-h-16 md:max-h-20 placeholder-gray-500 text-sm md:text-base lg:text-lg text-center md:text-left"
+              className="flex-1 resize-none border-0 bg-transparent p-2 focus:outline-none max-h-16 md:max-h-20 placeholder-gray-500 text-base md:text-sm text-center md:text-left self-center mt-1 md:mt-0"
               rows="1"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -91,7 +91,7 @@ export default function InputArea({
                 size="icon"
                 onClick={handleSend}
                 disabled={sending || !input.trim()}
-                className="bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-white rounded-lg md:rounded-xl shadow-md transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:scale-100 w-9 h-9 md:w-10 md:h-10 flex-shrink-0"
+                className="bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-white rounded-lg md:rounded-xl shadow-md transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:scale-100 w-10 h-10 md:w-9 md:h-9 flex-shrink-0"
               >
                 <motion.div
                   animate={sending ? { rotate: 360 } : { rotate: 0 }}
@@ -101,7 +101,7 @@ export default function InputArea({
                     ease: "linear"
                   }}
                 >
-                  <SendIcon className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  <SendIcon className="h-4 w-4 md:h-4 md:w-4" />
                 </motion.div>
               </Button>
             </motion.div>

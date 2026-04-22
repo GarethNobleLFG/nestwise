@@ -111,20 +111,22 @@ export default function WelcomeBanner({ navigate, isLoggedIn }) {
                   </Button>
                 </motion.div>
 
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button
-                    className="!text-lg !px-8 !py-4 !text-white !font-medium !shadow-lg !rounded-lg !transition-all !border-none !cursor-pointer"
-                    style={{
-                      background: 'linear-gradient(45deg, hsl(var(--gray-300)), hsl(var(--gray-400)))',
-                    }}
-                    onClick={() => navigate(isLoggedIn ? "/plannerbot" : "/signin")}
+                {isLoggedIn && (
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    Start Planning
-                  </Button>
-                </motion.div>
+                    <Button
+                      className="!text-lg !px-8 !py-4 !text-white !font-medium !shadow-lg !rounded-lg !transition-all !border-none !cursor-pointer"
+                      style={{
+                        background: 'linear-gradient(45deg, hsl(var(--gray-300)), hsl(var(--gray-400)))',
+                      }}
+                      onClick={() => navigate("/plannerbot")}
+                    >
+                      Get to Planner Bot
+                    </Button>
+                  </motion.div>
+                )}
               </motion.div>
 
             </motion.div>

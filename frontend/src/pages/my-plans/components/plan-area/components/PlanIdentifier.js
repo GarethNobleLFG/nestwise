@@ -8,6 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DeletePlanModal from './DeletePlanModal';
 import { downloadPlanUtil } from '../../../../../utils/downloadPlanUtil';
 import * as planHooks from '../../../../../hooks/plans';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../../../components/shared/shadcn/components/ui/tooltip';
 
 export default function PlanIdentifier({
     planData,
@@ -104,9 +105,18 @@ export default function PlanIdentifier({
 
                                     {/* Plan info */}
                                     <div className="flex-1 min-w-0 flex flex-col justify-center">
-                                        <h2 className="text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-amber-700 to-yellow-600 bg-clip-text text-transparent mb-2 md:truncate">
-                                            {planData?.name || "Premium Plan"}
-                                        </h2>
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <h2 className="text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-amber-700 to-yellow-600 bg-clip-text text-transparent mb-2 block md:truncate cursor-default">
+                                                        {planData?.name || "Premium Plan"}
+                                                    </h2>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>{planData?.name || "Premium Plan"}</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
                                         <p className="text-sm text-amber-600/80 font-medium flex items-center space-x-1 mb-3">
                                             <TrendingUpIcon className="w-4 h-4" />
                                             <span>Active • Last updated {planData?.updated_at ? new Date(planData.updated_at).toLocaleDateString() : 'Never'}</span>

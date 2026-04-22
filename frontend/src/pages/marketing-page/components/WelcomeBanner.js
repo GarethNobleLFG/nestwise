@@ -123,7 +123,7 @@ export default function WelcomeBanner({ navigate, isLoggedIn }) {
                       }}
                       onClick={() => navigate("/plannerbot")}
                     >
-                      Get to Planner Bot
+                      Go to Planner Bot
                     </Button>
                   </motion.div>
                 )}

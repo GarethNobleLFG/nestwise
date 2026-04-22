@@ -504,7 +504,7 @@ export default function PlannerBot() {
           {/* Mobile Arrow Pull-out Button for Planner - Middle Right */}
           <motion.button
             onClick={() => setIsMobilePlannerOpen(!isMobilePlannerOpen)}
-            className="md:hidden fixed right-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-8 h-12 text-white transition-all duration-300 rounded-l-lg z-50 border border-yellow-300 bg-gradient-to-br from-yellow-300 to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 shadow-lg"
+            className="md:hidden fixed right-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-8 h-12 text-white transition-all duration-300 rounded-l-lg z-[60] border border-yellow-300 bg-gradient-to-br from-yellow-300 to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 shadow-lg"
             whileTap={{ scale: 0.95 }}
             animate={{ rotate: isMobilePlannerOpen ? -90 : 90 }}
             transition={{ duration: 0.3 }}
@@ -577,20 +577,7 @@ export default function PlannerBot() {
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               className="md:hidden fixed inset-y-0 right-0 w-full max-w-md z-50 bg-white shadow-2xl"
             >
-              <div className="h-full flex flex-col p-4">
-                {/* Mobile Planner Header */}
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-800">Plan Details</h3>
-                  <button
-                    onClick={() => setIsMobilePlannerOpen(false)}
-                    className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-
+              <div className="h-full flex flex-col pt-16 px-4 pb-4">
                 {/* Mobile Planner Content */}
                 <div className="flex-1 overflow-hidden">
                   <PlannerArea

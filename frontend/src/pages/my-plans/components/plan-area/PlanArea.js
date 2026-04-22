@@ -46,7 +46,7 @@ export default function PlanArea({ planData, animationTriggered, plans, setPlans
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.5 }}
-                        className="max-md:[&_p]:!text-lg max-md:[&_li]:!text-lg max-md:[&_a]:!text-lg max-md:[&_strong]:!text-lg max-md:[&_h3]:!text-2xl max-md:[&_h2]:!text-3xl max-md:text-lg"
+                        className="prose max-w-none prose-headings:text-gray-800 prose-p:text-gray-800 prose-strong:text-gray-900 [&_p]:!text-lg md:[&_p]:!text-sm [&_li]:!text-lg md:[&_li]:!text-sm [&_a]:!text-lg md:[&_a]:!text-sm [&_strong]:!text-lg md:[&_strong]:!text-sm [&_h3]:!text-xl md:[&_h3]:!text-lg [&_h2]:!text-2xl md:[&_h2]:!text-xl text-lg md:text-sm md:[&>p:first-child]:!mt-0"
                     >
                         <ReactMarkdown components={markdownHandler} remarkPlugins={[remarkGfm]}>
                             {planContent || "Select a plan to view details."}

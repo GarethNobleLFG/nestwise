@@ -133,19 +133,7 @@ export default function MyPlans() {
                                 transition={{ duration: 0.3, ease: 'easeInOut' }}
                                 className="md:hidden fixed inset-y-0 right-0 w-full max-w-sm z-50 bg-white shadow-2xl"
                             >
-                                <div className="h-full flex flex-col">
-                                    {/* Mobile Header */}
-                                    <div className="flex items-center justify-between p-4 border-b border-gray-200">
-                                        <button
-                                            onClick={() => setIsMobilePlansOpen(false)}
-                                            className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
-                                        >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                    </div>
-
+                                <div className="h-full flex flex-col pt-16">
                                     {/* Mobile Tabs */}
                                     <div className="flex border-b border-gray-200">
                                         <button

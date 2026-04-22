@@ -202,21 +202,21 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
 
                         {/* Mobile Toggle Buttons - Only visible on mobile */}
                         <div className="block lg:hidden mb-4">
-                            <div className="flex bg-gray-100 rounded-lg p-1">
+                            <div className="flex border-b border-gray-200">
                                 <button
                                     onClick={() => setMobileActiveView('profile')}
-                                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${mobileActiveView === 'profile'
-                                        ? 'bg-white text-gray-900 shadow-sm'
-                                        : 'text-gray-600 hover:text-gray-900'
+                                    className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${mobileActiveView === 'profile'
+                                        ? 'text-amber-600 border-b-2 border-amber-600 bg-amber-50'
+                                        : 'text-gray-500 hover:text-gray-700'
                                         }`}
                                 >
                                     Profile
                                 </button>
                                 <button
                                     onClick={() => setMobileActiveView('plan')}
-                                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${mobileActiveView === 'plan'
-                                        ? 'bg-white text-gray-900 shadow-sm'
-                                        : 'text-gray-600 hover:text-gray-900'
+                                    className={`flex-1 py-3 px-4 text-sm font-medium transition-colors ${mobileActiveView === 'plan'
+                                        ? 'text-amber-600 border-b-2 border-amber-600 bg-amber-50'
+                                        : 'text-gray-500 hover:text-gray-700'
                                         }`}
                                 >
                                     Plan

@@ -37,26 +37,28 @@ export default function WelcomeBanner({ navigate, isLoggedIn }) {
           >
             {/* Main Title - Changes based on login status */}
             <motion.h1
-              className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-none"
+              className="text-6xl sm:text-7xl md:text-8xl lg:text-[6rem] font-bold tracking-tight leading-none"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
               {isLoggedIn && userName ? (
-                <>
+                <div className="flex flex-col gap-2">
                   <span className="text-gray-900">Welcome back, </span>
-                  <span className="bg-gradient-to-br from-yellow-400 to-[#c47c1eff] bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-br from-yellow-400 to-[#c47c1eff] bg-clip-text text-transparent break-words">
                     {userName}
                   </span>
                   <span className="text-gray-900">!</span>
-                </>
+                </div>
               ) : (
-                <>
-                  <span className="text-gray-900">Welcome to </span>
-                  <span className="text-yellow-400">Nest</span>
-                  <span className="text-[#c47c1eff]">Wise</span>
-                  <span className="text-gray-900">!</span>
-                </>
+                <div className="flex flex-wrap justify-center items-baseline gap-x-3">
+                  <span className="text-gray-900 text-5xl sm:text-6xl md:text-7xl lg:text-8xl">Welcome to</span>
+                  <span>
+                    <span className="text-yellow-400">Nest</span>
+                    <span className="text-[#c47c1eff]">Wise</span>
+                    <span className="text-gray-900">!</span>
+                  </span>
+                </div>
               )}
             </motion.h1>
 
@@ -76,7 +78,7 @@ export default function WelcomeBanner({ navigate, isLoggedIn }) {
 
             {/* CTA Button - Combined Redundant motion.div wrappers */}
             <motion.div
-              className="flex flex-col items-center justify-center pt-8 space-y-4"
+              className="flex flex-col items-center justify-center pt-32 md:pt-8 space-y-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
@@ -106,7 +108,7 @@ export default function WelcomeBanner({ navigate, isLoggedIn }) {
           {/* Writing Animation Component - Only show for non-logged in users */}
           {!isLoggedIn && (
             <motion.div
-              className="w-full max-w-[80%] sm:max-w-md md:max-w-2xl mx-auto"
+              className="w-full max-w-[80%] sm:max-w-md md:max-w-2xl mx-auto pt-24 md:pt-0"
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.8 }}

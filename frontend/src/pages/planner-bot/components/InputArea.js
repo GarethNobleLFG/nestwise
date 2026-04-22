@@ -13,7 +13,7 @@ export default function InputArea({
 }) {
   return (
     <motion.div
-      className="px-6 md:px-8 py-3 md:py-4 mb-[env(keyboard-inset-height,0) md:mb-3]"
+      className="px-6 md:px-8 py-3 md:py-4 mb-[env(keyboard-inset-height,0)]"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
@@ -47,7 +47,7 @@ export default function InputArea({
                 variant="ghost"
                 size="icon"
                 onClick={() => document.getElementById('file-upload')?.click()}
-                className="bg-white/50 backdrop-blur-sm hover:bg-white/70 rounded-lg md:rounded-xl shadow-sm transition-all duration-300 hover:scale-105 w-7 h-7 md:w-8 md:h-8 flex-shrink-0"
+                className="bg-white/50 backdrop-blur-sm hover:bg-white/70 rounded-lg md:rounded-xl shadow-sm transition-all duration-300 hover:scale-105 w-9 h-9 md:w-10 md:h-10 flex-shrink-0"
               >
                 <AddIcon className="h-3.5 w-3.5 md:h-4 md:w-4" />
               </Button>
@@ -91,7 +91,7 @@ export default function InputArea({
                 size="icon"
                 onClick={handleSend}
                 disabled={sending || !input.trim()}
-                className="bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-white rounded-lg md:rounded-xl shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:scale-100 w-7 h-7 md:w-8 md:h-8 flex-shrink-0"
+                className="bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-white rounded-lg md:rounded-xl shadow-md transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:scale-100 w-9 h-9 md:w-10 md:h-10 flex-shrink-0"
               >
                 <motion.div
                   animate={sending ? { rotate: 360 } : { rotate: 0 }}

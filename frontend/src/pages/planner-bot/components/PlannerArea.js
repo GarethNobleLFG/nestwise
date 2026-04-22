@@ -15,10 +15,10 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
     const [rawPlanJSON, setRawPlanJSON] = useState(null); // Keep raw JSON for database
     const [isGenerating, setIsGenerating] = useState(false);
     const [typedPlan, setTypedPlan] = useState('Your personalized financial plan will appear here once generated...');
-    
+
     // Mobile view state - 'profile' or 'plan'
     const [mobileActiveView, setMobileActiveView] = useState('plan');
-    
+
     // plan hooks used in modal; not invoking save here directly
     const planHooks = usePlanHooks();
     const scrollRef = useRef(null);
@@ -182,8 +182,7 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="w-full md:pt-6"
-            style={{ height: 'calc(100vh - 28px)' }}
+            className="w-full h-full flex flex-col min-h-0 pb-4 md:pt-6 md:pb-6"
         >
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -193,27 +192,25 @@ export default function PlannerArea({ animationTriggered, profileData, lastChatb
             >
                 <Card className="h-full bg-gradient-to-br from-gray-50 to-white backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-xl transition-shadow duration-300">
                     <CardContent className="p-4 h-full flex flex-col min-h-0 w-full min-w-0">
-                        
+
                         {/* Mobile Toggle Buttons - Only visible on mobile */}
                         <div className="block lg:hidden mb-4">
                             <div className="flex bg-gray-100 rounded-lg p-1">
                                 <button
                                     onClick={() => setMobileActiveView('profile')}
-                                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
-                                        mobileActiveView === 'profile'
+                                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${mobileActiveView === 'profile'
                                             ? 'bg-white text-gray-900 shadow-sm'
                                             : 'text-gray-600 hover:text-gray-900'
-                                    }`}
+                                        }`}
                                 >
                                     Profile
                                 </button>
                                 <button
                                     onClick={() => setMobileActiveView('plan')}
-                                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
-                                        mobileActiveView === 'plan'
+                                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${mobileActiveView === 'plan'
                                             ? 'bg-white text-gray-900 shadow-sm'
                                             : 'text-gray-600 hover:text-gray-900'
-                                    }`}
+                                        }`}
                                 >
                                     Plan
                                 </button>

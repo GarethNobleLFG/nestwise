@@ -497,10 +497,10 @@ export default function PlannerBot() {
   //const isChatActive = safeMessages.length > 1 || sending;
 
   return (
-    <div className="h-[100vh] flex overflow-hidden">
-      {/* Left side - takes full width on mobile, half on desktop */}
-      <div className="flex-1 flex md:justify-start h-full md:-mr-20 overflow-hidden">
-        <div className="md:w-[35vw] md:max-w-none flex flex-col h-full min-h-0 overflow-hidden">
+    <div className="w-full h-full flex overflow-hidden pb-6 md:pb-0">
+      {/* Left side - takes full width on mobile, proportional on desktop */}
+      <div className="flex-1 md:flex-[4] lg:flex-[3.5] xl:max-w-2xl flex flex-col h-full min-h-0 overflow-hidden">
+        <div className="w-full relative flex flex-col h-full min-h-0 overflow-hidden pt-2 xs:-mt-4 sm:pt-0">
           {/* Mobile Arrow Pull-out Button for Planner - Middle Right */}
           <motion.button
             onClick={() => setIsMobilePlannerOpen(!isMobilePlannerOpen)}
@@ -529,7 +529,7 @@ export default function PlannerBot() {
           </div>
 
           {/* Input Area */}
-          <div className="flex-shrink-0 md:mb-3">
+          <div className="flex-shrink-0 md:mb-3"> 
             <InputArea
               input={input}
               setInput={setInput}
@@ -541,9 +541,9 @@ export default function PlannerBot() {
         </div>
       </div>
 
-      {/* Desktop Right side - hidden on mobile */}
-      <div className="hidden md:flex md:flex-1 md:ml-10 flex-col px-8 h-full">
-        <div className="md:w-[53.5vw] flex flex-col h-full min-h-0">
+      {/* Desktop Right side - Planner Area */}
+      <div className="hidden md:flex md:flex-[5] lg:flex-[5] flex-col h-full min-h-0 pl-4 lg:pl-8 pr-4 lg:pr-8 mx-auto">
+        <div className="w-full max-w-5xl mx-auto h-full flex flex-col min-h-0">
           <PlannerArea
             animationTriggered={animationTriggered}
             profileData={profileData}

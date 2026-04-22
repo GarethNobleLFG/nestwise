@@ -38,26 +38,26 @@ export const usePlanHooks = () => {
   };
 
   const savePlan = (name, profileData, data, description) =>
-    request(`${API_BASE_URL}/plans/`, {
+    request(`${API_BASE_URL}/plans`, {
       method: "POST",
       body: JSON.stringify({ name, profileData, description, data }),
     });
 
   const getUserPlans = async () =>
-    request(`${API_BASE_URL}/plans/`);
+    request(`${API_BASE_URL}/plans`);
 
   const getPlanById = async(id) =>
-    request(`${API_BASE_URL}/plans/${id}/`);
+    request(`${API_BASE_URL}/plans/${id}`);
 
   // Update plan fields.
   const updatePlan = (id, name, data, description, profileData) =>
-    request(`${API_BASE_URL}/plans/${id}/`, {
+    request(`${API_BASE_URL}/plans/${id}`, {
       method: "PUT",
       body: JSON.stringify({ name, description, data, profileData }),
     });
 
   const deletePlan = (id) =>
-    request(`${API_BASE_URL}/plans/${id}/`, {
+    request(`${API_BASE_URL}/plans/${id}`, {
       method: "DELETE",
     });
 

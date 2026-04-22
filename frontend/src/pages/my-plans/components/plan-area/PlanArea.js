@@ -16,7 +16,7 @@ export default function PlanArea({ planData, animationTriggered, plans, setPlans
             transition={{ duration: 0.5 }}
             className="w-full h-full"
         >
-            <div className="h-full bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 shadow-sm flex flex-col">
+            <div className="h-full bg-gradient-to-br from-gray-50 to-white md:rounded-xl border border-gray-200 shadow-sm flex flex-col">
                 {/* Plan Header */}
                 <div className="p-4">
                     <PlanIdentifier

@@ -63,8 +63,8 @@ export default function MyPlans() {
 
 
     return (
-        <div className="h-screen flex">
-            <div className="flex-1 flex h-screen">
+        <div className="w-full h-full flex overflow-hidden">
+            <div className="w-full h-full flex">
                 {/* Mobile Hamburger Button */}
                 <motion.button
                     onClick={() => setIsMobilePlansOpen(!isMobilePlansOpen)}
@@ -88,31 +88,37 @@ export default function MyPlans() {
                 </motion.button>
 
                 {/* Desktop Plans Index - Hidden on mobile */}
-                <div className="hidden md:flex md:flex-[1.5] h-full pr-2">
-                    <PlansIndex
-                        plans={plans}
-                        onPlanSelect={handlePlanSelect}
-                        selectedPlanId={selectedPlanData?.id}
-                    />
+                <div className="hidden md:flex md:flex-[2] lg:max-w-sm h-full border-r border-gray-200/50">
+                    <div className="w-full h-full overflow-hidden">
+                        <PlansIndex
+                            plans={plans}
+                            onPlanSelect={handlePlanSelect}
+                            selectedPlanId={selectedPlanData?.id}
+                        />
+                    </div>
                 </div>
 
                 {/* Plan Area - Responsive width */}
-                <div className="flex-1 md:flex-[6] pl-2 md:pl-2 pr-2 pt-16 md:pt-0">
-                    <PlanArea
-                        planData={selectedPlanData}
-                        animationTriggered={animationTriggered}
-                        plans={plans}
-                        setPlans={setPlans}
-                        setSelectedPlanData={setSelectedPlanData}
-                    />
+                <div className="flex-1 md:flex-[5] h-full min-w-0">
+                    <div className="w-full h-full overflow-hidden">
+                        <PlanArea
+                            planData={selectedPlanData}
+                            animationTriggered={animationTriggered}
+                            plans={plans}
+                            setPlans={setPlans}
+                            setSelectedPlanData={setSelectedPlanData}
+                        />
+                    </div>
                 </div>
 
                 {/* Desktop Metrics Area - Hidden on mobile */}
-                <div className="hidden md:flex md:flex-[2.75] px-6 pl-2 pr-2">
-                    <MetricsArea
-                        planData={selectedPlanData}
-                        animationTriggered={animationTriggered}
-                    />
+                <div className="hidden md:flex md:flex-[3] lg:max-w-md h-full border-l border-gray-200/50">
+                    <div className="w-full h-full overflow-hidden">
+                        <MetricsArea
+                            planData={selectedPlanData}
+                            animationTriggered={animationTriggered}
+                        />
+                    </div>
                 </div>
 
                 {/* Mobile Overlay */}

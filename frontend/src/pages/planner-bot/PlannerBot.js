@@ -542,7 +542,7 @@ export default function PlannerBot() {
       </div>
 
       {/* Desktop Right side - Planner Area */}
-      <div className="hidden md:flex md:flex-[5] lg:flex-[5] flex-col h-full min-h-0 pl-4 lg:pl-8 pr-4 lg:pr-8 mx-auto">
+      <div className="hidden md:flex md:flex-[5] lg:flex-[5] flex-col h-full min-h-0 pr-4 lg:pr-8 mx-auto">
         <div className="w-full max-w-5xl mx-auto h-full flex flex-col min-h-0">
           <PlannerArea
             animationTriggered={animationTriggered}

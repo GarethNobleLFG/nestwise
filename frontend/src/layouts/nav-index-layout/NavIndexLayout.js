@@ -16,7 +16,7 @@ export default function NavIndexLayout({ activeView, children }) {
     const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
     return (
-        <div className="h-screen bg-gradient-to-br from-slate-50 to-gray-100 relative overflow-hidden">
+        <div className="h-[100dvh] bg-gradient-to-br from-slate-50 to-gray-100 relative overflow-hidden">
             {/* Background decoration */}
             <div className="absolute inset-0">
                 <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-yellow-400/20 to-amber-600/20 rounded-full blur-3xl"></div>

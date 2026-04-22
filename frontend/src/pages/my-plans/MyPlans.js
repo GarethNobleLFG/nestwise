@@ -6,6 +6,7 @@ import PlanArea from './components/plan-area/PlanArea';
 import PlansIndex from './components/PlansIndex';
 import { usePlanHooks } from '../../hooks/plans';
 import { useLocation } from 'react-router-dom';
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 
 export default function MyPlans() {
     const [animationTriggered, setAnimationTriggered] = useState(false);
@@ -65,26 +66,15 @@ export default function MyPlans() {
     return (
         <div className="w-full h-full flex overflow-hidden">
             <div className="w-full h-full flex">
-                {/* Mobile Hamburger Button */}
+                {/* Mobile Arrow Pull-out Button for Plans - Middle Right */}
                 <motion.button
                     onClick={() => setIsMobilePlansOpen(!isMobilePlansOpen)}
-                    className="md:hidden fixed top-4 right-4 flex items-center justify-center w-12 h-12 text-white transition-all duration-300 rounded-lg z-[60] border border-yellow-300 bg-gradient-to-br from-yellow-300 to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 shadow-lg"
+                    className="md:hidden fixed right-0 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-8 h-12 text-white transition-all duration-300 rounded-l-lg z-[60] border border-yellow-300 bg-gradient-to-br from-yellow-300 to-yellow-500 hover:from-yellow-400 hover:to-yellow-600 shadow-lg"
                     whileTap={{ scale: 0.95 }}
+                    animate={{ rotate: isMobilePlansOpen ? -90 : 90 }}
+                    transition={{ duration: 0.3 }}
                 >
-                    <motion.div
-                        animate={{ rotate: isMobilePlansOpen ? 180 : 0 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        {isMobilePlansOpen ? (
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        ) : (
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                        )}
-                    </motion.div>
+                    <ArrowLeftIcon className="w-6 h-6" />
                 </motion.button>
 
                 {/* Desktop Plans Index - Hidden on mobile */}
@@ -137,11 +127,11 @@ export default function MyPlans() {
 
                             {/* Mobile Panel */}
                             <motion.div
-                                initial={{ x: '-100%' }}
+                                initial={{ x: '100%' }}
                                 animate={{ x: 0 }}
-                                exit={{ x: '-100%' }}
+                                exit={{ x: '100%' }}
                                 transition={{ duration: 0.3, ease: 'easeInOut' }}
-                                className="md:hidden fixed inset-y-0 left-0 w-full max-w-sm z-50 bg-white shadow-2xl"
+                                className="md:hidden fixed inset-y-0 right-0 w-full max-w-sm z-50 bg-white shadow-2xl"
                             >
                                 <div className="h-full flex flex-col">
                                     {/* Mobile Header */}

@@ -497,7 +497,7 @@ export default function PlannerBot() {
   //const isChatActive = safeMessages.length > 1 || sending;
 
   return (
-    <div className="w-full h-full flex overflow-hidden pb-6 md:pb-0">
+    <div className="w-full h-full flex flex-col md:flex-row overflow-hidden">
       {/* Left side - takes full width on mobile, proportional on desktop */}
       <div className="flex-1 md:flex-[4] lg:flex-[3.5] xl:max-w-2xl flex flex-col h-full min-h-0 overflow-hidden">
         <div className="w-full relative flex flex-col h-full min-h-0 overflow-hidden pt-2 xs:-mt-4 sm:pt-0">
@@ -529,7 +529,7 @@ export default function PlannerBot() {
           </div>
 
           {/* Input Area */}
-          <div className="flex-shrink-0 md:mb-3"> 
+          <div className="flex-shrink-0 pb-2 md:pb-2">
             <InputArea
               input={input}
               setInput={setInput}

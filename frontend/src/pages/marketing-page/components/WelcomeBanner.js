@@ -44,11 +44,13 @@ export default function WelcomeBanner({ navigate, isLoggedIn }) {
             >
               {isLoggedIn && userName ? (
                 <div className="flex flex-col gap-2">
-                  <span className="text-gray-900">Welcome back, </span>
-                  <span className="bg-gradient-to-br from-yellow-400 to-[#c47c1eff] bg-clip-text text-transparent break-words">
-                    {userName}
-                  </span>
-                  <span className="text-gray-900">!</span>
+                  <span className="text-gray-900 text-5xl sm:text-6xl md:text-7xl lg:text-8xl">Welcome back, </span>
+                  <div>
+                    <span className="bg-gradient-to-br from-yellow-400 to-[#c47c1eff] bg-clip-text text-transparent break-words">
+                      {userName}
+                    </span>
+                    <span className="text-gray-900">!</span>
+                  </div>
                 </div>
               ) : (
                 <div className="flex flex-wrap justify-center items-baseline gap-x-3">
@@ -78,7 +80,7 @@ export default function WelcomeBanner({ navigate, isLoggedIn }) {
 
             {/* CTA Button - Combined Redundant motion.div wrappers */}
             <motion.div
-              className="flex flex-col items-center justify-center pt-32 md:pt-8 space-y-4"
+              className="flex flex-col items-center justify-center md:pt-8 space-y-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
@@ -108,7 +110,7 @@ export default function WelcomeBanner({ navigate, isLoggedIn }) {
           {/* Writing Animation Component - Only show for non-logged in users */}
           {!isLoggedIn && (
             <motion.div
-              className="w-full max-w-[80%] sm:max-w-md md:max-w-2xl mx-auto pt-24 md:pt-0"
+              className="w-full max-w-[80%] sm:max-w-md md:max-w-2xl mx-auto md:pt-0"
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.8 }}

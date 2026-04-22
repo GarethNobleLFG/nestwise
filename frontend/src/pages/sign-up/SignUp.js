@@ -95,10 +95,27 @@ export default function SignUp() {
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="!bg-white !rounded-2xl !p-8 !text-center !shadow-2xl"
+              className="!bg-white !rounded-2xl !p-8 !text-center !shadow-2xl !min-w-[280px]"
             >
-              <div className="!w-16 !h-16 !mx-auto !mb-4 !border-4 !border-t-transparent !rounded-full !animate-spin"
-                style={{ borderColor: '#FFD700 transparent transparent transparent' }}></div>
+              <motion.div
+                className="!text-5xl !font-extrabold !tracking-tight !mx-auto !mb-6 !flex !items-center !justify-center"
+                style={{
+                  fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
+                  textShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                }}
+                animate={{
+                  scale: [1, 1.15, 1],
+                  rotate: [0, 5, -5, 0],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                <span style={{ color: '#FFD700' }}>N</span>
+                <span style={{ color: '#c47c1eff' }}>W</span>
+              </motion.div>
               <h3 className="!text-xl !font-bold !text-gray-900 !mb-2">Account Created Successfully!</h3>
               <p className="!text-gray-600">Redirecting to Sign In...</p>
             </motion.div>

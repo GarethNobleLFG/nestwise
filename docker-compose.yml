@@ -26,6 +26,25 @@ services:
     networks:
       - default
 
+  # TEST SERVICE FOR USERAUTH
+  nestwise-backend-userauth-test:
+    build:
+      context: ./backend-userAuth
+      dockerfile: Dockerfile.test
+    container_name: userauth-backend-test
+    env_file:
+      - ./.env
+    environment:
+      - MONGO_URL=mongodb://mongo:27017
+      - MONGO_DB=nestwise_auth_test
+    volumes:
+      - ./backend-userAuth:/app
+    depends_on:
+      - mongo
+    command: pytest
+    networks:
+      - default
+
   # BACKEND LANGGRAPH
   nestwise-backend-langgraph:
     build: ./backend-langgraph

@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from routers.chatBot import chatRouter
 from routers.textizer import textizer_router       
 import os
-
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(title="LangGraph Backend", version="1.0.0")
 
@@ -14,6 +14,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.mount("/pdfs", StaticFiles(directory="retirement_pdfs"), name="pdfs")
 
 @app.get("/")
 async def home():

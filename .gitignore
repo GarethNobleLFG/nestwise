@@ -33,3 +33,8 @@ __pycache__/
 env/
 venv/
 .venv
+
+# vscode
+.vscode
+
+NestWise.code-workspace

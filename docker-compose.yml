@@ -120,8 +120,44 @@ services:
     restart: unless-stopped
     networks:
       - default
+  
+  # POSTGRES (New DB for .NET User.Auth)
+  postgres:
+    image: postgres:15-alpine
+    container_name: nestwise-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nestwise_user
+      POSTGRES_PASSWORD: nestwise_password
+      POSTGRES_DB: NestWiseDb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - default
 
-
+    # .NET USER AUTH SERVICE
+  nestwise-backend-userauth-dotnet:
+    build:
+      context: ./User.Auth
+      dockerfile: Dockerfile.dev
+    container_name: userauth-dotnet
+    ports:
+      - "7002:7002"
+    volumes:
+      - ./User.Auth:/app
+    environment:
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:7002
+      - ConnectionStrings__DefaultConnection=${DOTNET_POSTGRES_CONNECTION_STRING}
+      - JwtSettings__SecretKey=${JWT_SECRET_KEY}
+    command: dotnet watch --project src/User.Auth.Api/User.Auth.Api.csproj run
+    depends_on:
+      - postgres
+    networks:
+      - default
 
 networks:
   default:
@@ -129,3 +165,4 @@ networks:
 
 volumes:
   ingest_pgdata:
+  postgres_data:

@@ -20,7 +20,33 @@ namespace User.Auth.Core.Services
             _config = config;
         }
 
-        public async Task<UserAuthDto> SignUpAsync(UserAuthDto userDto, CancellationToken ct = default)
+        private string GenerateToken(Entities.User user)
+        {
+            var jwtSettings = _config.GetSection("JwtSettings");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email), // Match python "sub": db_user["email"]
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim("name", $"{user.FirstName} {user.LastName}"), // Add Python name claim compatibility
+                new Claim("user_id", user.Id.ToString()), // Support validate token id checks
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var token = new JwtSecurityToken(
+                issuer: jwtSettings["Issuer"],
+                audience: jwtSettings["Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(2),
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public async Task<UserSignUpResponseDto> SignUpAsync(UserAuthDto userDto, CancellationToken ct = default)
         {
             if (await _userRepository.GetUserByEmailAsync(userDto.Email, ct) != null)
                 throw new Exception("Email already registered");
@@ -33,38 +59,25 @@ namespace User.Auth.Core.Services
                 HashedPassword = BCrypt.Net.BCrypt.HashPassword(userDto.Password)
             };
 
-            await _userRepository.AddUserAsync(user, ct);
+            var savedUser = await _userRepository.AddUserAsync(user, ct);
 
-            return userDto;
+            return new UserSignUpResponseDto(
+                "User created successfully",
+                savedUser.Id.ToString(),
+                savedUser.Email,
+                $"{savedUser.FirstName} {savedUser.LastName}".Trim()
+            );
         }
 
         public async Task<TokenResponseDto?> SignInAsync(UserAuthDto userDto, CancellationToken ct = default)
         {
             var user = await _userRepository.GetUserByEmailAsync(userDto.Email, ct);
-            
+
             if (user == null || !BCrypt.Net.BCrypt.Verify(userDto.Password, user.HashedPassword))
                 return null;
 
-            var jwtSettings = _config.GetSection("JwtSettings");
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
-
-            var token = new JwtSecurityToken(
-                issuer: jwtSettings["Issuer"],
-                audience: jwtSettings["Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(2),
-                signingCredentials: creds
-            );
-
-            return new TokenResponseDto(new JwtSecurityTokenHandler().WriteToken(token));
+            var token = GenerateToken(user);
+            return new TokenResponseDto(token);
         }
 
         public async Task<UserProfileDto?> GetUserProfileAsync(string email, CancellationToken ct = default)
@@ -77,9 +90,13 @@ namespace User.Auth.Core.Services
             var user = await _userRepository.GetUserByEmailAsync(email, ct);
             if (user == null) return null;
 
-            if (!string.IsNullOrEmpty(updates.FirstName)) user.FirstName = updates.FirstName;
-            if (!string.IsNullOrEmpty(updates.LastName)) user.LastName = updates.LastName;
-            
+            if (!string.IsNullOrEmpty(updates.Name))
+            {
+                var parts = updates.Name.Split(' ', 2);
+                user.FirstName = parts[0];
+                user.LastName = parts.Length > 1 ? parts[1] : "";
+            }
+
             if (!string.IsNullOrEmpty(updates.Email) && updates.Email != email)
             {
                 if (await _userRepository.GetUserByEmailAsync(updates.Email, ct) != null)
@@ -92,8 +109,14 @@ namespace User.Auth.Core.Services
 
             await _userRepository.UpdateUserAsync(user, ct);
 
-            var profile = new UserProfileDto(user.Email, user.FirstName, user.LastName);
-            return new UserUpdateResponseDto("User profile updated successfully", profile);
+            var token = GenerateToken(user);
+
+            return new UserUpdateResponseDto(
+                "Profile updated successfully",
+                user.Email,
+                $"{user.FirstName} {user.LastName}".Trim(),
+                token
+            );
         }
     }
 }

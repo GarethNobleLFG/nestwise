@@ -7,29 +7,31 @@ using User.Auth.Core.Interfaces;
 namespace User.Auth.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("userauth")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IUserRepository _userRepository;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IUserRepository userRepository)
         {
             _userService = userService;
+            _userRepository = userRepository;
         }
 
         private string GetAuthenticatedEmail()
         {
-            return User.FindFirst(ClaimTypes.Email)?.Value 
+            return User.FindFirst(ClaimTypes.Email)?.Value
                 ?? throw new UnauthorizedAccessException("Invalid token claims.");
         }
 
         [HttpPost("signup")]
-        public async Task<ActionResult<UserAuthDto>> SignUp([FromBody] UserAuthDto userDto)
+        public async Task<ActionResult<UserSignUpResponseDto>> SignUp([FromBody] UserAuthDto userDto)
         {
             try
             {
                 var response = await _userService.SignUpAsync(userDto);
-                return Created("", response); // 201 Created
+                return Created("", response);
             }
             catch (Exception ex)
             {
@@ -41,13 +43,13 @@ namespace User.Auth.Api.Controllers
         public async Task<ActionResult<TokenResponseDto>> SignIn([FromBody] UserAuthDto userDto)
         {
             var token = await _userService.SignInAsync(userDto);
-            
+
             if (token == null)
             {
                 return Unauthorized(new { detail = "Invalid email or password" });
             }
 
-            return Ok(token);
+            return Ok(new { access_token = token.Token, token_type = "bearer" });
         }
 
         [Authorize]
@@ -59,7 +61,7 @@ namespace User.Auth.Api.Controllers
 
             if (profile == null) return NotFound();
 
-            return Ok(profile);
+            return Ok(new { email = profile.Email, name = $"{profile.FirstName} {profile.LastName}" });
         }
 
         [Authorize]
@@ -83,14 +85,22 @@ namespace User.Auth.Api.Controllers
 
         [Authorize]
         [HttpPost("validateToken")]
-        public async Task<ActionResult<UserProfileDto>> ValidateToken()
+        public async Task<ActionResult<ValidateTokenResponseDto>> ValidateToken()
         {
             var email = GetAuthenticatedEmail();
             var profile = await _userService.GetUserProfileAsync(email);
 
             if (profile == null) return NotFound();
 
-            return Ok(profile);
+            var userRecord = await _userRepository.GetUserByEmailAsync(email);
+            if (userRecord == null) return NotFound();
+
+            return Ok(new ValidateTokenResponseDto(
+                Valid: true,
+                Email: profile.Email,
+                Name: $"{profile.FirstName} {profile.LastName}".Trim(),
+                UserId: userRecord.Id.ToString()
+            ));
         }
     }
 }

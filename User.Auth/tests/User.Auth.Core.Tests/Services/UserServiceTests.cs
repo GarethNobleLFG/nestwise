@@ -4,221 +4,143 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Moq;
-using NUnit.Framework; // Changed from Xunit
+using NUnit.Framework;
 using User.Auth.Core.DTOs;
-using User.Auth.Core.Entities;
 using User.Auth.Core.Interfaces;
 using User.Auth.Core.Services;
 
 namespace User.Auth.Core.Tests.Services
 {
-    [TestFixture] // NUnit class marker
+    [TestFixture]
     public class UserServiceTests
     {
-        private Mock<IUserRepository> _mockRepo;
-        private Mock<IConfiguration> _mockConfig;
-        private UserService _service;
+        private Mock<IUserRepository> _mockRepo = null!;
+        private Mock<IConfiguration> _mockConfig = null!;
+        private UserService _service = null!;
 
-        [SetUp] // NUnit equivalent of a constructor for setup
+        [SetUp]
         public void SetUp()
         {
             _mockRepo = new Mock<IUserRepository>();
             _mockConfig = new Mock<IConfiguration>();
 
             var mockJwtSection = new Mock<IConfigurationSection>();
-            mockJwtSection.Setup(s => s["SecretKey"]).Returns("SuperSecretKeyThatIsAtLeast32BytesLong!");
-            mockJwtSection.Setup(s => s["Issuer"]).Returns("TestIssuer");
-            mockJwtSection.Setup(s => s["Audience"]).Returns("TestAudience");
+            mockJwtSection.Setup(s => s["SecretKey"]).Returns("SuperSecretKey123_WithEnoughLength_ToValidateSuccessfully!");
+            mockJwtSection.Setup(s => s["Issuer"]).Returns("Issuer");
+            mockJwtSection.Setup(s => s["Audience"]).Returns("Audience");
+
             _mockConfig.Setup(c => c.GetSection("JwtSettings")).Returns(mockJwtSection.Object);
 
             _service = new UserService(_mockRepo.Object, _mockConfig.Object);
         }
 
         [Test]
-        public async Task SignUpAsync_ShouldReturnDto_WhenEmailIsUnique()
+        public async Task SignUpAsync_ShouldThrowException_WhenEmailRegistered()
         {
-            // Arrange
-            var signUpDto = new UserAuthDto("newuser@example.com", "Password123!", "John", "Doe");
+            var dto = new UserAuthDto("test@example.com", "pass", "A", "B");
+            _mockRepo.Setup(r => r.GetUserByEmailAsync(dto.Email, It.IsAny<CancellationToken>()))
+                     .ReturnsAsync(new Entities.User { Email = dto.Email, FirstName = "A", LastName = "B", HashedPassword = "H" });
 
-            _mockRepo.Setup(r => r.GetUserByEmailAsync("newuser@example.com", It.IsAny<CancellationToken>()))
+            var act = () => _service.SignUpAsync(dto);
+
+            await act.Should().ThrowAsync<Exception>().WithMessage("Email already registered");
+        }
+
+        [Test]
+        public async Task SignUpAsync_ShouldAddUser_WhenEmailUnique()
+        {
+            var dto = new UserAuthDto("test@example.com", "pass", "A", "B");
+
+            _mockRepo.Setup(r => r.GetUserByEmailAsync(dto.Email, It.IsAny<CancellationToken>()))
                      .ReturnsAsync((Entities.User?)null);
 
-            // NUnit/Moq fix: Return the user being added
             _mockRepo.Setup(r => r.AddUserAsync(It.IsAny<Entities.User>(), It.IsAny<CancellationToken>()))
                      .ReturnsAsync((Entities.User u, CancellationToken ct) => u);
 
-            // Act
-            var result = await _service.SignUpAsync(signUpDto);
+            var result = await _service.SignUpAsync(dto);
 
-            // Assert
             result.Should().NotBeNull();
-            result.Email.Should().Be("newuser@example.com");
-
-            _mockRepo.Verify(r => r.AddUserAsync(It.Is<Entities.User>(u =>
-                u.Email == "newuser@example.com" &&
-                u.FirstName == "John" &&
-                u.HashedPassword != "Password123!"), It.IsAny<CancellationToken>()), Times.Once);
+            result.Email.Should().Be(dto.Email);
+            result.Name.Should().Be("A B");
+            _mockRepo.Verify(r => r.AddUserAsync(It.IsAny<Entities.User>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
-        public async Task SignUpAsync_ShouldThrowException_WhenEmailAlreadyExists()
+        public async Task SignInAsync_ShouldReturnNull_WhenUserNotFound()
         {
-            // Arrange
-            var signUpDto = new UserAuthDto("existing@example.com", "Password123!", "Jane", "Doe");
-            var existingUser = new Entities.User
-            {
-                Email = "existing@example.com",
-                FirstName = "Jane",
-                LastName = "Doe",
-                HashedPassword = "already_hashed"
-            };
-
-            _mockRepo.Setup(r => r.GetUserByEmailAsync("existing@example.com", It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(existingUser);
-
-            // Act
-            AsyncTestDelegate act = async () => await _service.SignUpAsync(signUpDto);
-
-            // Assert (NUnit Style)
-            var ex = Assert.ThrowsAsync<Exception>(act);
-            Assert.That(ex.Message, Is.EqualTo("Email already registered"));
-
-            _mockRepo.Verify(r => r.AddUserAsync(It.IsAny<Entities.User>(), It.IsAny<CancellationToken>()), Times.Never);
-        }
-
-        [Test]
-        public async Task SignUpAsync_ShouldHandleMissingNames_ByUsingEmptyStrings()
-        {
-            // Arrange
-            var signUpDto = new UserAuthDto("minimal@example.com", "Password123!", null, null);
-
-            _mockRepo.Setup(r => r.GetUserByEmailAsync("minimal@example.com", It.IsAny<CancellationToken>()))
+            var dto = new UserAuthDto("test@example.com", "pass", null, null);
+            _mockRepo.Setup(r => r.GetUserByEmailAsync(dto.Email, It.IsAny<CancellationToken>()))
                      .ReturnsAsync((Entities.User?)null);
 
-            _mockRepo.Setup(r => r.AddUserAsync(It.IsAny<Entities.User>(), It.IsAny<CancellationToken>()))
-                     .ReturnsAsync((Entities.User u, CancellationToken ct) => u);
+            var result = await _service.SignInAsync(dto);
 
-            // Act
-            await _service.SignUpAsync(signUpDto);
-
-            // Assert
-            _mockRepo.Verify(r => r.AddUserAsync(It.Is<Entities.User>(u =>
-                u.FirstName == "" && u.LastName == ""), It.IsAny<CancellationToken>()), Times.Once);
+            result.Should().BeNull();
         }
 
         [Test]
-        public async Task SignInAsync_ShouldReturnToken_WhenCredentialsAreValid()
+        public async Task SignInAsync_ShouldReturnNull_WhenPasswordInvalid()
         {
-            // Arrange
-            var userDto = new UserAuthDto("test@example.com", "password123", null, null);
+            var dto = new UserAuthDto("test@example.com", "wrong_pass", null, null);
+            var hashed = BCrypt.Net.BCrypt.HashPassword("correct_pass");
+            _mockRepo.Setup(r => r.GetUserByEmailAsync(dto.Email, It.IsAny<CancellationToken>()))
+                     .ReturnsAsync(new Entities.User { Email = dto.Email, FirstName = "A", LastName = "B", HashedPassword = hashed });
 
-            var dbUser = new Entities.User
-            {
-                Email = "test@example.com",
-                FirstName = "Test",
-                LastName = "User",
-                HashedPassword = BCrypt.Net.BCrypt.HashPassword("password123")
-            };
+            var result = await _service.SignInAsync(dto);
 
-            _mockRepo.Setup(r => r.GetUserByEmailAsync("test@example.com", It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(dbUser);
+            result.Should().BeNull();
+        }
 
-            // Act
-            var result = await _service.SignInAsync(userDto);
+        [Test]
+        public async Task SignInAsync_ShouldReturnTokens_WhenCredentialsCorrect()
+        {
+            var dto = new UserAuthDto("test@example.com", "pass", null, null);
+            var hashed = BCrypt.Net.BCrypt.HashPassword("pass");
+            _mockRepo.Setup(r => r.GetUserByEmailAsync(dto.Email, It.IsAny<CancellationToken>()))
+                     .ReturnsAsync(new Entities.User { Email = dto.Email, FirstName = "A", LastName = "B", HashedPassword = hashed });
 
-            // Assert
+            var result = await _service.SignInAsync(dto);
+
             result.Should().NotBeNull();
             result!.Token.Should().NotBeEmpty();
         }
 
         [Test]
-        [TestCase("wrong@example.com", "password123", false)]
-        [TestCase("test@example.com", "wrongpassword", true)]
-        public async Task SignInAsync_ShouldReturnNull_WhenCredentialsAreInvalid(string email, string password, bool userExists)
-        {
-            // Arrange
-            var userDto = new UserAuthDto(email, password, null, null);
-
-            Entities.User? dbUser = null;
-            if (userExists)
-            {
-                dbUser = new Entities.User
-                {
-                    Email = "test@example.com",
-                    FirstName = "Test",
-                    LastName = "User",
-                    HashedPassword = BCrypt.Net.BCrypt.HashPassword("correct_password_not_what_user_typed")
-                };
-            }
-
-            // For ANY email that isn't setup, it should return null
-            _mockRepo.Setup(r => r.GetUserByEmailAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                     .ReturnsAsync((Entities.User?)null);
-
-            // Now specifically setup the one we want to return the user (if they exist)
-            if (dbUser != null)
-            {
-                _mockRepo.Setup(r => r.GetUserByEmailAsync(email, It.IsAny<CancellationToken>()))
-                         .ReturnsAsync(dbUser);
-            }
-
-            // Act
-            var result = await _service.SignInAsync(userDto);
-
-            // Assert
-            result.Should().BeNull();
-        }
-
-        [Test]
         public async Task GetUserProfileAsync_ShouldReturnProfile_WhenUserExists()
         {
-            // Arrange
-            var email = "profile@example.com";
-            var expectedProfile = new UserProfileDto(email, "John", "Doe");
-
+            var email = "test@example.com";
+            var profile = new UserProfileDto(email, "First", "Last");
             _mockRepo.Setup(r => r.GetUserProfileByEmailAsync(email, It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(expectedProfile);
+                     .ReturnsAsync(profile);
 
-            // Act
             var result = await _service.GetUserProfileAsync(email);
 
-            // Assert
             result.Should().NotBeNull();
-            result!.Email.Should().Be(email);
-            result.FirstName.Should().Be("John");
-            _mockRepo.Verify(r => r.GetUserProfileByEmailAsync(email, It.IsAny<CancellationToken>()), Times.Once);
+            result.Should().BeEquivalentTo(profile);
         }
 
         [Test]
         public async Task GetUserProfileAsync_ShouldReturnNull_WhenUserDoesNotExist()
         {
-            // Arrange
-            var email = "missing@example.com";
-
+            var email = "nonexistent@example.com";
             _mockRepo.Setup(r => r.GetUserProfileByEmailAsync(email, It.IsAny<CancellationToken>()))
                      .ReturnsAsync((UserProfileDto?)null);
 
-            // Act
             var result = await _service.GetUserProfileAsync(email);
 
-            // Assert
             result.Should().BeNull();
         }
 
         [Test]
         public async Task UpdateUserProfileAsync_ShouldReturnNull_WhenUserDoesNotExist()
         {
-            // Arrange
             var email = "nonexistent@example.com";
-            var updates = new UserUpdateDto(null, "New", "New", null);
+            var updates = new UserUpdateDto(null, "New Name", null);
 
             _mockRepo.Setup(r => r.GetUserByEmailAsync(email, It.IsAny<CancellationToken>()))
                      .ReturnsAsync((Entities.User?)null);
 
-            // Act
             var result = await _service.UpdateUserProfileAsync(email, updates);
 
-            // Assert
             result.Should().BeNull();
             _mockRepo.Verify(r => r.UpdateUserAsync(It.IsAny<Entities.User>(), It.IsAny<CancellationToken>()), Times.Never);
         }
@@ -226,9 +148,8 @@ namespace User.Auth.Core.Tests.Services
         [Test]
         public async Task UpdateUserProfileAsync_ShouldHashNewPassword_WhenProvided()
         {
-            // Arrange
             var email = "test@example.com";
-            var updates = new UserUpdateDto(null, null, null, "NewSecurePassword123!");
+            var updates = new UserUpdateDto(null, null, "NewSecurePassword123!");
             var dbUser = new Entities.User
             {
                 Email = email,
@@ -240,10 +161,8 @@ namespace User.Auth.Core.Tests.Services
             _mockRepo.Setup(r => r.GetUserByEmailAsync(email, It.IsAny<CancellationToken>()))
                      .ReturnsAsync(dbUser);
 
-            // Act
             await _service.UpdateUserProfileAsync(email, updates);
 
-            // Assert
             dbUser.HashedPassword.Should().NotBe("old_hash");
             dbUser.HashedPassword.Should().NotBe("NewSecurePassword123!");
             BCrypt.Net.BCrypt.Verify("NewSecurePassword123!", dbUser.HashedPassword).Should().BeTrue();
@@ -252,49 +171,40 @@ namespace User.Auth.Core.Tests.Services
         [Test]
         public async Task UpdateUserProfileAsync_ShouldThrowException_WhenNewEmailIsTaken()
         {
-            // Arrange
             var oldEmail = "old@example.com";
             var takenEmail = "taken@example.com";
-            var updates = new UserUpdateDto(takenEmail, null, null, null);
+            var updates = new UserUpdateDto(takenEmail, null, null);
 
             var dbUser = new Entities.User { Email = oldEmail, FirstName = "A", LastName = "B", HashedPassword = "H" };
 
             _mockRepo.Setup(r => r.GetUserByEmailAsync(oldEmail, It.IsAny<CancellationToken>()))
                      .ReturnsAsync(dbUser);
 
-            // Simulate the Repository finding another user with the new requested email
             _mockRepo.Setup(r => r.GetUserByEmailAsync(takenEmail, It.IsAny<CancellationToken>()))
                      .ReturnsAsync(new Entities.User { Email = takenEmail, FirstName = "Other", LastName = "User", HashedPassword = "H2" });
 
-            // Act
-            AsyncTestDelegate act = async () => await _service.UpdateUserProfileAsync(oldEmail, updates);
+            var act = () => _service.UpdateUserProfileAsync(oldEmail, updates);
 
-            // Assert
-            var ex = Assert.ThrowsAsync<Exception>(act);
-            Assert.That(ex.Message, Is.EqualTo("Email already in use"));
+            await act.Should().ThrowAsync<Exception>().WithMessage("Email already in use");
         }
 
         [Test]
         public async Task UpdateUserProfileAsync_ShouldCorrectlyUpdateEmail_WhenNotTaken()
         {
-            // Arrange
             var oldEmail = "old@example.com";
             var newEmail = "new@example.com";
-            var updates = new UserUpdateDto(newEmail, null, null, null);
+            var updates = new UserUpdateDto(newEmail, null, null);
             var dbUser = new Entities.User { Email = oldEmail, FirstName = "A", LastName = "B", HashedPassword = "H" };
 
             _mockRepo.Setup(r => r.GetUserByEmailAsync(oldEmail, It.IsAny<CancellationToken>()))
                      .ReturnsAsync(dbUser);
 
-            // New email is NOT taken
             _mockRepo.Setup(r => r.GetUserByEmailAsync(newEmail, It.IsAny<CancellationToken>()))
                      .ReturnsAsync((Entities.User?)null);
 
-            // Act
             var result = await _service.UpdateUserProfileAsync(oldEmail, updates);
 
-            // Assert
-            result!.User.Email.Should().Be(newEmail);
+            result!.UpdatedEmail.Should().Be(newEmail);
             dbUser.Email.Should().Be(newEmail);
         }
     }

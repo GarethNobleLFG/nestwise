@@ -13,7 +13,7 @@ using User.Auth.Infrastructure.Data;
 namespace User.Auth.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260601001447_InitialCreate")]
+    [Migration("20260601004909_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -74,12 +74,10 @@ namespace User.Auth.Infrastructure.Migrations
 
             modelBuilder.Entity("User.Auth.Core.Entities.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
                         .IsRequired()

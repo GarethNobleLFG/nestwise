@@ -138,6 +138,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:7001
+      - DOTNET_USE_POLLING_FILE_WATCHER=true
+      - DOTNET_WATCH_SUPPRESS_LAUNCH_BROWSER=true
     command: dotnet watch --project src/User.Auth.Api/User.Auth.Api.csproj run
     depends_on:
       - postgres

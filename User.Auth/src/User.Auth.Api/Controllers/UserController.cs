@@ -61,7 +61,7 @@ namespace User.Auth.Api.Controllers
 
             if (profile == null) return NotFound();
 
-            return Ok(new { email = profile.Email, name = $"{profile.FirstName} {profile.LastName}" });
+            return Ok(new { email = profile.Email, name = profile.Name });
         }
 
         [Authorize]
@@ -98,7 +98,7 @@ namespace User.Auth.Api.Controllers
             return Ok(new ValidateTokenResponseDto(
                 Valid: true,
                 Email: profile.Email,
-                Name: $"{profile.FirstName} {profile.LastName}".Trim(),
+                Name: profile.Name.Trim(),
                 UserId: userRecord.Id.ToString()
             ));
         }

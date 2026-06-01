@@ -2,11 +2,11 @@ using System.Text.Json.Serialization;
 
 namespace User.Auth.Core.DTOs
 {
-    public record UserAuthDto(string Email, string Password, string? FirstName, string? LastName);
+    public record UserAuthDto(string Email, string Password, string? Name = null);
 
     public record TokenResponseDto(string Token, string TokenType = "Bearer");
 
-    public record UserProfileDto(string Email, string FirstName, string LastName);
+    public record UserProfileDto(string Email, string Name);
 
     public record UserSignUpResponseDto(
         string Message,

@@ -37,9 +37,9 @@ namespace User.Auth.Core.Tests.Services
         [Test]
         public async Task SignUpAsync_ShouldThrowException_WhenEmailRegistered()
         {
-            var dto = new UserAuthDto("test@example.com", "pass", "A", "B");
+            var dto = new UserAuthDto("test@example.com", "pass", "A B");
             _mockRepo.Setup(r => r.GetUserByEmailAsync(dto.Email, It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(new Entities.User { Email = dto.Email, FirstName = "A", LastName = "B", HashedPassword = "H" });
+                     .ReturnsAsync(new Entities.User { Email = dto.Email, Name = "A B", HashedPassword = "H" });
 
             var act = () => _service.SignUpAsync(dto);
 
@@ -49,7 +49,7 @@ namespace User.Auth.Core.Tests.Services
         [Test]
         public async Task SignUpAsync_ShouldAddUser_WhenEmailUnique()
         {
-            var dto = new UserAuthDto("test@example.com", "pass", "A", "B");
+            var dto = new UserAuthDto("test@example.com", "pass", "A B");
 
             _mockRepo.Setup(r => r.GetUserByEmailAsync(dto.Email, It.IsAny<CancellationToken>()))
                      .ReturnsAsync((Entities.User?)null);
@@ -68,7 +68,7 @@ namespace User.Auth.Core.Tests.Services
         [Test]
         public async Task SignInAsync_ShouldReturnNull_WhenUserNotFound()
         {
-            var dto = new UserAuthDto("test@example.com", "pass", null, null);
+            var dto = new UserAuthDto("test@example.com", "pass", null);
             _mockRepo.Setup(r => r.GetUserByEmailAsync(dto.Email, It.IsAny<CancellationToken>()))
                      .ReturnsAsync((Entities.User?)null);
 
@@ -80,10 +80,10 @@ namespace User.Auth.Core.Tests.Services
         [Test]
         public async Task SignInAsync_ShouldReturnNull_WhenPasswordInvalid()
         {
-            var dto = new UserAuthDto("test@example.com", "wrong_pass", null, null);
+            var dto = new UserAuthDto("test@example.com", "wrong_pass", null);
             var hashed = BCrypt.Net.BCrypt.HashPassword("correct_pass");
             _mockRepo.Setup(r => r.GetUserByEmailAsync(dto.Email, It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(new Entities.User { Email = dto.Email, FirstName = "A", LastName = "B", HashedPassword = hashed });
+                     .ReturnsAsync(new Entities.User { Email = dto.Email, Name = "A B", HashedPassword = hashed });
 
             var result = await _service.SignInAsync(dto);
 
@@ -93,10 +93,10 @@ namespace User.Auth.Core.Tests.Services
         [Test]
         public async Task SignInAsync_ShouldReturnTokens_WhenCredentialsCorrect()
         {
-            var dto = new UserAuthDto("test@example.com", "pass", null, null);
+            var dto = new UserAuthDto("test@example.com", "pass", null);
             var hashed = BCrypt.Net.BCrypt.HashPassword("pass");
             _mockRepo.Setup(r => r.GetUserByEmailAsync(dto.Email, It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(new Entities.User { Email = dto.Email, FirstName = "A", LastName = "B", HashedPassword = hashed });
+                     .ReturnsAsync(new Entities.User { Email = dto.Email, Name = "A B", HashedPassword = hashed });
 
             var result = await _service.SignInAsync(dto);
 
@@ -108,7 +108,7 @@ namespace User.Auth.Core.Tests.Services
         public async Task GetUserProfileAsync_ShouldReturnProfile_WhenUserExists()
         {
             var email = "test@example.com";
-            var profile = new UserProfileDto(email, "First", "Last");
+            var profile = new UserProfileDto(email, "First Last");
             _mockRepo.Setup(r => r.GetUserProfileByEmailAsync(email, It.IsAny<CancellationToken>()))
                      .ReturnsAsync(profile);
 
@@ -153,8 +153,7 @@ namespace User.Auth.Core.Tests.Services
             var dbUser = new Entities.User
             {
                 Email = email,
-                FirstName = "A",
-                LastName = "B",
+                Name = "A B",
                 HashedPassword = "old_hash"
             };
 
@@ -175,13 +174,13 @@ namespace User.Auth.Core.Tests.Services
             var takenEmail = "taken@example.com";
             var updates = new UserUpdateDto(takenEmail, null, null);
 
-            var dbUser = new Entities.User { Email = oldEmail, FirstName = "A", LastName = "B", HashedPassword = "H" };
+            var dbUser = new Entities.User { Email = oldEmail, Name = "A B", HashedPassword = "H" };
 
             _mockRepo.Setup(r => r.GetUserByEmailAsync(oldEmail, It.IsAny<CancellationToken>()))
                      .ReturnsAsync(dbUser);
 
             _mockRepo.Setup(r => r.GetUserByEmailAsync(takenEmail, It.IsAny<CancellationToken>()))
-                     .ReturnsAsync(new Entities.User { Email = takenEmail, FirstName = "Other", LastName = "User", HashedPassword = "H2" });
+                     .ReturnsAsync(new Entities.User { Email = takenEmail, Name = "Other User", HashedPassword = "H2" });
 
             var act = () => _service.UpdateUserProfileAsync(oldEmail, updates);
 
@@ -194,7 +193,7 @@ namespace User.Auth.Core.Tests.Services
             var oldEmail = "old@example.com";
             var newEmail = "new@example.com";
             var updates = new UserUpdateDto(newEmail, null, null);
-            var dbUser = new Entities.User { Email = oldEmail, FirstName = "A", LastName = "B", HashedPassword = "H" };
+            var dbUser = new Entities.User { Email = oldEmail, Name = "A B", HashedPassword = "H" };
 
             _mockRepo.Setup(r => r.GetUserByEmailAsync(oldEmail, It.IsAny<CancellationToken>()))
                      .ReturnsAsync(dbUser);

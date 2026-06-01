@@ -102,24 +102,24 @@ services:
   #   restart: unless-stopped
 
   # USER AUTH SERVICE
-  nestwise-backend-userauth:
-    build: ./backend-userAuth
-    container_name: userauth-backend
-    ports:
-      - "7001:7001"
-    env_file:
-      - ./.env
-    environment:
-      - MONGO_URL=mongodb://mongo:27017
-      - MONGO_DB=nestwise_auth
-    volumes:
-      - ./backend-userAuth:/app
-    command: uvicorn app:app --host 0.0.0.0 --port 7001 --reload
-    depends_on:
-      - mongo
-    restart: unless-stopped
-    networks:
-      - default
+  # nestwise-backend-userauth:
+  #   build: ./backend-userAuth
+  #   container_name: userauth-backend
+  #   ports:
+  #     - "7001:7001"
+  #   env_file:
+  #     - ./.env
+  #   environment:
+  #     - MONGO_URL=mongodb://mongo:27017
+  #     - MONGO_DB=nestwise_auth
+  #   volumes:
+  #     - ./backend-userAuth:/app
+  #   command: uvicorn app:app --host 0.0.0.0 --port 7001 --reload
+  #   depends_on:
+  #     - mongo
+  #   restart: unless-stopped
+  #   networks:
+  #     - default
   
   # POSTGRES (New DB for .NET User.Auth)
   postgres:
@@ -144,15 +144,20 @@ services:
       dockerfile: Dockerfile.dev
     container_name: userauth-dotnet
     ports:
-      - "7002:7002"
+      - "7001:7001"
     volumes:
       - ./User.Auth:/app
+      - /app/src/User.Auth.Api/bin
+      - /app/src/User.Auth.Api/obj
+      - /app/src/User.Auth.Core/bin
+      - /app/src/User.Auth.Core/obj
+      - /app/src/User.Auth.Infrastructure/bin
+      - /app/src/User.Auth.Infrastructure/obj
+    env_file:
+      - .env
     environment:
-      - DOTNET_USE_POLLING_FILE_WATCHER=1
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:7002
-      - ConnectionStrings__DefaultConnection=${DOTNET_POSTGRES_CONNECTION_STRING}
-      - JwtSettings__SecretKey=${JWT_SECRET_KEY}
+      - ASPNETCORE_URLS=http://+:7001
     command: dotnet watch --project src/User.Auth.Api/User.Auth.Api.csproj run
     depends_on:
       - postgres

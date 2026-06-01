@@ -43,10 +43,9 @@ namespace User.Auth.Api.Tests.Endpoints
         public async Task SignUp_ShouldReturnCreated_WhenSuccessful()
         {
             // Arrange
-            var req = new UserAuthDto(_testEmail, "password123", "First", "Last");
+            var req = new UserAuthDto(_testEmail, "password123", "First Last");
             var expectedResponse = new UserSignUpResponseDto("User created successfully", Guid.NewGuid().ToString(), _testEmail, "First Last");
 
-            // Fix mock return signature
             _mockService.Setup(s => s.SignUpAsync(req, It.IsAny<CancellationToken>()))
                         .ReturnsAsync(expectedResponse);
 
@@ -63,7 +62,7 @@ namespace User.Auth.Api.Tests.Endpoints
         [Test]
         public async Task SignUp_ShouldReturnBadRequest_WhenEmailAlreadyExists()
         {
-            var req = new UserAuthDto(_testEmail, "password123", "First", "Last");
+            var req = new UserAuthDto(_testEmail, "password123", "First Last");
             _mockService.Setup(s => s.SignUpAsync(req, It.IsAny<CancellationToken>()))
                         .ThrowsAsync(new Exception("Email already registered"));
 
@@ -77,7 +76,7 @@ namespace User.Auth.Api.Tests.Endpoints
         [Test]
         public async Task SignIn_ShouldReturnOk_WithToken_WhenCredentialsValid()
         {
-            var req = new UserAuthDto(_testEmail, "password123", null, null);
+            var req = new UserAuthDto(_testEmail, "password123", null);
             var expectedToken = new TokenResponseDto("mock-jwt-token");
 
             _mockService.Setup(s => s.SignInAsync(req, It.IsAny<CancellationToken>()))
@@ -92,7 +91,7 @@ namespace User.Auth.Api.Tests.Endpoints
         [Test]
         public async Task SignIn_ShouldReturnUnauthorized_WhenCredentialsInvalid()
         {
-            var req = new UserAuthDto(_testEmail, "wrong-password", null, null);
+            var req = new UserAuthDto(_testEmail, "wrong-password", null);
             _mockService.Setup(s => s.SignInAsync(req, It.IsAny<CancellationToken>()))
                         .ReturnsAsync((TokenResponseDto?)null);
 
@@ -106,7 +105,7 @@ namespace User.Auth.Api.Tests.Endpoints
         [Test]
         public async Task ReadUsersMe_ShouldReturnOk_WithProfile_WhenUserFound()
         {
-            var profile = new UserProfileDto(_testEmail, "First", "Last");
+            var profile = new UserProfileDto(_testEmail, "First Last");
             _mockService.Setup(s => s.GetUserProfileAsync(_testEmail, It.IsAny<CancellationToken>()))
                         .ReturnsAsync(profile);
 
@@ -160,12 +159,11 @@ namespace User.Auth.Api.Tests.Endpoints
         [Test]
         public async Task ValidateToken_ShouldReturnProfile_WhenValid()
         {
-            var profile = new UserProfileDto(_testEmail, "Jane", "Doe");
+            var profile = new UserProfileDto(_testEmail, "Jane Doe");
             var dbUser = new Core.Entities.User
             {
                 Email = _testEmail,
-                FirstName = "Jane",
-                LastName = "Doe",
+                Name = "Jane Doe",
                 HashedPassword = "mock"
             };
 

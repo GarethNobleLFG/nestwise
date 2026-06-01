@@ -27,8 +27,7 @@ namespace User.Auth.Infrastructure.Repositories
                 .Where(u => u.Email == email)
                 .Select(u => new UserProfileDto( 
                     u.Email,
-                    u.FirstName,
-                    u.LastName
+                    u.Name
                 ))
                 .FirstOrDefaultAsync(ct);
         }

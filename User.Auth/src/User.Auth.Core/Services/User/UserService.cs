@@ -23,21 +23,25 @@ namespace User.Auth.Core.Services
         private string GenerateToken(Entities.User user)
         {
             var jwtSettings = _config.GetSection("JwtSettings");
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!));
+
+            // Core fallback check to match docker/global .env keys
+            var secretKey = Environment.GetEnvironmentVariable("AUTH_JWT_SECRET")
+                            ?? jwtSettings["SecretKey"]
+                            ?? throw new InvalidOperationException("JWT Secret Key is missing.");
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email), // Match python "sub": db_user["email"]
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim("name", $"{user.FirstName} {user.LastName}"), // Add Python name claim compatibility
-                new Claim("user_id", user.Id.ToString()), // Support validate token id checks
+                new Claim("name", user.Name),
+                new Claim("user_id", user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
             var token = new JwtSecurityToken(
-                issuer: jwtSettings["Issuer"],
-                audience: jwtSettings["Audience"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddHours(2),
                 signingCredentials: creds
@@ -54,8 +58,7 @@ namespace User.Auth.Core.Services
             var user = new Entities.User
             {
                 Email = userDto.Email,
-                FirstName = userDto.FirstName ?? "",
-                LastName = userDto.LastName ?? "",
+                Name = userDto.Name ?? "NestWise User",
                 HashedPassword = BCrypt.Net.BCrypt.HashPassword(userDto.Password)
             };
 
@@ -65,7 +68,7 @@ namespace User.Auth.Core.Services
                 "User created successfully",
                 savedUser.Id.ToString(),
                 savedUser.Email,
-                $"{savedUser.FirstName} {savedUser.LastName}".Trim()
+                savedUser.Name
             );
         }
 
@@ -92,9 +95,7 @@ namespace User.Auth.Core.Services
 
             if (!string.IsNullOrEmpty(updates.Name))
             {
-                var parts = updates.Name.Split(' ', 2);
-                user.FirstName = parts[0];
-                user.LastName = parts.Length > 1 ? parts[1] : "";
+                user.Name = updates.Name;
             }
 
             if (!string.IsNullOrEmpty(updates.Email) && updates.Email != email)
@@ -114,7 +115,7 @@ namespace User.Auth.Core.Services
             return new UserUpdateResponseDto(
                 "Profile updated successfully",
                 user.Email,
-                $"{user.FirstName} {user.LastName}".Trim(),
+                user.Name,
                 token
             );
         }

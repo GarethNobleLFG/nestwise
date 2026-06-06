@@ -40,26 +40,6 @@ services:
     volumes:
       - ./backend-langgraph:/app
     command: uvicorn app:app --host 0.0.0.0 --port 8000 --reload
-    depends_on:
-      - mongo
-    networks:
-      - default
-
-  # MONGO (Existing DB)
-  mongo:
-    image: mongo:6.0
-    container_name: nestwise-mongo
-    restart: unless-stopped
-    command: ["mongod", "--config", "/etc/mongod.conf"]
-    volumes:
-      - ./mongo/mongod.conf:/etc/mongod.conf:ro
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    ports:
-      - "27017:27017"
     networks:
       - default
 
@@ -100,28 +80,51 @@ services:
   #   ports:
   #     - "6380:6379"
   #   restart: unless-stopped
-
-  # USER AUTH SERVICE
-  nestwise-backend-userauth:
-    build: ./backend-userAuth
-    container_name: userauth-backend
-    ports:
-      - "7001:7001"
-    env_file:
-      - ./.env
-    environment:
-      - MONGO_URL=mongodb://mongo:27017
-      - MONGO_DB=nestwise_auth
-    volumes:
-      - ./backend-userAuth:/app
-    command: uvicorn app:app --host 0.0.0.0 --port 7001 --reload
-    depends_on:
-      - mongo
+  
+  # POSTGRES (New DB for .NET User.Auth)
+  postgres:
+    image: postgres:15-alpine
+    container_name: nestwise-postgres
     restart: unless-stopped
+    environment:
+      POSTGRES_USER: nestwise_user
+      POSTGRES_PASSWORD: nestwise_password
+      POSTGRES_DB: NestWiseDb
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - default
 
-
+    # .NET USER AUTH SERVICE
+  nestwise-backend-userauth-dotnet:
+    build:
+      context: ./User.Auth
+      dockerfile: Dockerfile.dev
+    container_name: userauth-dotnet
+    ports:
+      - "7001:7001"
+    volumes:
+      - ./User.Auth:/app
+      - /app/src/User.Auth.Api/bin
+      - /app/src/User.Auth.Api/obj
+      - /app/src/User.Auth.Core/bin
+      - /app/src/User.Auth.Core/obj
+      - /app/src/User.Auth.Infrastructure/bin
+      - /app/src/User.Auth.Infrastructure/obj
+    env_file:
+      - .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:7001
+      - DOTNET_USE_POLLING_FILE_WATCHER=true
+      - DOTNET_WATCH_SUPPRESS_LAUNCH_BROWSER=true
+    command: dotnet watch --project src/User.Auth.Api/User.Auth.Api.csproj run
+    depends_on:
+      - postgres
+    networks:
+      - default
 
 networks:
   default:
@@ -129,3 +132,4 @@ networks:
 
 volumes:
   ingest_pgdata:
+  postgres_data:
